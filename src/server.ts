@@ -31,6 +31,7 @@ import { createMqttPlugin } from "./plugins/mqtt-plugin.js";
 import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
+import { createSshPlugin } from "./plugins/ssh-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
 import { utilitiesPlugin } from "./plugins/utilities-plugin.js";
 import { createYoutubePlugin } from "./plugins/youtube-plugin.js";
@@ -71,6 +72,7 @@ export async function createServer(ai: AiProvider) {
   const weatherPlugin = createWeatherPlugin();
   const youtubePlugin = createYoutubePlugin();
   const spotifyPlugin = createSpotifyPlugin();
+  const sshPlugin = createSshPlugin();
   const builtInPlugins = [
     systemPlugin,
     assistantPlugin,
@@ -88,7 +90,8 @@ export async function createServer(ai: AiProvider) {
     weatherPlugin,
     youtubePlugin,
     utilitiesPlugin,
-    spotifyPlugin
+    spotifyPlugin,
+    sshPlugin
   ];
 
   for (const plugin of builtInPlugins) {
