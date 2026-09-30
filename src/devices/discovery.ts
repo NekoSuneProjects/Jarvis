@@ -9,7 +9,7 @@ export interface SsdpDevice {
 }
 
 export class DiscoveryService {
-  private readonly bonjour=new Bonjour(undefined,(error)=>{
+  private readonly bonjour=new Bonjour(undefined,(error:Error)=>{
     console.warn("mDNS error:",error.message);
   });
   private published?:ReturnType<Bonjour["publish"]>;
@@ -32,7 +32,7 @@ export class DiscoveryService {
     const services=new Map<string,Service>();
     const duration=Math.max(500,Math.min(options.durationMs ?? 3000,15000));
     const browser=this.bonjour.find(
-      options.type?{type:options.type}:{},
+      {type:options.type ?? "http"},
       (service)=>{
         services.set(service.fqdn ?? `${service.name}:${service.port}`,service);
       }
