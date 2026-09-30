@@ -1,3 +1,4 @@
+import type { AiToolDefinition } from "../ai/types.js";
 import type { JarvisTool } from "../plugins/plugin-registry.js";
 import { PermissionManager } from "../permissions/permission-manager.js";
 
@@ -20,11 +21,25 @@ export class ToolRouter {
     }
   }
 
-  list(): Array<Pick<JarvisTool, "name" | "description" | "capability">> {
-    return [...this.tools.values()].map(({ name, description, capability }) => ({
-      name,
-      description,
-      capability
+  list(): Array<Pick<JarvisTool, "name" | "description" | "capability" | "parameters">> {
+    return [...this.tools.values()].map(
+      ({ name, description, capability, parameters }) => ({
+        name,
+        description,
+        capability,
+        parameters
+      })
+    );
+  }
+
+  aiDefinitions(): AiToolDefinition[] {
+    return [...this.tools.values()].map((tool) => ({
+      name: tool.name,
+      description: tool.description,
+      parameters: tool.parameters ?? {
+        type: "object",
+        additionalProperties: true
+      }
     }));
   }
 
