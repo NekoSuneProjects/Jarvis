@@ -2,25 +2,28 @@ import { z } from "zod";
 import { runProcess } from "../utils/process.js";
 import type { JarvisPlugin } from "./plugin-registry.js";
 
-async function docker(args:string[]){
-  const result=await runProcess("docker",args,{timeoutMs:30000});
+async function docker(args:string[],timeoutMs=30000){
+  const result=await runProcess("docker",args,{timeoutMs});
   if(result.code!==0) throw new Error(result.stderr.trim() || `docker exited with ${result.code}`);
   return result.stdout.trim();
+}
+
+function jsonLines(out:string){
+  return out?out.split("\n").filter(Boolean).map((line)=>JSON.parse(line)):[];
 }
 
 export const dockerPlugin:JarvisPlugin={
   id:"docker",
   name:"Docker",
-  version:"0.1.0",
-  description:"Docker CLI monitoring and container control.",
+  version:"0.2.0",
+  description:"Docker CLI monitoring, containers, images and Compose control.",
   tools:[
     {
       name:"docker.ps",
       description:"List Docker containers.",
       capability:"docker.read",
       async execute(){
-        const out=await docker(["ps","-a","--format","{{json .}}"]);
-        return out?out.split("\n").map((line)=>JSON.parse(line)):[];
+        return jsonLines(await docker(["ps","-a","--format","{{json .}}"]));
       }
     },
     {
@@ -32,6 +35,40 @@ export const dockerPlugin:JarvisPlugin={
         return {logs:await docker(["logs","--tail",String(value.tail),value.container])};
       }
     },
+    {
+      name:"docker.inspect",
+      description:"Inspect a Docker container or image.",
+      capability:"docker.read",
+      async execute(input){
+        const value=z.object({target:z.string().min(1)}).parse(input);
+        return JSON.parse(await docker(["inspect",value.target]));
+      }
+    },
+    {
+      name:"docker.stats",
+      description:"Read one-shot Docker container resource statistics.",
+      capability:"docker.read",
+      async execute(){
+        return jsonLines(await docker(["stats","--no-stream","--format","{{json .}}"]));
+      }
+    },
+    {
+      name:"docker.images",
+      description:"List local Docker images.",
+      capability:"docker.read",
+      async execute(){
+        return jsonLines(await docker(["images","--format","{{json .}}"]));
+      }
+    },
+    {
+      name:"docker.pull",
+      description:"Pull a Docker image. Requires control permission.",
+      capability:"docker.control",
+      async execute(input){
+        const value=z.object({image:z.string().min(1)}).parse(input);
+        return {output:await docker(["pull",value.image],120000)};
+      }
+    },
     ...(["start","stop","restart"] as const).map((action)=>({
       name:`docker.${action}`,
       description:`${action} a Docker container.`,
@@ -39,6 +76,36 @@ export const dockerPlugin:JarvisPlugin={
       async execute(input:unknown){
         const value=z.object({container:z.string().min(1)}).parse(input);
         return {output:await docker([action,value.container])};
+      }
+    })),
+    {
+      name:"docker.compose.ps",
+      description:"List services in a Docker Compose project.",
+      capability:"docker.read",
+      async execute(input){
+        const value=z.object({file:z.string().min(1),project:z.string().optional()}).parse(input);
+        const args=["compose","-f",value.file];
+        if(value.project) args.push("-p",value.project);
+        args.push("ps","--format","json");
+        const out=await docker(args);
+        try{return JSON.parse(out);}catch{return {raw:out};}
+      }
+    },
+    ...(["up","down","restart","pull"] as const).map((action)=>({
+      name:`docker.compose.${action}`,
+      description:`${action} a Docker Compose project. Requires control permission.`,
+      capability:"docker.control",
+      async execute(input:unknown){
+        const value=z.object({
+          file:z.string().min(1),
+          project:z.string().optional(),
+          detach:z.boolean().default(true)
+        }).parse(input);
+        const args=["compose","-f",value.file];
+        if(value.project) args.push("-p",value.project);
+        args.push(action);
+        if(action==="up" && value.detach) args.push("-d");
+        return {output:await docker(args,120000)};
       }
     }))
   ]
