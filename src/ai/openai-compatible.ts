@@ -197,6 +197,47 @@ export class OpenAiCompatibleProvider implements AiProvider {
     };
   }
 
+
+  async vision(prompt:string,images:Array<{mimeType:string;base64:string}>,model?:string):Promise<ChatResponse>{
+    const response=await fetchWithRetry(`${config.ai.baseUrl}/chat/completions`,{
+      method:"POST",
+      headers:this.headers(),
+      signal:AbortSignal.timeout(config.ai.timeoutMs),
+      body:JSON.stringify({
+        model:model ?? config.ai.model,
+        messages:[{
+          role:"user",
+          content:[
+            {type:"text",text:prompt},
+            ...images.map((image)=>({
+              type:"image_url",
+              image_url:{
+                url:`data:${image.mimeType};base64,${image.base64}`
+              }
+            }))
+          ]
+        }],
+        stream:false
+      })
+    });
+
+    if(!response.ok){
+      const body=await response.text();
+      throw new Error(`AI vision request failed (${response.status}): ${body.slice(0,500)}`);
+    }
+
+    const data=(await response.json()) as CompletionResponse;
+    const content=data.choices?.[0]?.message?.content?.trim() ?? "";
+    if(!content) throw new Error("AI provider returned an empty vision response");
+
+    return {
+      content,
+      model:data.model ?? model ?? config.ai.model,
+      provider:this.id,
+      toolCalls:[]
+    };
+  }
+
   async health(): Promise<{ ok: boolean; detail?: string }> {
     try {
       const controller = new AbortController();
