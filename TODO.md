@@ -63,6 +63,13 @@ Implemented in the repository so far:
 - [x] Docker images/stats/inspect and Compose controls
 - [x] Cross-platform systeminformation monitoring suite
 - [x] Playwright tabs/forms/uploads/download capture
+- [x] Permission-gated mouse/keyboard/window automation
+- [x] Protected local shell, process kill and system power controls
+- [x] Recursive workspace file search/copy/move/delete
+- [x] RRULE recurring alarms/reminders and timer pause/resume/add/cancel
+- [x] Edge TTS online no-key fallback beside Piper
+- [x] mDNS/Bonjour + SSDP/UPnP discovery and Jarvis LAN advertisement
+- [x] Native desktop notification delivery with persistent fallback
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -170,8 +177,8 @@ Implemented in the repository so far:
 - [x] Add Piper TTS provider
 - [ ] Add local voice model selection
 - [ ] Add UK English voices
-- [ ] Add speed control
-- [ ] Add pitch control where supported
+- [x] Add speed control
+- [x] Add pitch control where supported
 - [ ] Add Raspberry Pi support
 - [ ] Add Windows support
 - [ ] Add Linux support
@@ -179,13 +186,13 @@ Implemented in the repository so far:
 
 ## Edge TTS
 
-- [ ] Add Edge TTS provider
-- [ ] Add voice list
-- [ ] Add locale selection
+- [x] Add Edge TTS provider
+- [x] Add voice list
+- [x] Add locale selection foundation
 - [ ] Add voice preview
 - [ ] Add speed control
 - [ ] Add pitch control
-- [ ] Add online/offline detection
+- [x] Add online/offline detection
 - [ ] Add fallback voice if service fails
 
 ## Custom TTS API
@@ -209,7 +216,7 @@ Implemented in the repository so far:
 - [x] Add safe-search setting
 - [x] Add result count setting
 - [x] Add language setting
-- [ ] Add timeout handling
+- [x] Add timeout handling
 - [ ] Add fallback search provider
 
 ## General Web Search
@@ -297,10 +304,10 @@ Implemented in the repository so far:
 - [ ] Read Slides
 - [ ] Download files
 - [ ] Upload files
-- [ ] Create folders
-- [ ] Move files
-- [ ] Rename files
-- [ ] Delete files
+- [x] Create folders
+- [x] Move files
+- [x] Rename files
+- [x] Delete files
 - [ ] Share files
 - [ ] Create Google Docs
 - [ ] Create Sheets
@@ -453,7 +460,7 @@ Implemented in the repository so far:
 - [ ] Search library
 - [ ] Open media
 - [ ] Read now playing
-- [ ] Device discovery
+- [x] Device discovery foundation
 
 ---
 
@@ -747,8 +754,8 @@ Implemented in the repository so far:
 - [x] Application launcher
 - [x] Process manager
 - [ ] Window manager
-- [ ] Mouse control
-- [ ] Keyboard control
+- [x] Mouse control
+- [x] Keyboard control
 - [x] Clipboard
 - [x] Screenshots
 - [ ] Audio volume
@@ -1072,11 +1079,11 @@ Implemented in the repository so far:
 
 - [x] Multiple timers
 - [x] Named timers
-- [ ] Pause timer
-- [ ] Resume timer
+- [x] Pause timer
+- [x] Resume timer
 - [ ] Add time
 - [ ] Remove time
-- [ ] Cancel timer
+- [x] Cancel timer
 - [ ] Timer notifications
 - [ ] Timer TTS
 - [ ] Cross-device sync
@@ -1088,7 +1095,7 @@ Implemented in the repository so far:
 
 - [x] Time reminder
 - [x] Date reminder
-- [ ] Recurring reminder
+- [x] Recurring reminder
 - [ ] Device-state reminder
 - [ ] Presence reminder
 - [ ] Location reminder
@@ -1306,7 +1313,7 @@ Implemented in the repository so far:
 - [ ] CSV
 - [ ] HTML
 - [ ] ZIP
-- [ ] File search
+- [x] File search
 - [ ] Folder search
 - [ ] Rename
 - [ ] Move
