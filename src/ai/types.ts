@@ -23,6 +23,7 @@ export interface ChatRequest {
   messages: ChatMessage[];
   temperature?: number;
   tools?: AiToolDefinition[];
+  model?: string;
 }
 
 export interface ChatResponse {
@@ -32,8 +33,22 @@ export interface ChatResponse {
   toolCalls: AiToolCall[];
 }
 
+export interface AiModelInfo {
+  id: string;
+  ownedBy?: string;
+  created?: number;
+}
+
+export interface EmbeddingResponse {
+  model: string;
+  embeddings: number[][];
+  provider: string;
+}
+
 export interface AiProvider {
   readonly id: string;
   chat(request: ChatRequest): Promise<ChatResponse>;
   health(): Promise<{ ok: boolean; detail?: string }>;
+  models?(): Promise<AiModelInfo[]>;
+  embeddings?(input: string | string[], model?: string): Promise<EmbeddingResponse>;
 }
