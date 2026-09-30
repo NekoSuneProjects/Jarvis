@@ -36,6 +36,7 @@ import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { powerPlugin } from "./plugins/power-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
+import { shellPlugin } from "./plugins/shell-plugin.js";
 import { createSshPlugin } from "./plugins/ssh-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
 import { utilitiesPlugin } from "./plugins/utilities-plugin.js";
@@ -98,6 +99,7 @@ export async function createServer(ai: AiProvider) {
     dockerPlugin,
     wolPlugin,
     searchPlugin,
+    shellPlugin,
     weatherPlugin,
     windowPlugin,
     youtubePlugin,
