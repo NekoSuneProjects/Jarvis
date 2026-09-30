@@ -1493,3 +1493,111 @@ An integration should not be marked complete until:
 - [ ] Raspberry Pi support tested where applicable
 - [ ] Android support tested where applicable
 - [ ] Documentation is added
+
+
+---
+
+# Next 100 Implementation TODOs
+
+This section is a focused queue of 100 concrete implementation tasks for upcoming Jarvis work.
+
+- [ ] 001. Add automatic Piper Jarvis medium voice download
+- [ ] 002. Add automatic Piper Jarvis high voice download
+- [ ] 003. Add Piper model download checksum validation
+- [ ] 004. Add interrupted Piper download resume handling
+- [ ] 005. Add Piper model download progress reporting
+- [ ] 006. Add Piper model cache cleanup command
+- [ ] 007. Add Piper voice selection API endpoint
+- [ ] 008. Add Piper voice selection in Flutter settings
+- [ ] 009. Add Piper voice preview button
+- [ ] 010. Add Piper fallback error message when binary is missing
+- [ ] 011. Bundle Piper runtime for Windows builds
+- [ ] 012. Detect bundled Piper binary before PATH lookup
+- [ ] 013. Add Windows installer option for Piper voice model preload
+- [ ] 014. Add Windows installer option to skip model preload
+- [ ] 015. Add Windows portable launcher health check
+- [ ] 016. Add Windows launcher log file
+- [ ] 017. Add Windows launcher graceful core shutdown
+- [ ] 018. Add Windows Start Menu shortcut for logs
+- [ ] 019. Add Windows Start Menu shortcut for settings
+- [ ] 020. Add Windows uninstall cleanup option for cached models
+- [ ] 021. Add manual GitHub Actions portable ZIP toggle
+- [ ] 022. Add manual GitHub Actions installer EXE toggle
+- [ ] 023. Add manual GitHub Actions release publishing toggle
+- [ ] 024. Add manual GitHub Actions release tag input
+- [ ] 025. Add manual GitHub Actions Jarvis base URL input validation
+- [ ] 026. Add manual GitHub Actions Piper voice preset input
+- [ ] 027. Add GitHub Actions build summary with artifact links
+- [ ] 028. Add GitHub Actions cache for npm dependencies
+- [ ] 029. Add GitHub Actions cache for Flutter pub dependencies
+- [ ] 030. Add GitHub Actions timeout limits for stuck builds
+- [ ] 031. Add CI job that verifies TypeScript formatting
+- [ ] 032. Add CI job that runs TypeScript tests
+- [ ] 033. Add CI job that validates environment schema defaults
+- [ ] 034. Add CI job that validates Flutter formatting
+- [ ] 035. Add CI job that runs Flutter tests
+- [ ] 036. Add CI job that smoke-tests Windows executable startup
+- [ ] 037. Add CI job that validates installer creation
+- [ ] 038. Add CI job that verifies release assets exist
+- [ ] 039. Add CI failure log artifact upload
+- [ ] 040. Add CI dependency vulnerability audit
+- [ ] 041. Add /health details for Piper availability
+- [ ] 042. Add /health details for selected voice
+- [ ] 043. Add /health details for AI provider reachability
+- [ ] 044. Add /health details for database state
+- [ ] 045. Add /health details for writable data directory
+- [ ] 046. Add /health details for browser automation availability
+- [ ] 047. Add /health details for ADB availability
+- [ ] 048. Add /health details for smart-home integrations
+- [ ] 049. Add /health degraded-state reporting
+- [ ] 050. Add /health startup diagnostics history
+- [ ] 051. Add structured JSON logging
+- [ ] 052. Add rotating local log files
+- [ ] 053. Add configurable log levels
+- [ ] 054. Add request correlation IDs
+- [ ] 055. Add tool-call audit logging
+- [ ] 056. Add TTS latency metrics
+- [ ] 057. Add AI response latency metrics
+- [ ] 058. Add WebSocket connection metrics
+- [ ] 059. Add integration reconnect metrics
+- [ ] 060. Add optional diagnostics export ZIP
+- [ ] 061. Add settings API for assistant name
+- [ ] 062. Add settings API for AI endpoint
+- [ ] 063. Add settings API for AI model
+- [ ] 064. Add settings API for TTS provider
+- [ ] 065. Add settings API for Piper voice
+- [ ] 066. Add settings API for wake-word mode
+- [ ] 067. Add settings persistence in SQLite
+- [ ] 068. Add settings validation errors to UI
+- [ ] 069. Add settings import/export
+- [ ] 070. Add settings reset-to-defaults
+- [ ] 071. Add first-run setup wizard
+- [ ] 072. Add first-run AI provider test
+- [ ] 073. Add first-run microphone test
+- [ ] 074. Add first-run speaker test
+- [ ] 075. Add first-run Piper voice download screen
+- [ ] 076. Add first-run permissions explanation
+- [ ] 077. Add first-run local-only mode option
+- [ ] 078. Add first-run Home Assistant optional setup
+- [ ] 079. Add first-run Discord optional setup
+- [ ] 080. Add first-run completion health check
+- [ ] 081. Add conversation history search
+- [ ] 082. Add conversation delete controls
+- [ ] 083. Add per-conversation export
+- [ ] 084. Add memory enable/disable control
+- [ ] 085. Add memory review screen
+- [ ] 086. Add tool permission confirmation UI
+- [ ] 087. Add dangerous action confirmation flow
+- [ ] 088. Add per-tool allow/deny rules
+- [ ] 089. Add per-device permission profiles
+- [ ] 090. Add emergency stop button
+- [ ] 091. Add Windows notification support
+- [ ] 092. Add Linux notification support
+- [ ] 093. Add notification action buttons
+- [ ] 094. Add tray icon for desktop builds
+- [ ] 095. Add tray menu for mute/listening modes
+- [ ] 096. Add tray menu for restarting core
+- [ ] 097. Add tray menu for opening logs
+- [ ] 098. Add auto-start-on-login option
+- [ ] 099. Add update-available notification
+- [ ] 100. Add self-update preparation for signed releases
