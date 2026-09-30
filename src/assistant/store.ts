@@ -175,6 +175,26 @@ export class AssistantStore {
     return this.database.db.prepare("UPDATE reminders SET completed=1 WHERE id=?").run(id).changes > 0;
   }
 
+  createNotification(title:string,body:string,priority="normal",source="jarvis") {
+    const result=this.database.db.prepare(
+      "INSERT INTO notifications (title,body,priority,source,created_at) VALUES (?,?,?,?,?)"
+    ).run(title,body,priority,source,now());
+    return this.database.db.prepare("SELECT * FROM notifications WHERE id=?").get(result.lastInsertRowid);
+  }
+
+  listNotifications(limit=100, unreadOnly=false) {
+    if(unreadOnly) return this.database.db.prepare(
+      "SELECT * FROM notifications WHERE is_read=0 ORDER BY created_at DESC LIMIT ?"
+    ).all(limit);
+    return this.database.db.prepare(
+      "SELECT * FROM notifications ORDER BY created_at DESC LIMIT ?"
+    ).all(limit);
+  }
+
+  markNotificationRead(id:number,read=true) {
+    return this.database.db.prepare("UPDATE notifications SET is_read=? WHERE id=?").run(read?1:0,id).changes>0;
+  }
+
   createRoutine(name:string, trigger:unknown, actions:unknown[], conditions:unknown[] = []) {
     const at=now();
     const result=this.database.db.prepare(
