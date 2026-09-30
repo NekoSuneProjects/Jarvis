@@ -25,6 +25,7 @@ import { filesPlugin } from "./plugins/files-plugin.js";
 import { createGithubPlugin } from "./plugins/github-plugin.js";
 import { createGooglePlugin } from "./plugins/google-plugin.js";
 import { createMemoryPlugin } from "./plugins/memory-plugin.js";
+import { createNotificationsPlugin } from "./plugins/notifications-plugin.js";
 import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
@@ -61,6 +62,7 @@ export async function createServer(ai: AiProvider) {
   const googlePlugin = createGooglePlugin();
   const memoryPlugin = createMemoryPlugin(store);
   const mediaServersPlugin = createMediaServersPlugin();
+  const notificationsPlugin = createNotificationsPlugin(store, events);
   const searchPlugin = createSearchPlugin();
   const weatherPlugin = createWeatherPlugin();
   const spotifyPlugin = createSpotifyPlugin();
@@ -107,10 +109,12 @@ export async function createServer(ai: AiProvider) {
   integrations.register(mqtt);
 
   scheduler.start();
+  routines.start();
   void integrations.connectEnabled();
 
   app.addHook("onClose", async () => {
     scheduler.stop();
+    routines.stop();
     await integrations.disconnectAll();
     await browser.close();
     database.close();
@@ -442,6 +446,46 @@ export async function createServer(ai: AiProvider) {
   app.post<{ Body: { name?: string; fireAt: string; repeatRule?: string } }>("/api/v1/alarms", async (request) => ({
     alarm: store.createAlarm(request.body.name ?? "Alarm", request.body.fireAt, request.body.repeatRule)
   }));
+
+  app.get<{ Querystring: { unreadOnly?: string } }>("/api/v1/notifications", async (request) => {
+    permissions.assertAllowed("notifications.read");
+    return {
+      notifications: store.listNotifications(
+        100,
+        request.query.unreadOnly === "true"
+      )
+    };
+  });
+
+  app.post<{ Body: { title: string; body?: string; priority?: string; source?: string } }>(
+    "/api/v1/notifications",
+    async (request) => {
+      permissions.assertAllowed("notifications.send");
+      const notification = store.createNotification(
+        request.body.title,
+        request.body.body ?? "",
+        request.body.priority ?? "normal",
+        request.body.source ?? "api"
+      );
+      events.publish("notification.created", notification);
+      return { notification };
+    }
+  );
+
+  app.patch<{ Params: { id: string }; Body: { read: boolean } }>(
+    "/api/v1/notifications/:id",
+    async (request) => ({
+      ok: store.markNotificationRead(Number(request.params.id), request.body.read)
+    })
+  );
+
+  app.post<{ Params: { key: string }; Body: unknown }>(
+    "/api/v1/routines/webhook/:key",
+    async (request) => ({
+      ok: true,
+      results: await routines.triggerWebhook(request.params.key, request.body)
+    })
+  );
 
   app.get("/api/v1/routines", async () => ({ routines: store.listRoutines() }));
   app.post<{ Body: { name: string; trigger?: unknown; actions: unknown[]; conditions?: unknown[] } }>(
