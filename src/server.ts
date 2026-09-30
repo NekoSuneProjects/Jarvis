@@ -17,6 +17,7 @@ import { PermissionManager } from "./permissions/permission-manager.js";
 import { createAssistantPlugin } from "./plugins/assistant-plugin.js";
 import { createBrowserPlugin } from "./plugins/browser-plugin.js";
 import { createDiscordPlugin } from "./plugins/discord-plugin.js";
+import { createDevicesPlugin } from "./plugins/devices-plugin.js";
 import { computerPlugin } from "./plugins/computer-plugin.js";
 import { dockerPlugin } from "./plugins/docker-plugin.js";
 import { filesPlugin } from "./plugins/files-plugin.js";
@@ -52,6 +53,7 @@ export async function createServer(ai: AiProvider) {
   const browser = new BrowserAutomation();
   const assistantPlugin = createAssistantPlugin(store);
   const browserPlugin = createBrowserPlugin(browser);
+  const devicesPlugin = createDevicesPlugin(devices);
   const discordPlugin = createDiscordPlugin();
   const githubPlugin = createGithubPlugin();
   const googlePlugin = createGooglePlugin();
@@ -64,6 +66,7 @@ export async function createServer(ai: AiProvider) {
     assistantPlugin,
     browserPlugin,
     computerPlugin,
+    devicesPlugin,
     discordPlugin,
     filesPlugin,
     githubPlugin,
@@ -289,6 +292,74 @@ export async function createServer(ai: AiProvider) {
       return { ok: true };
     }
   );
+
+  app.get("/api/v1/agents/commands", async (request, reply) => {
+    const deviceId = request.headers["x-jarvis-device-id"]?.toString() ?? "";
+    const authorization = request.headers.authorization ?? "";
+    const token = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
+
+    if (!deviceId || !token || !devices.authenticate(deviceId, token)) {
+      return reply.code(401).send({ error: "Invalid device credentials" });
+    }
+
+    return { commands: devices.pendingCommands(deviceId) };
+  });
+
+  app.post<{
+    Params: { id: string };
+    Body: { ok: boolean; result?: unknown };
+  }>("/api/v1/agents/commands/:id/result", async (request, reply) => {
+    const deviceId = request.headers["x-jarvis-device-id"]?.toString() ?? "";
+    const authorization = request.headers.authorization ?? "";
+    const token = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
+
+    if (!deviceId || !token || !devices.authenticate(deviceId, token)) {
+      return reply.code(401).send({ error: "Invalid device credentials" });
+    }
+
+    const ok = devices.completeCommand(
+      deviceId,
+      request.params.id,
+      request.body.ok,
+      request.body.result ?? null
+    );
+
+    events.publish("device.command.result", {
+      deviceId,
+      commandId: request.params.id,
+      ok: request.body.ok,
+      result: request.body.result ?? null
+    });
+
+    return { ok };
+  });
+
+  app.get<{ Params: { id: string } }>("/api/v1/devices/:id/commands", async (request) => {
+    permissions.assertAllowed("devices.read");
+    return { commands: devices.listCommands(request.params.id) };
+  });
+
+  app.post<{
+    Params: { id: string };
+    Body: { command: string; args?: Record<string, unknown> };
+  }>("/api/v1/devices/:id/commands", async (request, reply) => {
+    try {
+      permissions.assertAllowed("devices.manage");
+      const command = devices.enqueueCommand(
+        request.params.id,
+        request.body.command,
+        request.body.args ?? {}
+      );
+      events.publish("device.command.queued", command);
+      return { ok: true, command };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to queue command";
+      return reply.code(message.startsWith("Permission") ? 403 : 400).send({
+        ok: false,
+        error: message
+      });
+    }
+  });
 
   app.get("/api/v1/devices", async () => {
     permissions.assertAllowed("devices.read");
