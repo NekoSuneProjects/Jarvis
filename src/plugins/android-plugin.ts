@@ -29,7 +29,7 @@ function safeInputText(text:string){
   return text
     .replace(/%/g,"%25")
     .replace(/ /g,"%s")
-    .replace(/[&|<>;()$]/g,(ch)=>"\\\"+ch);
+    .replace(/[&|<>;()$]/g,(ch)=>"\\"+ch);
 }
 
 export const androidPlugin:JarvisPlugin={
