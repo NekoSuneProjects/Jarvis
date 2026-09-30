@@ -76,6 +76,9 @@ Implemented in the repository so far:
 - [x] AI model discovery and embeddings APIs
 - [x] Expanded Spotify queue/library/device/playlist controls
 - [x] Expanded Gmail/Calendar/Drive management tools
+- [x] AES-256-GCM encrypted local secret vault
+- [x] Persistent plugin enable/disable with execution enforcement
+- [x] Searchable sensitive-action audit log API
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -85,12 +88,12 @@ Implemented in the repository so far:
 
 - [x] Create shared integration interface
 - [ ] Create plugin manifest format
-- [ ] Add integration enable/disable toggle
+- [x] Add integration enable/disable toggle
 - [x] Add per-integration permissions
 - [ ] Add per-device permissions
-- [ ] Add OAuth token storage
-- [ ] Add API key storage
-- [ ] Add encrypted secrets storage
+- [x] Add OAuth token storage foundation
+- [x] Add API key storage foundation
+- [x] Add encrypted secrets storage
 - [ ] Add connection status UI
 - [ ] Add reconnect support
 - [ ] Add refresh-token support
@@ -99,7 +102,7 @@ Implemented in the repository so far:
 - [ ] Add retry handling
 - [x] Add timeout handling
 - [ ] Add integration logs
-- [ ] Add audit logs for sensitive actions
+- [x] Add audit logs for sensitive actions
 - [ ] Add integration capability discovery
 - [x] Add integration versioning
 - [ ] Add plugin dependency system
