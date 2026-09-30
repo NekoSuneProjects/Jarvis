@@ -142,6 +142,19 @@ export class JarvisDatabase {
       CREATE INDEX IF NOT EXISTS idx_agent_commands_device_status
         ON agent_commands(device_id, status, created_at);
 
+      CREATE TABLE IF NOT EXISTS notifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        priority TEXT NOT NULL DEFAULT 'normal',
+        source TEXT NOT NULL DEFAULT 'jarvis',
+        is_read INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_notifications_created
+        ON notifications(created_at DESC);
+
       CREATE TABLE IF NOT EXISTS audit_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         at TEXT NOT NULL,
