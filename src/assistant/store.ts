@@ -296,4 +296,33 @@ export class AssistantStore {
     this.database.db.prepare("INSERT INTO audit_log (at,actor,action,detail_json) VALUES (?,?,?,?)")
       .run(now(), actor, action, JSON.stringify(detail));
   }
+
+  listAudit(limit=200,actor?:string,action?:string) {
+    const clauses:string[]=[];
+    const values:unknown[]=[];
+
+    if(actor){
+      clauses.push("actor=?");
+      values.push(actor);
+    }
+    if(action){
+      clauses.push("action LIKE ?");
+      values.push(`%${action}%`);
+    }
+
+    const where=clauses.length?`WHERE ${clauses.join(" AND ")}`:"";
+    const rows=this.database.db.prepare(
+      `SELECT * FROM audit_log ${where} ORDER BY id DESC LIMIT ?`
+    ).all(...values,limit) as Array<{
+      id:number;at:string;actor:string;action:string;detail_json:string;
+    }>;
+
+    return rows.map((row)=>({
+      id:row.id,
+      at:row.at,
+      actor:row.actor,
+      action:row.action,
+      detail:JSON.parse(row.detail_json)
+    }));
+  }
 }
