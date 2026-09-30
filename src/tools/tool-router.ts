@@ -1,39 +1,52 @@
 import type { AiToolDefinition } from "../ai/types.js";
-import type { JarvisTool } from "../plugins/plugin-registry.js";
+import type { JarvisTool, PluginRegistry } from "../plugins/plugin-registry.js";
 import { PermissionManager } from "../permissions/permission-manager.js";
 
+interface RegisteredTool {
+  tool:JarvisTool;
+  pluginId:string;
+}
+
 export class ToolRouter {
-  private readonly tools = new Map<string, JarvisTool>();
+  private readonly tools = new Map<string, RegisteredTool>();
 
-  constructor(private readonly permissions: PermissionManager) {}
+  constructor(
+    private readonly permissions: PermissionManager,
+    private readonly plugins:PluginRegistry
+  ) {}
 
-  register(tool: JarvisTool): void {
+  register(tool: JarvisTool,pluginId:string): void {
     if (this.tools.has(tool.name)) {
       throw new Error(`Tool already registered: ${tool.name}`);
     }
 
-    this.tools.set(tool.name, tool);
+    this.tools.set(tool.name, {tool,pluginId});
   }
 
-  registerMany(tools: JarvisTool[]): void {
+  registerMany(tools: JarvisTool[],pluginId:string): void {
     for (const tool of tools) {
-      this.register(tool);
+      this.register(tool,pluginId);
     }
   }
 
-  list(): Array<Pick<JarvisTool, "name" | "description" | "capability" | "parameters">> {
-    return [...this.tools.values()].map(
-      ({ name, description, capability, parameters }) => ({
+  private enabledEntries(){
+    return [...this.tools.values()].filter(({pluginId})=>this.plugins.isEnabled(pluginId));
+  }
+
+  list(): Array<Pick<JarvisTool, "name" | "description" | "capability" | "parameters"> & {pluginId:string}> {
+    return this.enabledEntries().map(
+      ({tool:{name, description, capability, parameters},pluginId}) => ({
         name,
         description,
         capability,
-        parameters
+        parameters,
+        pluginId
       })
     );
   }
 
   aiDefinitions(): AiToolDefinition[] {
-    return [...this.tools.values()].map((tool) => ({
+    return this.enabledEntries().map(({tool}) => ({
       name: tool.name,
       description: tool.description,
       parameters: tool.parameters ?? {
@@ -44,13 +57,17 @@ export class ToolRouter {
   }
 
   async execute(name: string, input: unknown): Promise<unknown> {
-    const tool = this.tools.get(name);
+    const registered = this.tools.get(name);
 
-    if (!tool) {
+    if (!registered) {
       throw new Error(`Unknown tool: ${name}`);
     }
 
-    this.permissions.assertAllowed(tool.capability);
-    return tool.execute(input);
+    if(!this.plugins.isEnabled(registered.pluginId)){
+      throw new Error(`Plugin disabled: ${registered.pluginId}`);
+    }
+
+    this.permissions.assertAllowed(registered.tool.capability);
+    return registered.tool.execute(input);
   }
 }
