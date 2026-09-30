@@ -54,7 +54,9 @@ const schema = z.object({
   EDGE_TTS_BIN: z.string().default("edge-tts"),
   EDGE_TTS_VOICE: z.string().default("en-GB-SoniaNeural"),
   EDGE_TTS_RATE: z.string().default("+0%"),
-  EDGE_TTS_PITCH: z.string().default("+0Hz")
+  EDGE_TTS_PITCH: z.string().default("+0Hz"),
+
+  JARVIS_API_TOKEN: z.string().default("")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -124,5 +126,6 @@ export const config = {
     voice: parsed.data.EDGE_TTS_VOICE,
     rate: parsed.data.EDGE_TTS_RATE,
     pitch: parsed.data.EDGE_TTS_PITCH
-  }
+  },
+  apiToken: parsed.data.JARVIS_API_TOKEN
 } as const;
