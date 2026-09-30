@@ -1,3 +1,4 @@
+import fs from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import websocket from "@fastify/websocket";
 import Fastify from "fastify";
@@ -53,6 +54,7 @@ import { systemPlugin } from "./plugins/system-plugin.js";
 import { JarvisDatabase } from "./storage/database.js";
 import { SecretVault } from "./security/secret-vault.js";
 import { ToolRouter } from "./tools/tool-router.js";
+import { workspacePath } from "./utils/workspace-path.js";
 
 export async function createServer(ai: AiProvider) {
   const app = Fastify({ logger: true });
@@ -381,6 +383,37 @@ export async function createServer(ai: AiProvider) {
       return ai.embeddings(request.body.input, request.body.model);
     }
   );
+
+  app.post<{
+    Body: {
+      prompt: string;
+      images: string[];
+      model?: string;
+    };
+  }>("/api/v1/ai/vision", async (request, reply) => {
+    if (!ai.vision) {
+      return reply.code(501).send({
+        error: "AI provider does not support vision"
+      });
+    }
+
+    const mimeFor = (filename: string) => {
+      const lower = filename.toLowerCase();
+      if (lower.endsWith(".png")) return "image/png";
+      if (lower.endsWith(".webp")) return "image/webp";
+      if (lower.endsWith(".gif")) return "image/gif";
+      return "image/jpeg";
+    };
+
+    const images = await Promise.all(
+      request.body.images.map(async (relative) => ({
+        mimeType: mimeFor(relative),
+        base64: (await fs.readFile(workspacePath(relative))).toString("base64")
+      }))
+    );
+
+    return ai.vision(request.body.prompt, images, request.body.model);
+  });
 
   app.get("/api/v1/voice", async () => ({
     providers: [
