@@ -127,6 +127,21 @@ export class JarvisDatabase {
 
       CREATE INDEX IF NOT EXISTS idx_devices_last_seen ON devices(last_seen_at);
 
+      CREATE TABLE IF NOT EXISTS agent_commands (
+        id TEXT PRIMARY KEY,
+        device_id TEXT NOT NULL,
+        command TEXT NOT NULL,
+        args_json TEXT NOT NULL DEFAULT '{}',
+        status TEXT NOT NULL DEFAULT 'queued',
+        result_json TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY(device_id) REFERENCES devices(id) ON DELETE CASCADE
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_agent_commands_device_status
+        ON agent_commands(device_id, status, created_at);
+
       CREATE TABLE IF NOT EXISTS audit_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         at TEXT NOT NULL,
