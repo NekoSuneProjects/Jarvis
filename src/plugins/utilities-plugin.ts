@@ -72,7 +72,8 @@ export const utilitiesPlugin:JarvisPlugin={
           from:z.string().min(1),
           to:z.string().min(1)
         }).parse(input);
-        const result=convert(value.value).from(value.from as never).to(value.to as never);
+        const convertAny:any=convert;
+        const result=convertAny(value.value).from(value.from).to(value.to);
         return {...value,result};
       }
     },
