@@ -36,27 +36,6 @@ on:
         required: false
         default: ""
         type: string
-  push:
-    branches: ["main"]
-    tags: ["v*"]
-    paths:
-      - "apps/jarvis_ui/**"
-      - "src/**"
-      - "services/**"
-      - "agents/**"
-      - "package.json"
-      - "tsconfig.json"
-      - ".github/workflows/windows.yml"
-  pull_request:
-    paths:
-      - "apps/jarvis_ui/**"
-      - "src/**"
-      - "services/**"
-      - "agents/**"
-      - "package.json"
-      - "tsconfig.json"
-      - ".github/workflows/windows.yml"
-
 permissions:
   contents: write
 
@@ -255,11 +234,11 @@ jobs:
           }
 
       - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish_release)
+        if: inputs.publish_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
-          name: NekoSune Jarvis ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
+          tag_name: ${{ inputs.release_tag }}
+          name: NekoSune Jarvis ${{ inputs.release_tag }}
           generate_release_notes: true
           fail_on_unmatched_files: false
           files: |
