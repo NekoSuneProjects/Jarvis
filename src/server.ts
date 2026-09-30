@@ -9,6 +9,7 @@ import { JarvisAgent } from "./agent/jarvis-agent.js";
 import { Scheduler } from "./assistant/scheduler.js";
 import { RoutineEngine } from "./assistant/routine-engine.js";
 import { EventBus } from "./events/event-bus.js";
+import { DeviceRegistry } from "./devices/device-registry.js";
 import { IntegrationManager } from "./integrations/manager.js";
 import { HomeAssistantIntegration } from "./integrations/home-assistant.js";
 import { MqttIntegration } from "./integrations/mqtt.js";
@@ -39,6 +40,7 @@ export async function createServer(ai: AiProvider) {
   const database = new JarvisDatabase();
   const store = new AssistantStore(database);
   const events = new EventBus();
+  const devices = new DeviceRegistry(database);
   const scheduler = new Scheduler(store, events);
   const permissions = new PermissionManager();
   const plugins = new PluginRegistry();
@@ -233,6 +235,79 @@ export async function createServer(ai: AiProvider) {
         }
 
         throw error;
+      }
+    }
+  );
+
+  app.post<{
+    Body: {
+      pairingCode: string;
+      name: string;
+      platform: string;
+      arch: string;
+      capabilities?: string[];
+      metadata?: Record<string, unknown>;
+    };
+  }>("/api/v1/agents/register", async (request, reply) => {
+    try {
+      const result = devices.register(request.body);
+      events.publish("device.paired", {
+        id: result.id,
+        name: request.body.name,
+        platform: request.body.platform
+      });
+      store.audit("device", "device.paired", {
+        id: result.id,
+        name: request.body.name
+      });
+      return result;
+    } catch (error) {
+      return reply.code(403).send({
+        error: error instanceof Error ? error.message : "Device pairing failed"
+      });
+    }
+  });
+
+  app.post<{ Body: { metadata?: Record<string, unknown> } }>(
+    "/api/v1/agents/heartbeat",
+    async (request, reply) => {
+      const deviceId = request.headers["x-jarvis-device-id"]?.toString() ?? "";
+      const authorization = request.headers.authorization ?? "";
+      const token = authorization.startsWith("Bearer ")
+        ? authorization.slice(7)
+        : "";
+
+      if (!deviceId || !token || !devices.authenticate(deviceId, token)) {
+        return reply.code(401).send({ error: "Invalid device credentials" });
+      }
+
+      devices.heartbeat(deviceId, request.body?.metadata ?? {});
+      events.publish("device.heartbeat", {
+        id: deviceId,
+        metadata: request.body?.metadata ?? {}
+      });
+      return { ok: true };
+    }
+  );
+
+  app.get("/api/v1/devices", async () => {
+    permissions.assertAllowed("devices.read");
+    return { devices: devices.list() };
+  });
+
+  app.post<{ Params: { id: string } }>(
+    "/api/v1/devices/:id/revoke",
+    async (request, reply) => {
+      try {
+        permissions.assertAllowed("devices.manage");
+        const ok = devices.revoke(request.params.id);
+        if (ok) events.publish("device.revoked", { id: request.params.id });
+        return { ok };
+      } catch (error) {
+        return reply.code(403).send({
+          ok: false,
+          error: error instanceof Error ? error.message : "Permission denied"
+        });
       }
     }
   );
