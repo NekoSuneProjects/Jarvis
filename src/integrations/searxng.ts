@@ -1,3 +1,5 @@
+import { fetchWithRetry } from "../utils/http.js";
+
 export interface SearxResult {
   title:string;
   url:string;
@@ -22,7 +24,7 @@ export class SearxngIntegration {
     if(options.language) url.searchParams.set("language",options.language);
     if(options.safesearch!==undefined) url.searchParams.set("safesearch",String(options.safesearch));
 
-    const response=await fetch(url,{signal:AbortSignal.timeout(15000)});
+    const response=await fetchWithRetry(url,{signal:AbortSignal.timeout(15000)});
     if(!response.ok) throw new Error(`SearXNG HTTP ${response.status}`);
     const body=await response.json() as {results?:SearxResult[]};
     return (body.results ?? []).slice(0,options.limit ?? 10);
