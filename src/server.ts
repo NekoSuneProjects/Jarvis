@@ -10,6 +10,13 @@ import { HomeAssistantIntegration } from "./integrations/home-assistant.js";
 import { MqttIntegration } from "./integrations/mqtt.js";
 import { PermissionManager } from "./permissions/permission-manager.js";
 import { createAssistantPlugin } from "./plugins/assistant-plugin.js";
+import { dockerPlugin } from "./plugins/docker-plugin.js";
+import { filesPlugin } from "./plugins/files-plugin.js";
+import { createSearchPlugin } from "./plugins/search-plugin.js";
+import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
+import { createWeatherPlugin } from "./plugins/weather-plugin.js";
+import { wolPlugin } from "./plugins/wol-plugin.js";
+import { PiperTtsProvider } from "./voice/piper.js";
 import { PluginRegistry } from "./plugins/plugin-registry.js";
 import { systemPlugin } from "./plugins/system-plugin.js";
 import { JarvisDatabase } from "./storage/database.js";
@@ -29,10 +36,26 @@ export async function createServer(ai: AiProvider) {
   const integrations = new IntegrationManager();
 
   const assistantPlugin = createAssistantPlugin(store);
-  plugins.register(systemPlugin);
-  plugins.register(assistantPlugin);
-  tools.registerMany(systemPlugin.tools);
-  tools.registerMany(assistantPlugin.tools);
+  const searchPlugin = createSearchPlugin();
+  const weatherPlugin = createWeatherPlugin();
+  const spotifyPlugin = createSpotifyPlugin();
+  const builtInPlugins = [
+    systemPlugin,
+    assistantPlugin,
+    filesPlugin,
+    dockerPlugin,
+    wolPlugin,
+    searchPlugin,
+    weatherPlugin,
+    spotifyPlugin
+  ];
+
+  for (const plugin of builtInPlugins) {
+    plugins.register(plugin);
+    tools.registerMany(plugin.tools);
+  }
+
+  const piper = new PiperTtsProvider();
 
   const homeAssistant = new HomeAssistantIntegration({
     baseUrl: config.homeAssistant.url,
@@ -121,6 +144,32 @@ export async function createServer(ai: AiProvider) {
   app.get("/api/v1/tools", async () => ({
     tools: tools.list()
   }));
+
+  app.get("/api/v1/voice", async () => ({
+    providers: [
+      {
+        id: piper.id,
+        available: await piper.available()
+      }
+    ]
+  }));
+
+  app.post<{ Body: { text: string; outputPath?: string } }>("/api/v1/voice/tts", async (request, reply) => {
+    try {
+      const outputPath = request.body.outputPath ?? `${config.dataDir}/tts/output.wav`;
+      const result = await piper.synthesize({
+        text: request.body.text,
+        outputPath
+      });
+      events.publish("voice.tts.completed", result);
+      return { ok: true, ...result };
+    } catch (error) {
+      return reply.code(503).send({
+        ok: false,
+        error: error instanceof Error ? error.message : "TTS failed"
+      });
+    }
+  });
 
   app.post<{ Body: { input?: unknown }; Params: { name: string } }>(
     "/api/v1/tools/:name/execute",
