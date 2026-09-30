@@ -70,6 +70,9 @@ Implemented in the repository so far:
 - [x] Edge TTS online no-key fallback beside Piper
 - [x] mDNS/Bonjour + SSDP/UPnP discovery and Jarvis LAN advertisement
 - [x] Native desktop notification delivery with persistent fallback
+- [x] Optional bearer-token Core API protection for LAN clients
+- [x] Flutter REST/WebSocket API-token support
+- [x] Approval-gated local shell and process termination
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
