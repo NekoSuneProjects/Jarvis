@@ -21,6 +21,8 @@ const DEFAULT_RULES: PermissionRule[] = [
   { capability: "network.wol", decision: "ask" },
   { capability: "computer.clipboard", decision: "ask" },
   { capability: "computer.screenshot", decision: "ask" },
+  { capability: "computer.input", decision: "ask" },
+  { capability: "computer.window", decision: "ask" },
   { capability: "browser.navigate", decision: "allow" },
   { capability: "browser.read", decision: "allow" },
   { capability: "browser.interact", decision: "ask" },
