@@ -12,9 +12,12 @@ import { MqttIntegration } from "./integrations/mqtt.js";
 import { PermissionManager } from "./permissions/permission-manager.js";
 import { createAssistantPlugin } from "./plugins/assistant-plugin.js";
 import { createBrowserPlugin } from "./plugins/browser-plugin.js";
+import { createDiscordPlugin } from "./plugins/discord-plugin.js";
 import { computerPlugin } from "./plugins/computer-plugin.js";
 import { dockerPlugin } from "./plugins/docker-plugin.js";
 import { filesPlugin } from "./plugins/files-plugin.js";
+import { createGithubPlugin } from "./plugins/github-plugin.js";
+import { createGooglePlugin } from "./plugins/google-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
@@ -41,6 +44,9 @@ export async function createServer(ai: AiProvider) {
   const browser = new BrowserAutomation();
   const assistantPlugin = createAssistantPlugin(store);
   const browserPlugin = createBrowserPlugin(browser);
+  const discordPlugin = createDiscordPlugin();
+  const githubPlugin = createGithubPlugin();
+  const googlePlugin = createGooglePlugin();
   const searchPlugin = createSearchPlugin();
   const weatherPlugin = createWeatherPlugin();
   const spotifyPlugin = createSpotifyPlugin();
@@ -49,7 +55,10 @@ export async function createServer(ai: AiProvider) {
     assistantPlugin,
     browserPlugin,
     computerPlugin,
+    discordPlugin,
     filesPlugin,
+    githubPlugin,
+    googlePlugin,
     dockerPlugin,
     wolPlugin,
     searchPlugin,
