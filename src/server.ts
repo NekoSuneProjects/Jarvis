@@ -467,9 +467,26 @@ export async function createServer(ai: AiProvider) {
     timer: store.createTimer(request.body.name ?? "Timer", request.body.durationMs)
   }));
 
+  app.post<{ Params: { id: string } }>("/api/v1/timers/:id/pause", async (request) => ({
+    ok: store.pauseTimer(Number(request.params.id))
+  }));
+  app.post<{ Params: { id: string } }>("/api/v1/timers/:id/resume", async (request) => ({
+    ok: store.resumeTimer(Number(request.params.id))
+  }));
+  app.post<{ Params: { id: string }; Body: { deltaMs: number } }>("/api/v1/timers/:id/add-time", async (request) => ({
+    ok: store.addTimerTime(Number(request.params.id), request.body.deltaMs)
+  }));
+  app.delete<{ Params: { id: string } }>("/api/v1/timers/:id", async (request) => ({
+    ok: store.cancelTimer(Number(request.params.id))
+  }));
+
   app.get("/api/v1/alarms", async () => ({ alarms: store.listAlarms() }));
   app.post<{ Body: { name?: string; fireAt: string; repeatRule?: string } }>("/api/v1/alarms", async (request) => ({
     alarm: store.createAlarm(request.body.name ?? "Alarm", request.body.fireAt, request.body.repeatRule)
+  }));
+
+  app.delete<{ Params: { id: string } }>("/api/v1/alarms/:id", async (request) => ({
+    ok: store.deleteAlarm(Number(request.params.id))
   }));
 
   app.get<{ Querystring: { unreadOnly?: string } }>("/api/v1/notifications", async (request) => {
@@ -547,6 +564,13 @@ export async function createServer(ai: AiProvider) {
   }));
   app.post<{ Params: { id: string } }>("/api/v1/reminders/:id/complete", async (request) => ({
     ok: store.completeReminder(Number(request.params.id))
+  }));
+
+  app.post<{ Params: { id: string }; Body: { durationMs: number } }>("/api/v1/reminders/:id/snooze", async (request) => ({
+    ok: store.snoozeReminder(Number(request.params.id), request.body.durationMs)
+  }));
+  app.delete<{ Params: { id: string } }>("/api/v1/reminders/:id", async (request) => ({
+    ok: store.deleteReminder(Number(request.params.id))
   }));
 
   app.get("/api/v1/home-assistant/states", async (_request, reply) => {
