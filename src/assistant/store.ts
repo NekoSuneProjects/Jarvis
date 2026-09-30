@@ -5,6 +5,75 @@ const now = () => new Date().toISOString();
 export class AssistantStore {
   constructor(private readonly database: JarvisDatabase) {}
 
+  ensureConversation(id:string, title?:string) {
+    const existing=this.database.db.prepare("SELECT * FROM conversations WHERE id=?").get(id);
+    if(existing) return existing;
+    const at=now();
+    this.database.db.prepare(
+      "INSERT INTO conversations (id,title,created_at,updated_at) VALUES (?,?,?,?)"
+    ).run(id,title ?? null,at,at);
+    return this.database.db.prepare("SELECT * FROM conversations WHERE id=?").get(id);
+  }
+
+  appendConversationMessage(conversationId:string, role:string, content:string) {
+    this.ensureConversation(conversationId);
+    const at=now();
+    const result=this.database.db.prepare(
+      "INSERT INTO conversation_messages (conversation_id,role,content,created_at) VALUES (?,?,?,?)"
+    ).run(conversationId,role,content,at);
+    this.database.db.prepare("UPDATE conversations SET updated_at=? WHERE id=?").run(at,conversationId);
+    return this.database.db.prepare("SELECT * FROM conversation_messages WHERE id=?").get(result.lastInsertRowid);
+  }
+
+  conversationMessages(conversationId:string, limit=30) {
+    return this.database.db.prepare(
+      "SELECT role,content,created_at FROM conversation_messages WHERE conversation_id=? ORDER BY id DESC LIMIT ?"
+    ).all(conversationId,limit).reverse();
+  }
+
+  listConversations(limit=50) {
+    return this.database.db.prepare(
+      "SELECT * FROM conversations ORDER BY updated_at DESC LIMIT ?"
+    ).all(limit);
+  }
+
+  remember(category:string,key:string,value:string) {
+    const at=now();
+    this.database.db.prepare(
+      `INSERT INTO memories (category,key,value,created_at,updated_at)
+       VALUES (?,?,?,?,?)
+       ON CONFLICT(category,key) DO UPDATE SET value=excluded.value,updated_at=excluded.updated_at`
+    ).run(category,key,value,at,at);
+    return this.database.db.prepare(
+      "SELECT * FROM memories WHERE category=? AND key=?"
+    ).get(category,key);
+  }
+
+  searchMemories(query:string,category?:string,limit=20) {
+    const like=`%${query}%`;
+    if(category){
+      return this.database.db.prepare(
+        "SELECT * FROM memories WHERE category=? AND (key LIKE ? OR value LIKE ?) ORDER BY updated_at DESC LIMIT ?"
+      ).all(category,like,like,limit);
+    }
+    return this.database.db.prepare(
+      "SELECT * FROM memories WHERE key LIKE ? OR value LIKE ? ORDER BY updated_at DESC LIMIT ?"
+    ).all(like,like,limit);
+  }
+
+  listMemories(category?:string,limit=100) {
+    if(category) return this.database.db.prepare(
+      "SELECT * FROM memories WHERE category=? ORDER BY updated_at DESC LIMIT ?"
+    ).all(category,limit);
+    return this.database.db.prepare(
+      "SELECT * FROM memories ORDER BY updated_at DESC LIMIT ?"
+    ).all(limit);
+  }
+
+  forgetMemory(id:number) {
+    return this.database.db.prepare("DELETE FROM memories WHERE id=?").run(id).changes>0;
+  }
+
   createNote(title: string, body = "", tags: string[] = []) {
     const at = now();
     const result = this.database.db
