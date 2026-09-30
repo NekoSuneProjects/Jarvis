@@ -1,3 +1,5 @@
+import { fetchWithRetry } from "../utils/http.js";
+
 export class GoogleIntegration {
   constructor(private readonly accessToken:string) {}
 
@@ -5,7 +7,7 @@ export class GoogleIntegration {
 
   private async request(base:string,path:string,init:RequestInit={}){
     if(!this.accessToken) throw new Error("Google integration is not configured");
-    const response=await fetch(base+path,{
+    const response=await fetchWithRetry(base+path,{
       ...init,
       headers:{
         authorization:`Bearer ${this.accessToken}`,
