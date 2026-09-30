@@ -106,6 +106,26 @@ export class AssistantStore {
     return this.database.db.prepare("UPDATE reminders SET completed=1 WHERE id=?").run(id).changes > 0;
   }
 
+  createRoutine(name:string, trigger:unknown, actions:unknown[], conditions:unknown[] = []) {
+    const at=now();
+    const result=this.database.db.prepare(
+      "INSERT INTO routines (name,trigger_json,actions_json,conditions_json,created_at,updated_at) VALUES (?,?,?,?,?,?)"
+    ).run(name,JSON.stringify(trigger),JSON.stringify(actions),JSON.stringify(conditions),at,at);
+    return this.getRoutine(Number(result.lastInsertRowid));
+  }
+
+  getRoutine(id:number) {
+    return this.database.db.prepare("SELECT * FROM routines WHERE id=?").get(id);
+  }
+
+  listRoutines() {
+    return this.database.db.prepare("SELECT * FROM routines ORDER BY name").all();
+  }
+
+  setRoutineEnabled(id:number,enabled:boolean) {
+    return this.database.db.prepare("UPDATE routines SET enabled=?,updated_at=? WHERE id=?").run(enabled?1:0,now(),id).changes>0;
+  }
+
   dueTimers() {
     return this.database.db.prepare("SELECT * FROM timers WHERE state='running' AND ends_at<=?").all(now());
   }
