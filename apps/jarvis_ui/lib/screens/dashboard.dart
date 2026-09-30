@@ -24,6 +24,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<dynamic> timers = [];
   List<dynamic> alarms = [];
   List<dynamic> reminders = [];
+  List<dynamic> notifications = [];
+  List<dynamic> devices = [];
 
   JarvisState state = JarvisState.idle;
   StreamSubscription<dynamic>? eventSubscription;
@@ -44,6 +46,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         widget.client.timers(),
         widget.client.alarms(),
         widget.client.reminders(),
+        widget.client.notifications(),
+        widget.client.devices(),
       ]);
       if (!mounted) return;
       setState(() {
@@ -52,6 +56,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         timers = results[2] as List<dynamic>;
         alarms = results[3] as List<dynamic>;
         reminders = results[4] as List<dynamic>;
+        notifications = results[5] as List<dynamic>;
+        devices = results[6] as List<dynamic>;
         error = null;
       });
     } catch (e) {
@@ -68,7 +74,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           final type = event['type']?.toString() ?? '';
           if (type.startsWith('timer.') ||
               type.startsWith('alarm.') ||
-              type.startsWith('reminder.')) {
+              type.startsWith('reminder.') ||
+              type.startsWith('notification.') ||
+              type.startsWith('device.') ||
+              type.startsWith('routine.')) {
             _refresh();
           }
           if (!mounted) return;
@@ -102,7 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final response = await widget.client.chat(text);
       if (!mounted) return;
       setState(() {
-        messages.add((user: false, text: response));
+        messages.add((user: false, text: response.content));
         state = JarvisState.idle;
       });
     } catch (e) {
@@ -322,6 +331,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           section('TIMERS', timers),
           section('ALARMS', alarms),
           section('REMINDERS', reminders),
+          section('DEVICES', devices),
+          section('NOTIFICATIONS', notifications),
         ],
       ),
     );
