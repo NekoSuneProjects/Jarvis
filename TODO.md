@@ -59,6 +59,10 @@ Implemented in the repository so far:
 - [x] Place geocoding and weather-by-place
 - [x] No-key YouTube search through SearXNG
 - [x] Flutter persistent conversations, devices and notification panels
+- [x] SSH saved-host command integration
+- [x] Docker images/stats/inspect and Compose controls
+- [x] Cross-platform systeminformation monitoring suite
+- [x] Playwright tabs/forms/uploads/download capture
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -229,10 +233,10 @@ Implemented in the repository so far:
 - [x] Add webpage reading
 - [x] Add click
 - [x] Add typing
-- [ ] Add form filling
-- [ ] Add tab control
-- [ ] Add downloads
-- [ ] Add uploads
+- [x] Add form filling
+- [x] Add tab control
+- [x] Add downloads
+- [x] Add uploads
 - [x] Add page screenshots
 - [ ] Add cookie storage
 - [ ] Add login session support
@@ -636,7 +640,7 @@ Implemented in the repository so far:
 - [ ] Sensor readings
 - [ ] Light control
 - [ ] Button events
-- [ ] Battery information
+- [x] Battery information
 - [ ] Direct coordinator support as future option
 
 ---
@@ -916,18 +920,18 @@ Implemented in the repository so far:
 - [x] Stop container
 - [x] Restart container
 - [x] Read logs
-- [ ] Inspect container
-- [ ] Read stats
-- [ ] List images
-- [ ] Pull image
+- [x] Inspect container
+- [x] Read stats
+- [x] List images
+- [x] Pull image
 - [ ] Remove container
 - [ ] Remove image
-- [ ] Docker Compose support
+- [x] Docker Compose support
 - [ ] List Compose stacks
-- [ ] Start stack
-- [ ] Stop stack
-- [ ] Restart stack
-- [ ] Update stack
+- [x] Start stack
+- [x] Stop stack
+- [x] Restart stack
+- [x] Update stack foundation
 - [ ] Confirmation for destructive commands
 - [ ] Remote Docker support
 
@@ -935,20 +939,20 @@ Implemented in the repository so far:
 
 # SSH
 
-- [ ] SSH connection manager
-- [ ] Password auth
-- [ ] SSH key auth
+- [x] SSH connection manager
+- [x] Password auth
+- [x] SSH key auth
 - [ ] Agent support
 - [ ] Host key verification
-- [ ] Saved hosts
-- [ ] Run command
+- [x] Saved hosts
+- [x] Run command
 - [ ] Stream output
 - [ ] Upload file
 - [ ] Download file
 - [ ] SFTP browser
 - [ ] Remote service control
 - [ ] Remote logs
-- [ ] Permission prompts
+- [x] Permission prompts
 - [ ] Secure credential storage
 
 ---
@@ -1315,18 +1319,18 @@ Implemented in the repository so far:
 # System Monitoring
 
 - [x] CPU usage
-- [ ] CPU temperature
+- [x] CPU temperature
 - [x] RAM usage
-- [ ] GPU usage
-- [ ] GPU VRAM
-- [ ] GPU temperature
-- [ ] Disk usage
+- [x] GPU usage
+- [x] GPU VRAM
+- [x] GPU temperature
+- [x] Disk usage
 - [ ] Disk health
-- [ ] Network upload
-- [ ] Network download
-- [ ] Wi-Fi information
+- [x] Network upload
+- [x] Network download
+- [x] Wi-Fi information
 - [ ] Battery
-- [ ] Running processes
+- [x] Running processes
 - [ ] Running services
 - [ ] Docker stats
 - [x] Uptime
