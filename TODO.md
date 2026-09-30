@@ -30,6 +30,13 @@ Implemented in the repository so far:
 - [x] Wake-on-LAN tool
 - [x] Piper CPU TTS provider
 - [x] GitHub Actions TypeScript CI
+- [x] Cross-platform desktop URL/app launch tools
+- [x] Clipboard and desktop screenshot tools
+- [x] Playwright Chromium browser automation
+- [x] Google Gmail/Calendar/Drive token-based REST tools
+- [x] Discord bot-mode REST tools
+- [x] GitHub PAT REST tools
+- [x] Manual multi-action routine engine
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -192,19 +199,19 @@ Implemented in the repository so far:
 
 ## Playwright
 
-- [ ] Add browser launch
-- [ ] Add Chromium support
+- [x] Add browser launch
+- [x] Add Chromium support
 - [ ] Add Firefox support
 - [ ] Add persistent profiles
-- [ ] Add open URL
-- [ ] Add webpage reading
-- [ ] Add click
-- [ ] Add typing
+- [x] Add open URL
+- [x] Add webpage reading
+- [x] Add click
+- [x] Add typing
 - [ ] Add form filling
 - [ ] Add tab control
 - [ ] Add downloads
 - [ ] Add uploads
-- [ ] Add page screenshots
+- [x] Add page screenshots
 - [ ] Add cookie storage
 - [ ] Add login session support
 - [ ] Add safe autofill permissions
@@ -218,15 +225,15 @@ Implemented in the repository so far:
 ## Gmail
 
 - [ ] Add Google OAuth
-- [ ] Add Gmail connection
+- [x] Add Gmail connection
 - [ ] Read inbox
-- [ ] Search email
-- [ ] Read email thread
+- [x] Search email
+- [x] Read email thread
 - [ ] Read attachments
 - [ ] Draft email
 - [ ] Reply to email
 - [ ] Forward email
-- [ ] Send email
+- [x] Send email
 - [ ] Mark read/unread
 - [ ] Archive email
 - [ ] Delete email
@@ -241,9 +248,9 @@ Implemented in the repository so far:
 ## Google Calendar
 
 - [ ] Read calendars
-- [ ] List events
-- [ ] Read event details
-- [ ] Create event
+- [x] List events
+- [x] Read event details
+- [x] Create event
 - [ ] Update event
 - [ ] Delete event
 - [ ] RSVP to event
@@ -257,8 +264,8 @@ Implemented in the repository so far:
 
 ## Google Drive
 
-- [ ] Browse files
-- [ ] Search files
+- [x] Browse files
+- [x] Search files
 - [ ] Read Google Docs
 - [ ] Read Sheets
 - [ ] Read Slides
@@ -485,12 +492,12 @@ Implemented in the repository so far:
 # Discord
 
 - [ ] Discord OAuth
-- [ ] Read current user
-- [ ] Read server list
-- [ ] Read channels
-- [ ] Read recent messages
+- [x] Read current user
+- [x] Read server list
+- [x] Read channels
+- [x] Read recent messages
 - [ ] Search messages
-- [ ] Send message
+- [x] Send message
 - [ ] Reply to message
 - [ ] Read DMs
 - [ ] Send DM
@@ -498,27 +505,27 @@ Implemented in the repository so far:
 - [ ] Notification summary
 - [ ] Voice-channel presence where supported
 - [ ] Approval before sending
-- [ ] Bot-token mode
+- [x] Bot-token mode
 - [ ] User OAuth mode
 
 ---
 
 # GitHub
 
-- [ ] GitHub OAuth / PAT support
-- [ ] List repositories
+- [x] GitHub OAuth / PAT support
+- [x] List repositories
 - [ ] Search repositories
-- [ ] Read repository
+- [x] Read repository
 - [ ] Clone repository
 - [ ] Pull repository
-- [ ] Read issues
-- [ ] Create issue
+- [x] Read issues
+- [x] Create issue
 - [ ] Update issue
 - [ ] Comment on issue
-- [ ] Read pull requests
+- [x] Read pull requests
 - [ ] Create pull request
 - [ ] Review pull request
-- [ ] Read Actions runs
+- [x] Read Actions runs
 - [ ] Read build logs
 - [ ] Re-run workflow
 - [ ] Read releases
@@ -711,13 +718,13 @@ Implemented in the repository so far:
 
 # Windows Integration
 
-- [ ] Application launcher
-- [ ] Process manager
+- [x] Application launcher
+- [x] Process manager
 - [ ] Window manager
 - [ ] Mouse control
 - [ ] Keyboard control
-- [ ] Clipboard
-- [ ] Screenshots
+- [x] Clipboard
+- [x] Screenshots
 - [ ] Audio volume
 - [ ] Per-app audio control
 - [ ] PowerShell
@@ -1099,19 +1106,19 @@ Implemented in the repository so far:
 
 # Routines
 
-- [ ] Routine editor
+- [x] Routine editor
 - [ ] Voice trigger
 - [ ] Time trigger
 - [ ] Device trigger
 - [ ] Presence trigger
 - [ ] Webhook trigger
 - [ ] MQTT trigger
-- [ ] Multiple actions
-- [ ] Delays
+- [x] Multiple actions
+- [x] Delays
 - [ ] Conditions
 - [ ] Branching
-- [ ] Enable / disable
-- [ ] Manual run
+- [x] Enable / disable
+- [x] Manual run
 - [ ] Routine logs
 - [ ] Import / export routines
 
