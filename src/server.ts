@@ -22,6 +22,7 @@ import { createDiscoveryPlugin } from "./plugins/discovery-plugin.js";
 import { documentsPlugin } from "./plugins/documents-plugin.js";
 import { createDevicesPlugin } from "./plugins/devices-plugin.js";
 import { computerPlugin } from "./plugins/computer-plugin.js";
+import { desktopInputPlugin } from "./plugins/desktop-input-plugin.js";
 import { dockerPlugin } from "./plugins/docker-plugin.js";
 import { filesPlugin } from "./plugins/files-plugin.js";
 import { createGithubPlugin } from "./plugins/github-plugin.js";
@@ -39,6 +40,7 @@ import { createWeatherPlugin } from "./plugins/weather-plugin.js";
 import { utilitiesPlugin } from "./plugins/utilities-plugin.js";
 import { createYoutubePlugin } from "./plugins/youtube-plugin.js";
 import { wolPlugin } from "./plugins/wol-plugin.js";
+import { windowPlugin } from "./plugins/window-plugin.js";
 import { PiperTtsProvider } from "./voice/piper.js";
 import { EdgeTtsProvider } from "./voice/edge-tts.js";
 import { PluginRegistry } from "./plugins/plugin-registry.js";
@@ -84,6 +86,7 @@ export async function createServer(ai: AiProvider) {
     assistantPlugin,
     browserPlugin,
     computerPlugin,
+    desktopInputPlugin,
     devicesPlugin,
     discoveryPlugin,
     discordPlugin,
@@ -95,6 +98,7 @@ export async function createServer(ai: AiProvider) {
     wolPlugin,
     searchPlugin,
     weatherPlugin,
+    windowPlugin,
     youtubePlugin,
     utilitiesPlugin,
     spotifyPlugin,
