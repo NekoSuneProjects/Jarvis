@@ -218,6 +218,17 @@ export async function createServer(ai: AiProvider) {
     permissions: permissions.list()
   }));
 
+  app.get<{ Querystring: { limit?: string; actor?: string; action?: string } }>(
+    "/api/v1/audit",
+    async (request) => ({
+      entries: store.listAudit(
+        Math.max(1, Math.min(1000, Number(request.query.limit ?? 200))),
+        request.query.actor,
+        request.query.action
+      )
+    })
+  );
+
   app.patch<{ Params: { capability: string }; Body: { decision: "allow" | "ask" | "deny" } }>(
     "/api/v1/permissions/:capability",
     async (request) => {
