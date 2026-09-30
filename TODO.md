@@ -37,6 +37,9 @@ Implemented in the repository so far:
 - [x] Discord bot-mode REST tools
 - [x] GitHub PAT REST tools
 - [x] Manual multi-action routine engine
+- [x] Flutter cross-platform HUD client
+- [x] Animated Jarvis orb and responsive dashboard
+- [x] Flutter chat/API client and WebSocket event client
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -810,7 +813,7 @@ Implemented in the repository so far:
 
 # macOS
 
-- [ ] Flutter macOS project
+- [x] Flutter macOS project scaffold
 - [ ] Application launcher
 - [ ] Accessibility permission guide
 - [ ] Keyboard control
@@ -835,7 +838,7 @@ Implemented in the repository so far:
 
 # Android
 
-- [ ] Flutter Android app
+- [x] Flutter Android app scaffold
 - [ ] Microphone permission
 - [ ] Notifications permission
 - [ ] Wake-word foreground service
