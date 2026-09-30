@@ -112,6 +112,21 @@ export class JarvisDatabase {
 
       CREATE INDEX IF NOT EXISTS idx_memories_category ON memories(category);
 
+      CREATE TABLE IF NOT EXISTS devices (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        platform TEXT NOT NULL,
+        arch TEXT NOT NULL,
+        token_hash TEXT NOT NULL,
+        capabilities_json TEXT NOT NULL DEFAULT '[]',
+        metadata_json TEXT NOT NULL DEFAULT '{}',
+        last_seen_at TEXT,
+        created_at TEXT NOT NULL,
+        revoked INTEGER NOT NULL DEFAULT 0
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_devices_last_seen ON devices(last_seen_at);
+
       CREATE TABLE IF NOT EXISTS audit_log (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         at TEXT NOT NULL,
