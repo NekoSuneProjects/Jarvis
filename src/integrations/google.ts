@@ -9,14 +9,16 @@ export class GoogleIntegration {
       ...init,
       headers:{
         authorization:`Bearer ${this.accessToken}`,
-        "content-type":"application/json",
+        ...(init.body && typeof init.body==="string" ? {"content-type":"application/json"} : {}),
         ...(init.headers ?? {})
       },
-      signal:AbortSignal.timeout(20000)
+      signal:AbortSignal.timeout(30000)
     });
     if(response.status===204) return null;
     if(!response.ok) throw new Error(`Google API HTTP ${response.status}: ${await response.text()}`);
-    return response.json();
+    const contentType=response.headers.get("content-type") ?? "";
+    if(contentType.includes("application/json")) return response.json();
+    return response.arrayBuffer();
   }
 
   gmailSearch(q:string,maxResults=20){
@@ -28,11 +30,41 @@ export class GoogleIntegration {
     return this.request("https://gmail.googleapis.com",`/gmail/v1/users/me/messages/${encodeURIComponent(id)}?format=full`);
   }
 
-  gmailSend(rawRfc822:string){
+  gmailSend(rawRfc822:string,threadId?:string){
     const raw=Buffer.from(rawRfc822,"utf8").toString("base64url");
     return this.request("https://gmail.googleapis.com","/gmail/v1/users/me/messages/send",{
       method:"POST",
-      body:JSON.stringify({raw})
+      body:JSON.stringify({raw,...(threadId?{threadId}:{})})
+    });
+  }
+
+  gmailDraft(rawRfc822:string,threadId?:string){
+    const raw=Buffer.from(rawRfc822,"utf8").toString("base64url");
+    return this.request("https://gmail.googleapis.com","/gmail/v1/users/me/drafts",{
+      method:"POST",
+      body:JSON.stringify({message:{raw,...(threadId?{threadId}:{})}})
+    });
+  }
+
+  gmailModify(id:string,addLabelIds:string[]=[],removeLabelIds:string[]=[]){
+    return this.request("https://gmail.googleapis.com",`/gmail/v1/users/me/messages/${encodeURIComponent(id)}/modify`,{
+      method:"POST",
+      body:JSON.stringify({addLabelIds,removeLabelIds})
+    });
+  }
+
+  gmailDelete(id:string){
+    return this.request("https://gmail.googleapis.com",`/gmail/v1/users/me/messages/${encodeURIComponent(id)}`,{method:"DELETE"});
+  }
+
+  gmailLabels(){
+    return this.request("https://gmail.googleapis.com","/gmail/v1/users/me/labels");
+  }
+
+  gmailCreateLabel(name:string){
+    return this.request("https://gmail.googleapis.com","/gmail/v1/users/me/labels",{
+      method:"POST",
+      body:JSON.stringify({name,labelListVisibility:"labelShow",messageListVisibility:"show"})
     });
   }
 
@@ -53,16 +85,98 @@ export class GoogleIntegration {
     });
   }
 
+  calendarUpdate(calendarId:string,eventId:string,event:Record<string,unknown>){
+    return this.request("https://www.googleapis.com",`/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`,{
+      method:"PATCH",
+      body:JSON.stringify(event)
+    });
+  }
+
+  calendarDelete(calendarId:string,eventId:string){
+    return this.request("https://www.googleapis.com",`/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`,{
+      method:"DELETE"
+    });
+  }
+
+  calendarList(){
+    return this.request("https://www.googleapis.com","/calendar/v3/users/me/calendarList");
+  }
+
+  calendarFreeBusy(timeMin:string,timeMax:string,calendarIds:string[]){
+    return this.request("https://www.googleapis.com","/calendar/v3/freeBusy",{
+      method:"POST",
+      body:JSON.stringify({
+        timeMin,
+        timeMax,
+        items:calendarIds.map((id)=>({id}))
+      })
+    });
+  }
+
   driveFiles(q?:string,pageSize=50){
     const params=new URLSearchParams({
       pageSize:String(pageSize),
-      fields:"files(id,name,mimeType,modifiedTime,webViewLink,webContentLink,size)"
+      fields:"files(id,name,mimeType,modifiedTime,parents,webViewLink,webContentLink,size)"
     });
     if(q) params.set("q",q);
     return this.request("https://www.googleapis.com",`/drive/v3/files?${params}`);
   }
 
   driveFile(id:string){
-    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}?fields=id,name,mimeType,modifiedTime,webViewLink,webContentLink,size`);
+    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}?fields=id,name,mimeType,modifiedTime,parents,webViewLink,webContentLink,size`);
+  }
+
+  driveDownload(id:string){
+    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}?alt=media`);
+  }
+
+  driveCreateFolder(name:string,parentId?:string){
+    return this.request("https://www.googleapis.com","/drive/v3/files",{
+      method:"POST",
+      body:JSON.stringify({
+        name,
+        mimeType:"application/vnd.google-apps.folder",
+        ...(parentId?{parents:[parentId]}:{})
+      })
+    });
+  }
+
+  driveRename(id:string,name:string){
+    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}`,{
+      method:"PATCH",
+      body:JSON.stringify({name})
+    });
+  }
+
+  driveMove(id:string,newParentId:string,oldParentIds:string[]=[]){
+    const params=new URLSearchParams({addParents:newParentId,fields:"id,name,parents"});
+    if(oldParentIds.length) params.set("removeParents",oldParentIds.join(","));
+    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}?${params}`,{
+      method:"PATCH"
+    });
+  }
+
+  driveDelete(id:string){
+    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}`,{method:"DELETE"});
+  }
+
+  driveUpload(name:string,bytes:Uint8Array,mimeType="application/octet-stream",parentId?:string){
+    const boundary="jarvis_"+Date.now().toString(36);
+    const metadata=JSON.stringify({name,...(parentId?{parents:[parentId]}:{})});
+    const header=Buffer.from(
+      `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metadata}\r\n--${boundary}\r\nContent-Type: ${mimeType}\r\n\r\n`
+    );
+    const footer=Buffer.from(`\r\n--${boundary}--`);
+    const body=Buffer.concat([header,Buffer.from(bytes),footer]);
+
+    return this.request(
+      "https://www.googleapis.com",
+      "/upload/drive/v3/files?uploadType=multipart",
+      {
+        method:"POST",
+        headers:{"content-type":`multipart/related; boundary=${boundary}`},
+        body
+      }
+    );
   }
 }
