@@ -48,6 +48,9 @@ Implemented in the repository so far:
 - [x] Zero-dependency Node remote agent
 - [x] Remote agent command queue and result reporting
 - [x] PDF/DOCX/XLSX/PPTX generation tools
+- [x] Jellyfin/Plex/Kodi media tools
+- [x] Internet radio search tools
+- [x] Local music scanning and metadata search
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -314,7 +317,7 @@ Implemented in the repository so far:
 - [x] Search artists
 - [x] Search albums
 - [x] Search playlists
-- [ ] Play playlist
+- [x] Play playlist
 - [ ] Play album
 - [ ] Play artist
 - [ ] Queue track
@@ -338,10 +341,10 @@ Implemented in the repository so far:
 - [ ] Search YouTube
 - [ ] Embedded player
 - [ ] Play video
-- [ ] Pause
-- [ ] Resume
+- [x] Pause
+- [x] Resume
 - [ ] Seek
-- [ ] Volume
+- [x] Volume
 - [ ] Fullscreen
 - [ ] Queue videos
 - [ ] Read video metadata
@@ -358,8 +361,8 @@ Implemented in the repository so far:
 # YouTube Music
 
 - [ ] Search songs
-- [ ] Search artists
-- [ ] Search albums
+- [x] Search artists
+- [x] Search albums
 - [ ] Search playlists
 - [ ] Start playback
 - [ ] Queue songs
@@ -388,32 +391,32 @@ Implemented in the repository so far:
 
 # Jellyfin
 
-- [ ] Add Jellyfin server URL
-- [ ] Add API token
+- [x] Add Jellyfin server URL
+- [x] Add API token
 - [ ] Add username/password pairing
 - [ ] Browse media
-- [ ] Search movies
-- [ ] Search shows
-- [ ] Search music
+- [x] Search movies
+- [x] Search shows
+- [x] Search music
 - [ ] Play media
 - [ ] Pause
 - [ ] Resume
-- [ ] Stop playback
+- [x] Stop playback
 - [ ] Select playback device
 - [ ] Continue watching
 - [ ] Recently added
 - [ ] User profiles
 - [ ] Library status
-- [ ] Server health check
+- [x] Server health check foundation
 
 ---
 
 # Plex
 
-- [ ] Plex authentication
+- [x] Plex authentication
 - [ ] Discover Plex servers
-- [ ] Browse libraries
-- [ ] Search media
+- [x] Browse libraries
+- [x] Search media
 - [ ] Play media
 - [ ] Pause
 - [ ] Resume
@@ -427,8 +430,8 @@ Implemented in the repository so far:
 
 # Kodi
 
-- [ ] Add Kodi JSON-RPC endpoint
-- [ ] Authentication
+- [x] Add Kodi JSON-RPC endpoint
+- [x] Authentication
 - [ ] Play
 - [ ] Pause
 - [ ] Resume
@@ -473,10 +476,10 @@ Implemented in the repository so far:
 
 # Internet Radio
 
-- [ ] Search stations
+- [x] Search stations
 - [ ] Save favourites
 - [ ] Play stream URL
-- [ ] Station metadata
+- [x] Station metadata
 - [ ] Current track metadata
 - [ ] Country filtering
 - [ ] Genre filtering
@@ -486,12 +489,12 @@ Implemented in the repository so far:
 
 # Local Music
 
-- [ ] Scan local music folders
-- [ ] Read metadata
+- [x] Scan local music folders
+- [x] Read metadata
 - [ ] Album art
 - [ ] Search artists
 - [ ] Search albums
-- [ ] Search tracks
+- [x] Search tracks
 - [ ] Create local playlists
 - [ ] Shuffle
 - [ ] Repeat
