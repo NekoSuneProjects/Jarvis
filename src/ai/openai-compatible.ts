@@ -1,11 +1,24 @@
 import { config } from "../config.js";
-import type { AiProvider, ChatRequest, ChatResponse } from "./types.js";
+import type {
+  AiProvider,
+  AiToolCall,
+  ChatMessage,
+  ChatRequest,
+  ChatResponse
+} from "./types.js";
 
 type CompletionResponse = {
   model?: string;
   choices?: Array<{
     message?: {
       content?: string | null;
+      tool_calls?: Array<{
+        id?: string;
+        function?: {
+          name?: string;
+          arguments?: string;
+        };
+      }>;
     };
   }>;
 };
@@ -25,6 +38,36 @@ export class OpenAiCompatibleProvider implements AiProvider {
     return headers;
   }
 
+  private wireMessage(message: ChatMessage) {
+    if (message.role === "tool") {
+      return {
+        role: "tool",
+        content: message.content,
+        tool_call_id: message.toolCallId
+      };
+    }
+
+    if (message.role === "assistant" && message.toolCalls?.length) {
+      return {
+        role: "assistant",
+        content: message.content || null,
+        tool_calls: message.toolCalls.map((call) => ({
+          id: call.id,
+          type: "function",
+          function: {
+            name: call.name,
+            arguments: JSON.stringify(call.arguments)
+          }
+        }))
+      };
+    }
+
+    return {
+      role: message.role,
+      content: message.content
+    };
+  }
+
   async chat(request: ChatRequest): Promise<ChatResponse> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), config.ai.timeoutMs);
@@ -36,9 +79,22 @@ export class OpenAiCompatibleProvider implements AiProvider {
         signal: controller.signal,
         body: JSON.stringify({
           model: config.ai.model,
-          messages: request.messages,
+          messages: request.messages.map((message) => this.wireMessage(message)),
           temperature: request.temperature ?? config.ai.temperature,
-          stream: false
+          stream: false,
+          ...(request.tools?.length
+            ? {
+                tools: request.tools.map((tool) => ({
+                  type: "function",
+                  function: {
+                    name: tool.name,
+                    description: tool.description,
+                    parameters: tool.parameters
+                  }
+                })),
+                tool_choice: "auto"
+              }
+            : {})
         })
       });
 
@@ -48,16 +104,34 @@ export class OpenAiCompatibleProvider implements AiProvider {
       }
 
       const data = (await response.json()) as CompletionResponse;
-      const content = data.choices?.[0]?.message?.content?.trim();
+      const message = data.choices?.[0]?.message;
+      const toolCalls: AiToolCall[] = (message?.tool_calls ?? [])
+        .filter((call) => call.function?.name)
+        .map((call, index) => {
+          let parsed: Record<string, unknown> = {};
+          try {
+            parsed = JSON.parse(call.function?.arguments || "{}") as Record<string, unknown>;
+          } catch {
+            parsed = {};
+          }
+          return {
+            id: call.id ?? `tool_call_${index}`,
+            name: call.function!.name!,
+            arguments: parsed
+          };
+        });
 
-      if (!content) {
+      const content = message?.content?.trim() ?? "";
+
+      if (!content && toolCalls.length === 0) {
         throw new Error("AI provider returned an empty response");
       }
 
       return {
         content,
         model: data.model ?? config.ai.model,
-        provider: this.id
+        provider: this.id,
+        toolCalls
       };
     } finally {
       clearTimeout(timeout);
