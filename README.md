@@ -15,9 +15,9 @@ The goal is to provide one shared assistant ecosystem where desktops, laptops, R
 
 ---
 
-## âœ¨ Main Features
+## ✨ Main Features
 
-### ðŸ¤– AI Assistant
+### 🤖 AI Assistant
 
 - Ollama support
 - OpenAI-compatible API support
@@ -47,112 +47,112 @@ Example commands:
 
 ---
 
-# ðŸ–¥ï¸ Cross-Platform Support
+# 🖥️ Cross-Platform Support
 
 | Platform | Support |
 |---|---|
-| Windows 10 / 11 | âœ… Full |
-| Linux x64 | âœ… Full |
-| Linux ARM64 | âœ… Planned / Full Target |
-| Raspberry Pi | âœ… Lightweight / Satellite |
-| macOS Intel | ðŸ›  Source Support |
-| macOS Apple Silicon | ðŸ›  Source Support |
-| Android | âœ… Planned / Full Client |
-| iOS | ðŸ”® Future |
-| Web Dashboard | ðŸ”® Optional |
+| Windows 10 / 11 | ✅ Full |
+| Linux x64 | ✅ Full |
+| Linux ARM64 | ✅ Planned / Full Target |
+| Raspberry Pi | ✅ Lightweight / Satellite |
+| macOS Intel | 🛠 Source Support |
+| macOS Apple Silicon | 🛠 Source Support |
+| Android | ✅ Planned / Full Client |
+| iOS | 🔮 Future |
+| Web Dashboard | 🔮 Optional |
 
 macOS and iOS project files can be included, but Apple application builds must be compiled and signed on macOS hardware.
 
 ---
 
-# ðŸ—ï¸ Architecture
+# 🏗️ Architecture
 
 ```text
-                           â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-                           â”‚       NEKOSUNE JARVIS UI       â”‚
-                           â”‚                                â”‚
-                           â”‚ Flutter                        â”‚
-                           â”‚ Windows / Linux / Raspberry Pi â”‚
-                           â”‚ macOS / Android / future iOS   â”‚
-                           â”‚                                â”‚
-                           â”‚ HUD + Orb + Chat + Dashboard   â”‚
-                           â”‚ animations / visualizer        â”‚
-                           â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                                           â”‚
+                           ┌────────────────────────────────┐
+                           │       NEKOSUNE JARVIS UI       │
+                           │                                │
+                           │ Flutter                        │
+                           │ Windows / Linux / Raspberry Pi │
+                           │ macOS / Android / future iOS   │
+                           │                                │
+                           │ HUD + Orb + Chat + Dashboard   │
+                           │ animations / visualizer        │
+                           └───────────────┬────────────────┘
+                                           │
                                   WebSocket / IPC
-                                           â”‚
-                    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-                    â”‚               JARVIS CORE                 â”‚
-                    â”‚           Node.js / TypeScript            â”‚
-                    â”‚                                            â”‚
-                    â”‚ â€¢ tool router                              â”‚
-                    â”‚ â€¢ permissions                              â”‚
-                    â”‚ â€¢ conversation state                       â”‚
-                    â”‚ â€¢ intent router                            â”‚
-                    â”‚ â€¢ automation engine                        â”‚
-                    â”‚ â€¢ plugin manager                           â”‚
-                    â”‚ â€¢ device registry                          â”‚
-                    â”‚ â€¢ routines                                 â”‚
-                    â”‚ â€¢ alarms / reminders / timers              â”‚
-                    â”‚ â€¢ multi-room coordination                  â”‚
-                    â””â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                          â”‚             â”‚               â”‚
-              â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â” â”Œâ”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”Œâ”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-              â”‚     AI BRAIN     â”‚ â”‚    VOICE     â”‚ â”‚     MEMORY      â”‚
-              â”‚                  â”‚ â”‚              â”‚ â”‚                 â”‚
-              â”‚ Ollama           â”‚ â”‚ Wake word    â”‚ â”‚ SQLite          â”‚
-              â”‚ OpenAI APIs      â”‚ â”‚ VAD          â”‚ â”‚ Vector memory   â”‚
-              â”‚ Vision models    â”‚ â”‚ STT          â”‚ â”‚ Conversations   â”‚
-              â”‚ Tool calling     â”‚ â”‚ TTS          â”‚ â”‚ Devices/People  â”‚
-              â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”˜ â””â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                          â”‚             â”‚
-                          â”‚             â”œâ”€ sherpa-onnx
-                          â”‚             â”œâ”€ Piper
-                          â”‚             â”œâ”€ Edge TTS
-                          â”‚             â””â”€ optional remote TTS
-                          â”‚
-                          â–¼
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                              JARVIS TOOLS                                 â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ COMPUTER        â”‚ WEB / BROWSER    â”‚ COMMUNICATION    â”‚ MEDIA             â”‚
-â”‚                 â”‚                  â”‚                  â”‚                   â”‚
-â”‚ mouse           â”‚ web search       â”‚ Gmail            â”‚ Spotify           â”‚
-â”‚ keyboard        â”‚ Playwright       â”‚ Calendar         â”‚ YouTube           â”‚
-â”‚ screenshots     â”‚ webpage reading  â”‚ Google Drive     â”‚ YouTube Music     â”‚
-â”‚ open programs   â”‚ browser tabs     â”‚ Discord          â”‚ SoundCloud        â”‚
-â”‚ close programs  â”‚ downloads        â”‚ notifications    â”‚ local music       â”‚
-â”‚ window control  â”‚ forms            â”‚ announcements    â”‚ radio             â”‚
-â”‚ clipboard       â”‚ page actions     â”‚ intercom         â”‚ media keys        â”‚
-â”‚ PowerShell      â”‚ autofill         â”‚                  â”‚ volume            â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ FILES           â”‚ SMART HOME       â”‚ DEVELOPMENT      â”‚ SYSTEM            â”‚
-â”‚                 â”‚                  â”‚                  â”‚                   â”‚
-â”‚ PDF             â”‚ Home Assistant   â”‚ GitHub           â”‚ CPU               â”‚
-â”‚ DOCX            â”‚ MQTT             â”‚ terminals        â”‚ RAM               â”‚
-â”‚ XLSX            â”‚ Matter           â”‚ scripts          â”‚ GPU               â”‚
-â”‚ PPTX            â”‚ Zigbee*          â”‚ Docker           â”‚ temperatures      â”‚
-â”‚ TXT / MD        â”‚ Hue              â”‚ SSH              â”‚ disk space        â”‚
-â”‚ JSON / CSV      â”‚ Tuya             â”‚ logs             â”‚ network           â”‚
-â”‚ folders         â”‚ Tasmota          â”‚ services         â”‚ battery           â”‚
-â”‚ file search     â”‚ smart plugs      â”‚ containers       â”‚ Wi-Fi             â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ ASSISTANT       â”‚ AUTOMATION       â”‚ DEVICES          â”‚ VISION            â”‚
-â”‚                 â”‚                  â”‚                  â”‚                   â”‚
-â”‚ alarms          â”‚ routines         â”‚ phone            â”‚ screenshot read   â”‚
-â”‚ reminders       â”‚ IF/THEN rules    â”‚ PCs              â”‚ UI understanding  â”‚
-â”‚ timers          â”‚ schedules        â”‚ Raspberry Pi     â”‚ error detection   â”‚
-â”‚ shopping lists  â”‚ events           â”‚ smart speakers   â”‚ button finding    â”‚
-â”‚ notes           â”‚ conditions       â”‚ TVs              â”‚ visual Q&A        â”‚
-â”‚ weather         â”‚ triggers         â”‚ Chromecast       â”‚ OCR when needed   â”‚
-â”‚ calculations    â”‚ webhooks         â”‚ tablets          â”‚                   â”‚
-â”‚ conversions     â”‚ device states    â”‚ NAS              â”‚                   â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                                           │
+                    ┌──────────────────────▼─────────────────────┐
+                    │               JARVIS CORE                 │
+                    │           Node.js / TypeScript            │
+                    │                                            │
+                    │ • tool router                              │
+                    │ • permissions                              │
+                    │ • conversation state                       │
+                    │ • intent router                            │
+                    │ • automation engine                        │
+                    │ • plugin manager                           │
+                    │ • device registry                          │
+                    │ • routines                                 │
+                    │ • alarms / reminders / timers              │
+                    │ • multi-room coordination                  │
+                    └─────┬─────────────┬───────────────┬────────┘
+                          │             │               │
+              ┌───────────▼──────┐ ┌────▼─────────┐ ┌──▼──────────────┐
+              │     AI BRAIN     │ │    VOICE     │ │     MEMORY      │
+              │                  │ │              │ │                 │
+              │ Ollama           │ │ Wake word    │ │ SQLite          │
+              │ OpenAI APIs      │ │ VAD          │ │ Vector memory   │
+              │ Vision models    │ │ STT          │ │ Conversations   │
+              │ Tool calling     │ │ TTS          │ │ Devices/People  │
+              └───────────┬──────┘ └────┬─────────┘ └─────────────────┘
+                          │             │
+                          │             ├─ sherpa-onnx
+                          │             ├─ Piper
+                          │             ├─ Edge TTS
+                          │             └─ optional remote TTS
+                          │
+                          ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                              JARVIS TOOLS                                 │
+├─────────────────┬──────────────────┬──────────────────┬───────────────────┤
+│ COMPUTER        │ WEB / BROWSER    │ COMMUNICATION    │ MEDIA             │
+│                 │                  │                  │                   │
+│ mouse           │ web search       │ Gmail            │ Spotify           │
+│ keyboard        │ Playwright       │ Calendar         │ YouTube           │
+│ screenshots     │ webpage reading  │ Google Drive     │ YouTube Music     │
+│ open programs   │ browser tabs     │ Discord          │ SoundCloud        │
+│ close programs  │ downloads        │ notifications    │ local music       │
+│ window control  │ forms            │ announcements    │ radio             │
+│ clipboard       │ page actions     │ intercom         │ media keys        │
+│ PowerShell      │ autofill         │                  │ volume            │
+├─────────────────┼──────────────────┼──────────────────┼───────────────────┤
+│ FILES           │ SMART HOME       │ DEVELOPMENT      │ SYSTEM            │
+│                 │                  │                  │                   │
+│ PDF             │ Home Assistant   │ GitHub           │ CPU               │
+│ DOCX            │ MQTT             │ terminals        │ RAM               │
+│ XLSX            │ Matter           │ scripts          │ GPU               │
+│ PPTX            │ Zigbee*          │ Docker           │ temperatures      │
+│ TXT / MD        │ Hue              │ SSH              │ disk space        │
+│ JSON / CSV      │ Tuya             │ logs             │ network           │
+│ folders         │ Tasmota          │ services         │ battery           │
+│ file search     │ smart plugs      │ containers       │ Wi-Fi             │
+├─────────────────┼──────────────────┼──────────────────┼───────────────────┤
+│ ASSISTANT       │ AUTOMATION       │ DEVICES          │ VISION            │
+│                 │                  │                  │                   │
+│ alarms          │ routines         │ phone            │ screenshot read   │
+│ reminders       │ IF/THEN rules    │ PCs              │ UI understanding  │
+│ timers          │ schedules        │ Raspberry Pi     │ error detection   │
+│ shopping lists  │ events           │ smart speakers   │ button finding    │
+│ notes           │ conditions       │ TVs              │ visual Q&A        │
+│ weather         │ triggers         │ Chromecast       │ OCR when needed   │
+│ calculations    │ webhooks         │ tablets          │                   │
+│ conversions     │ device states    │ NAS              │                   │
+└─────────────────┴──────────────────┴──────────────────┴───────────────────┘
 ```
 
 ---
 
-# ðŸŽ™ï¸ Voice Assistant
+# 🎙️ Voice Assistant
 
 NekoSune Jarvis should support both lightweight offline voice processing and optional higher-quality remote voice services.
 
@@ -160,23 +160,23 @@ NekoSune Jarvis should support both lightweight offline voice processing and opt
 
 ```text
 Microphone
-   â”‚
-   â–¼
+   │
+   ▼
 Wake Word Detector
-   â”‚
-   â–¼
+   │
+   ▼
 Voice Activity Detection
-   â”‚
-   â–¼
+   │
+   ▼
 Speech-to-Text
-   â”‚
-   â–¼
+   │
+   ▼
 Intent Router / AI
-   â”‚
-   â–¼
+   │
+   ▼
 Tool Execution
-   â”‚
-   â–¼
+   │
+   ▼
 Text-to-Speech
 ```
 
@@ -217,7 +217,7 @@ Optimised for use while gaming or streaming
 
 ---
 
-# ðŸ”Š Lightweight TTS / Speech
+# 🔊 Lightweight TTS / Speech
 
 The default voice stack should work without a dedicated GPU.
 
@@ -249,41 +249,41 @@ Example configuration:
 ```text
 Voice Engine
 
-â— Sherpa ONNX
+● Sherpa ONNX
   CPU: Low
   GPU: Not Required
 
-â—‹ Piper
+○ Piper
   CPU: Low
   GPU: Not Required
 
-â—‹ Edge TTS
+○ Edge TTS
   CPU: Very Low
   Internet: Required
 
-â—‹ Remote API
+○ Remote API
   Processing: Remote
 ```
 
 ---
 
-# ðŸ¥§ Raspberry Pi Mode
+# 🥧 Raspberry Pi Mode
 
 Raspberry Pi devices can operate as lightweight Jarvis satellites.
 
 ```text
 Raspberry Pi
-      â”‚
-      â”‚ Voice command
-      â–¼
+      │
+      │ Voice command
+      ▼
 Local Wake Word
-      â”‚
-      â–¼
+      │
+      ▼
 Local Intent Router
-      â”‚
-      â”œâ”€â”€ Local command â†’ execute instantly
-      â”‚
-      â””â”€â”€ AI request â†’ send to remote Ollama server
+      │
+      ├── Local command → execute instantly
+      │
+      └── AI request → send to remote Ollama server
 ```
 
 Local capabilities:
@@ -306,7 +306,7 @@ Heavy tasks can be sent to another machine.
 
 ---
 
-# âš¡ Local Intent Routing
+# ⚡ Local Intent Routing
 
 Simple commands should not require an LLM.
 
@@ -335,7 +335,7 @@ LLM calls are reserved for more complex requests.
 
 ---
 
-# ðŸ§  Memory
+# 🧠 Memory
 
 Long-term assistant memory using SQLite and optional vector search.
 
@@ -357,10 +357,10 @@ Notes
 Memory controls:
 
 ```text
-[âœ“] Conversations
-[âœ“] Preferences
-[âœ“] Projects
-[âœ“] Devices
+[✓] Conversations
+[✓] Preferences
+[✓] Projects
+[✓] Devices
 [ ] Sensitive Data
 
 [ View Memory ]
@@ -373,7 +373,7 @@ Passwords, authentication secrets, and private keys should never be stored in lo
 
 ---
 
-# ðŸ–±ï¸ Computer Control
+# 🖱️ Computer Control
 
 Jarvis can control supported desktop operating systems.
 
@@ -424,7 +424,7 @@ Example commands:
 
 ---
 
-# ðŸ‘ï¸ Vision
+# 👁️ Vision
 
 Jarvis can optionally understand what is displayed on a screen.
 
@@ -432,17 +432,17 @@ Example pipeline:
 
 ```text
 Screenshot
-   â”‚
-   â–¼
+   │
+   ▼
 Vision Model
-   â”‚
-   â–¼
+   │
+   ▼
 Screen Understanding
-   â”‚
-   â–¼
+   │
+   ▼
 Tool Planner
-   â”‚
-   â–¼
+   │
+   ▼
 Action
 ```
 
@@ -462,7 +462,7 @@ Example commands:
 
 ---
 
-# ðŸŒ Browser Automation
+# 🌐 Browser Automation
 
 Browser automation should prefer webpage structure over screen coordinates.
 
@@ -506,7 +506,7 @@ Example commands:
 
 ---
 
-# ðŸ“„ File Creation
+# 📄 File Creation
 
 Jarvis can create and manage files.
 
@@ -546,7 +546,7 @@ Example commands:
 
 ---
 
-# ðŸ“§ Communication Integrations
+# 📧 Communication Integrations
 
 Planned integrations:
 
@@ -574,7 +574,7 @@ Example commands:
 
 ---
 
-# ðŸŽµ Media
+# 🎵 Media
 
 Supported / planned:
 
@@ -612,7 +612,7 @@ Example commands:
 
 ---
 
-# ðŸ  Smart Home
+# 🏠 Smart Home
 
 NekoSune Jarvis is intended to act as a self-hosted alternative to Alexa and Google Home.
 
@@ -653,7 +653,7 @@ Example commands:
 
 ---
 
-# â° Alexa / Google Home Style Features
+# ⏰ Alexa / Google Home Style Features
 
 ## Alarms
 
@@ -756,7 +756,7 @@ Commands:
 
 ---
 
-# ðŸ” Routines
+# 🔁 Routines
 
 Jarvis can run Alexa-style routines.
 
@@ -766,13 +766,13 @@ Example:
 Routine:
 Good Morning
 
-â†’ Stop alarm
-â†’ Turn bedroom light on
-â†’ Brightness 25%
-â†’ Read weather
-â†’ Read calendar
-â†’ Read reminders
-â†’ Start Spotify
+→ Stop alarm
+→ Turn bedroom light on
+→ Brightness 25%
+→ Read weather
+→ Read calendar
+→ Read reminders
+→ Start Spotify
 ```
 
 Another example:
@@ -781,16 +781,16 @@ Another example:
 Routine:
 Good Night
 
-â†’ Pause music
-â†’ Turn lights off
-â†’ Lock PC
-â†’ Enable Do Not Disturb
-â†’ Read next alarm
+→ Pause music
+→ Turn lights off
+→ Lock PC
+→ Enable Do Not Disturb
+→ Read next alarm
 ```
 
 ---
 
-# ðŸ§© IF / THEN Automations
+# 🧩 IF / THEN Automations
 
 Advanced routines can use conditions.
 
@@ -823,7 +823,7 @@ run Welcome Home routine
 
 ---
 
-# ðŸ“¢ Multi-Room Assistant
+# 📢 Multi-Room Assistant
 
 Multiple Jarvis devices can act as assistant satellites.
 
@@ -831,16 +831,16 @@ Example:
 
 ```text
 Bedroom Pi
-      â”‚
+      │
 Living Room Pi
-      â”‚
+      │
 Main PC
-      â”‚
+      │
 Android Phone
-      â”‚
+      │
 Laptop
-      â”‚
-      â–¼
+      │
+      ▼
 NekoSune Jarvis Server
 ```
 
@@ -860,7 +860,7 @@ Commands:
 
 ---
 
-# ðŸ“ž Intercom
+# 📞 Intercom
 
 Supported through peer-to-peer or local network audio.
 
@@ -874,13 +874,13 @@ Example:
 
 ```text
 Living Room Pi
-       â†•
+       ↕
 Bedroom Pi
 ```
 
 ---
 
-# ðŸ” Device Discovery
+# 🔍 Device Discovery
 
 Possible discovery methods:
 
@@ -909,7 +909,7 @@ MQTT Broker
 
 ---
 
-# ðŸ“± Android Client
+# 📱 Android Client
 
 The Android client should function as a real assistant, not just a remote.
 
@@ -942,7 +942,7 @@ Example:
 
 ---
 
-# ðŸŽ iOS
+# 🍎 iOS
 
 iOS support is planned for the future.
 
@@ -960,23 +960,23 @@ Apple builds must be compiled and signed using macOS hardware.
 
 ---
 
-# ðŸ–¥ï¸ Remote PC / Server Agents
+# 🖥️ Remote PC / Server Agents
 
 Optional Jarvis agents can run on remote machines.
 
 ```text
 MAIN JARVIS
-      â”‚
-      â”œâ”€â”€â”€â”€ Windows Gaming PC
-      â”‚         Jarvis Agent
-      â”‚
-      â”œâ”€â”€â”€â”€ Linux Server
-      â”‚         Jarvis Agent
-      â”‚
-      â”œâ”€â”€â”€â”€ Raspberry Pi
-      â”‚         Jarvis Agent
-      â”‚
-      â””â”€â”€â”€â”€ Laptop
+      │
+      ├──── Windows Gaming PC
+      │         Jarvis Agent
+      │
+      ├──── Linux Server
+      │         Jarvis Agent
+      │
+      ├──── Raspberry Pi
+      │         Jarvis Agent
+      │
+      └──── Laptop
                 Jarvis Agent
 ```
 
@@ -996,7 +996,7 @@ Example remote commands:
 
 ---
 
-# ðŸ‘¨â€ðŸ’» Developer / Server Tools
+# 👨‍💻 Developer / Server Tools
 
 Planned tools:
 
@@ -1039,7 +1039,7 @@ Examples:
 
 ---
 
-# ðŸ“Š System Monitoring
+# 📊 System Monitoring
 
 Jarvis can display or read:
 
@@ -1059,27 +1059,27 @@ Jarvis can display or read:
 Example dashboard:
 
 ```text
-â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®
-â”‚              NEKOSUNE AI                â”‚
-â”‚                                         â”‚
-â”‚                    â—‰                    â”‚
-â”‚                Listening                â”‚
-â”‚                                         â”‚
-â”‚ â–â–ƒâ–…â–‡â–†â–ƒâ–‚â–…â–‡â–…â–ƒâ–                           â”‚
-â”‚                                         â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ Bedroom       21.4Â°C       Lights ON    â”‚
-â”‚ PC            ONLINE       GPU 46Â°C     â”‚
-â”‚ Phone         71%          HOME         â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ Timer: Pizza                  12:31      â”‚
-â”‚ Alarm: Tomorrow               07:00      â”‚
-â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯
+╭─────────────────────────────────────────╮
+│              NEKOSUNE AI                │
+│                                         │
+│                    ◉                    │
+│                Listening                │
+│                                         │
+│ ▁▃▅▇▆▃▂▅▇▅▃▁                           │
+│                                         │
+├─────────────────────────────────────────┤
+│ Bedroom       21.4°C       Lights ON    │
+│ PC            ONLINE       GPU 46°C     │
+│ Phone         71%          HOME         │
+├─────────────────────────────────────────┤
+│ Timer: Pizza                  12:31      │
+│ Alarm: Tomorrow               07:00      │
+╰─────────────────────────────────────────╯
 ```
 
 ---
 
-# ðŸŽ¨ UI
+# 🎨 UI
 
 The UI should feel like a real Jarvis interface rather than a standard chatbot.
 
@@ -1107,7 +1107,7 @@ Planned visual features:
 
 ---
 
-# âš™ï¸ Performance Modes
+# ⚙️ Performance Modes
 
 ```text
 ULTRA
@@ -1132,7 +1132,7 @@ Voice assistant only
 
 ---
 
-# ðŸ” Permissions
+# 🔐 Permissions
 
 Because Jarvis can control the operating system, permissions must be built into the core.
 
@@ -1140,20 +1140,20 @@ Example permissions:
 
 ```text
 Safe
-âœ“ Weather
-âœ“ Timers
-âœ“ Music
-âœ“ System information
+✓ Weather
+✓ Timers
+✓ Music
+✓ System information
 
 Computer
-âœ“ Mouse
-âœ“ Keyboard
-âœ“ Open applications
-âœ“ Screenshots
+✓ Mouse
+✓ Keyboard
+✓ Open applications
+✓ Screenshots
 
 Files
-âœ“ Read
-âœ“ Create
+✓ Read
+✓ Create
 ? Move
 ? Delete
 
@@ -1193,7 +1193,7 @@ Remove-Item C:\Example
 
 ---
 
-# ðŸ”Œ Plugin System
+# 🔌 Plugin System
 
 Jarvis should use a plugin-based architecture.
 
@@ -1201,18 +1201,18 @@ Example:
 
 ```text
 plugins/
-â”œâ”€â”€ spotify/
-â”œâ”€â”€ youtube/
-â”œâ”€â”€ gmail/
-â”œâ”€â”€ google-drive/
-â”œâ”€â”€ calendar/
-â”œâ”€â”€ discord/
-â”œâ”€â”€ github/
-â”œâ”€â”€ weather/
-â”œâ”€â”€ home-assistant/
-â”œâ”€â”€ windows/
-â”œâ”€â”€ browser/
-â””â”€â”€ docker/
+├── spotify/
+├── youtube/
+├── gmail/
+├── google-drive/
+├── calendar/
+├── discord/
+├── github/
+├── weather/
+├── home-assistant/
+├── windows/
+├── browser/
+└── docker/
 ```
 
 Each plugin exposes tools.
@@ -1236,138 +1236,138 @@ export default {
 
 ---
 
-# ðŸ“‚ Proposed Repository Structure
+# 📂 Proposed Repository Structure
 
 ```text
 NekoSuneJarvis/
-â”‚
-â”œâ”€â”€ apps/
-â”‚   â”œâ”€â”€ desktop-mobile/
-â”‚   â”‚   â””â”€â”€ Flutter
-â”‚   â”‚
-â”‚   â”œâ”€â”€ web-dashboard/
-â”‚   â””â”€â”€ tray/
-â”‚
-â”œâ”€â”€ core/
-â”‚   â”œâ”€â”€ agent/
-â”‚   â”œâ”€â”€ llm/
-â”‚   â”œâ”€â”€ vision/
-â”‚   â”œâ”€â”€ intents/
-â”‚   â”œâ”€â”€ tools/
-â”‚   â”œâ”€â”€ permissions/
-â”‚   â”œâ”€â”€ memory/
-â”‚   â””â”€â”€ plugins/
-â”‚
-â”œâ”€â”€ voice/
-â”‚   â”œâ”€â”€ wakeword/
-â”‚   â”œâ”€â”€ vad/
-â”‚   â”œâ”€â”€ stt/
-â”‚   â””â”€â”€ tts/
-â”‚
-â”œâ”€â”€ assistant/
-â”‚   â”œâ”€â”€ alarms/
-â”‚   â”œâ”€â”€ timers/
-â”‚   â”œâ”€â”€ reminders/
-â”‚   â”œâ”€â”€ notes/
-â”‚   â”œâ”€â”€ lists/
-â”‚   â”œâ”€â”€ routines/
-â”‚   â””â”€â”€ announcements/
-â”‚
-â”œâ”€â”€ automation/
-â”‚   â”œâ”€â”€ triggers/
-â”‚   â”œâ”€â”€ conditions/
-â”‚   â”œâ”€â”€ actions/
-â”‚   â””â”€â”€ scheduler/
-â”‚
-â”œâ”€â”€ computer/
-â”‚   â”œâ”€â”€ windows/
-â”‚   â”œâ”€â”€ linux/
-â”‚   â”œâ”€â”€ macos/
-â”‚   â”œâ”€â”€ input/
-â”‚   â”œâ”€â”€ screenshots/
-â”‚   â””â”€â”€ window-manager/
-â”‚
-â”œâ”€â”€ browser/
-â”‚   â”œâ”€â”€ playwright/
-â”‚   â”œâ”€â”€ search/
-â”‚   â””â”€â”€ downloads/
-â”‚
-â”œâ”€â”€ integrations/
-â”‚   â”œâ”€â”€ spotify/
-â”‚   â”œâ”€â”€ youtube/
-â”‚   â”œâ”€â”€ gmail/
-â”‚   â”œâ”€â”€ google-calendar/
-â”‚   â”œâ”€â”€ google-drive/
-â”‚   â”œâ”€â”€ discord/
-â”‚   â”œâ”€â”€ github/
-â”‚   â”œâ”€â”€ home-assistant/
-â”‚   â”œâ”€â”€ mqtt/
-â”‚   â””â”€â”€ matter/
-â”‚
-â”œâ”€â”€ documents/
-â”‚   â”œâ”€â”€ pdf/
-â”‚   â”œâ”€â”€ docx/
-â”‚   â”œâ”€â”€ xlsx/
-â”‚   â””â”€â”€ pptx/
-â”‚
-â”œâ”€â”€ devices/
-â”‚   â”œâ”€â”€ discovery/
-â”‚   â”œâ”€â”€ satellites/
-â”‚   â”œâ”€â”€ android/
-â”‚   â”œâ”€â”€ raspberry-pi/
-â”‚   â””â”€â”€ remote-agent/
-â”‚
-â”œâ”€â”€ media/
-â”‚   â”œâ”€â”€ spotify/
-â”‚   â”œâ”€â”€ youtube/
-â”‚   â”œâ”€â”€ radio/
-â”‚   â”œâ”€â”€ local/
-â”‚   â””â”€â”€ multiroom/
-â”‚
-â”œâ”€â”€ server/
-â”‚   â”œâ”€â”€ api/
-â”‚   â”œâ”€â”€ websocket/
-â”‚   â”œâ”€â”€ auth/
-â”‚   â””â”€â”€ device-registry/
-â”‚
-â”œâ”€â”€ shared/
-â”‚   â”œâ”€â”€ models/
-â”‚   â”œâ”€â”€ protocol/
-â”‚   â””â”€â”€ config/
-â”‚
-â””â”€â”€ platform/
-    â”œâ”€â”€ windows/
-    â”œâ”€â”€ linux/
-    â”œâ”€â”€ raspberry-pi/
-    â”œâ”€â”€ macos/
-    â”œâ”€â”€ android/
-    â””â”€â”€ ios/
+│
+├── apps/
+│   ├── desktop-mobile/
+│   │   └── Flutter
+│   │
+│   ├── web-dashboard/
+│   └── tray/
+│
+├── core/
+│   ├── agent/
+│   ├── llm/
+│   ├── vision/
+│   ├── intents/
+│   ├── tools/
+│   ├── permissions/
+│   ├── memory/
+│   └── plugins/
+│
+├── voice/
+│   ├── wakeword/
+│   ├── vad/
+│   ├── stt/
+│   └── tts/
+│
+├── assistant/
+│   ├── alarms/
+│   ├── timers/
+│   ├── reminders/
+│   ├── notes/
+│   ├── lists/
+│   ├── routines/
+│   └── announcements/
+│
+├── automation/
+│   ├── triggers/
+│   ├── conditions/
+│   ├── actions/
+│   └── scheduler/
+│
+├── computer/
+│   ├── windows/
+│   ├── linux/
+│   ├── macos/
+│   ├── input/
+│   ├── screenshots/
+│   └── window-manager/
+│
+├── browser/
+│   ├── playwright/
+│   ├── search/
+│   └── downloads/
+│
+├── integrations/
+│   ├── spotify/
+│   ├── youtube/
+│   ├── gmail/
+│   ├── google-calendar/
+│   ├── google-drive/
+│   ├── discord/
+│   ├── github/
+│   ├── home-assistant/
+│   ├── mqtt/
+│   └── matter/
+│
+├── documents/
+│   ├── pdf/
+│   ├── docx/
+│   ├── xlsx/
+│   └── pptx/
+│
+├── devices/
+│   ├── discovery/
+│   ├── satellites/
+│   ├── android/
+│   ├── raspberry-pi/
+│   └── remote-agent/
+│
+├── media/
+│   ├── spotify/
+│   ├── youtube/
+│   ├── radio/
+│   ├── local/
+│   └── multiroom/
+│
+├── server/
+│   ├── api/
+│   ├── websocket/
+│   ├── auth/
+│   └── device-registry/
+│
+├── shared/
+│   ├── models/
+│   ├── protocol/
+│   └── config/
+│
+└── platform/
+    ├── windows/
+    ├── linux/
+    ├── raspberry-pi/
+    ├── macos/
+    ├── android/
+    └── ios/
 ```
 
 ---
 
-# ðŸŒ Offline Support
+# 🌐 Offline Support
 
 Core features should remain available without the internet.
 
 Offline:
 
 ```text
-âœ“ Wake word
-âœ“ Speech recognition
-âœ“ TTS
-âœ“ Time
-âœ“ Alarms
-âœ“ Timers
-âœ“ Reminders
-âœ“ Volume
-âœ“ Local music
-âœ“ Computer control
-âœ“ MQTT
-âœ“ Home Assistant LAN
-âœ“ Smart-home actions
-âœ“ Routines
-âœ“ Shutdown / restart
+✓ Wake word
+✓ Speech recognition
+✓ TTS
+✓ Time
+✓ Alarms
+✓ Timers
+✓ Reminders
+✓ Volume
+✓ Local music
+✓ Computer control
+✓ MQTT
+✓ Home Assistant LAN
+✓ Smart-home actions
+✓ Routines
+✓ Shutdown / restart
 ```
 
 Online / Remote:
@@ -1384,9 +1384,9 @@ Cloud integrations
 
 ---
 
-# ðŸ—ºï¸ Development Roadmap
+# 🗺️ Development Roadmap
 
-## Phase 1 â€” Core
+## Phase 1 — Core
 
 - [ ] Flutter desktop application
 - [ ] Node.js / TypeScript Jarvis Core
@@ -1398,7 +1398,7 @@ Cloud integrations
 - [ ] Permission manager
 - [ ] SQLite database
 
-## Phase 2 â€” Voice
+## Phase 2 — Voice
 
 - [ ] Wake word
 - [ ] VAD
@@ -1408,7 +1408,7 @@ Cloud integrations
 - [ ] Push-to-talk
 - [ ] Continuous conversation
 
-## Phase 3 â€” Desktop Control
+## Phase 3 — Desktop Control
 
 - [ ] Application launcher
 - [ ] Keyboard
@@ -1421,7 +1421,7 @@ Cloud integrations
 - [ ] Linux support
 - [ ] macOS source support
 
-## Phase 4 â€” Browser / Vision
+## Phase 4 — Browser / Vision
 
 - [ ] Playwright
 - [ ] Web search
@@ -1431,7 +1431,7 @@ Cloud integrations
 - [ ] Screen understanding
 - [ ] Visual interaction
 
-## Phase 5 â€” Alexa / Google Home Features
+## Phase 5 — Alexa / Google Home Features
 
 - [ ] Timers
 - [ ] Alarms
@@ -1443,7 +1443,7 @@ Cloud integrations
 - [ ] Intercom
 - [ ] Multi-room assistant
 
-## Phase 6 â€” Smart Home
+## Phase 6 — Smart Home
 
 - [ ] Home Assistant
 - [ ] MQTT
@@ -1455,7 +1455,7 @@ Cloud integrations
 - [ ] TVs
 - [ ] Media devices
 
-## Phase 7 â€” Integrations
+## Phase 7 — Integrations
 
 - [ ] Spotify
 - [ ] YouTube
@@ -1467,7 +1467,7 @@ Cloud integrations
 - [ ] Jellyfin
 - [ ] Plex
 
-## Phase 8 â€” Mobile
+## Phase 8 — Mobile
 
 - [ ] Android client
 - [ ] Notifications
@@ -1478,7 +1478,7 @@ Cloud integrations
 - [ ] Remote PC control
 - [ ] iOS project preparation
 
-## Phase 9 â€” Remote Agents
+## Phase 9 — Remote Agents
 
 - [ ] Windows agent
 - [ ] Linux agent
@@ -1490,7 +1490,7 @@ Cloud integrations
 
 ---
 
-# ðŸŽ¯ Project Goal
+# 🎯 Project Goal
 
 The goal of NekoSune Jarvis is to create a self-hosted assistant that combines:
 
@@ -1534,7 +1534,7 @@ while sharing the same assistant identity, memory, integrations, routines, permi
 
 ---
 
-# âš ï¸ Security
+# ⚠️ Security
 
 NekoSune Jarvis can potentially control computers, files, servers, smart-home devices, and online services.
 
@@ -1554,7 +1554,7 @@ The project should therefore follow these rules:
 
 ---
 
-# ðŸ“œ License
+# 📜 License
 
 A license has not yet been selected.
 
@@ -1566,7 +1566,7 @@ Recommended options:
 
 ---
 
-# ðŸš§ Status
+# 🚧 Status
 
 NekoSune Jarvis is currently a planned project / work in progress.
 
