@@ -142,6 +142,12 @@ export class JarvisDatabase {
       CREATE INDEX IF NOT EXISTS idx_agent_commands_device_status
         ON agent_commands(device_id, status, created_at);
 
+      CREATE TABLE IF NOT EXISTS plugin_settings (
+        plugin_id TEXT PRIMARY KEY,
+        enabled INTEGER NOT NULL DEFAULT 1,
+        updated_at TEXT NOT NULL
+      );
+
       CREATE TABLE IF NOT EXISTS secrets (
         name TEXT PRIMARY KEY,
         ciphertext TEXT NOT NULL,
