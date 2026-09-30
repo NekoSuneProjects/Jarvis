@@ -1,5 +1,20 @@
+import { rrulestr } from "rrule";
 import type { AssistantStore } from "./store.js";
 import type { EventBus } from "../events/event-bus.js";
+
+function nextOccurrence(rule:string,currentFireAt:string):string|null{
+  try{
+    const normalized=rule.trim().replace(/^RRULE:/i,"");
+    const recurrence=rrulestr(normalized,{
+      dtstart:new Date(currentFireAt),
+      forceset:false
+    });
+    const next=recurrence.after(new Date(currentFireAt),false);
+    return next?.toISOString() ?? null;
+  }catch{
+    return null;
+  }
+}
 
 export class Scheduler {
   private interval?: NodeJS.Timeout;
@@ -27,17 +42,38 @@ export class Scheduler {
       }
     }
 
-    for (const alarm of this.store.dueAlarms() as Array<{id:number;name:string;repeat_rule:string|null}>) {
+    for (const alarm of this.store.dueAlarms() as Array<{
+      id:number;
+      name:string;
+      fire_at:string;
+      repeat_rule:string|null;
+    }>) {
       this.events.publish("alarm.fired", alarm);
-      // Repeating rules are intentionally kept for the recurrence engine.
-      if (!alarm.repeat_rule) {
+
+      if (alarm.repeat_rule) {
+        const next=nextOccurrence(alarm.repeat_rule,alarm.fire_at);
+        if(next) this.store.updateAlarmFireAt(alarm.id,next);
+        else this.store.disableAlarm(alarm.id);
+      } else {
         this.store.disableAlarm(alarm.id);
       }
     }
 
-    for (const reminder of this.store.dueReminders() as Array<{id:number;text:string;repeat_rule:string|null}>) {
+    for (const reminder of this.store.dueReminders() as Array<{
+      id:number;
+      text:string;
+      fire_at:string;
+      repeat_rule:string|null;
+    }>) {
       this.events.publish("reminder.fired", reminder);
-      if (!reminder.repeat_rule) this.store.completeReminder(reminder.id);
+
+      if (reminder.repeat_rule) {
+        const next=nextOccurrence(reminder.repeat_rule,reminder.fire_at);
+        if(next) this.store.updateReminderFireAt(reminder.id,next);
+        else this.store.completeReminder(reminder.id);
+      } else {
+        this.store.completeReminder(reminder.id);
+      }
     }
   }
 }
