@@ -51,6 +51,10 @@ Implemented in the repository so far:
 - [x] Jellyfin/Plex/Kodi media tools
 - [x] Internet radio search tools
 - [x] Local music scanning and metadata search
+- [x] Event/time/MQTT/voice/webhook routine triggers
+- [x] Persistent notification center and notification tools
+- [x] Home Assistant AI tool integration
+- [x] MQTT AI publish/subscribe tools
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -590,10 +594,10 @@ Implemented in the repository so far:
 - [ ] Topic browser
 - [ ] Device auto-discovery
 - [ ] Home Assistant MQTT discovery
-- [ ] Trigger Jarvis routine from MQTT
+- [x] Trigger Jarvis routine from MQTT
 - [ ] Publish Jarvis state to MQTT
 - [ ] Publish voice assistant events
-- [ ] MQTT permissions
+- [x] MQTT permissions
 
 ---
 
@@ -980,10 +984,10 @@ Implemented in the repository so far:
 - [ ] Email notifications
 - [ ] GitHub notifications
 - [ ] Discord notifications
-- [ ] Smart-home notifications
+- [x] Smart-home notifications foundation
 - [ ] System alerts
 - [ ] Server alerts
-- [ ] Jarvis notification summary
+- [x] Jarvis notification summary foundation
 - [ ] Priority filtering
 - [ ] Quiet hours
 - [ ] Read aloud option
@@ -1121,15 +1125,15 @@ Implemented in the repository so far:
 # Routines
 
 - [x] Routine editor
-- [ ] Voice trigger
-- [ ] Time trigger
+- [x] Voice trigger
+- [x] Time trigger
 - [ ] Device trigger
 - [ ] Presence trigger
-- [ ] Webhook trigger
-- [ ] MQTT trigger
+- [x] Webhook trigger
+- [x] MQTT trigger
 - [x] Multiple actions
 - [x] Delays
-- [ ] Conditions
+- [x] Conditions
 - [ ] Branching
 - [x] Enable / disable
 - [x] Manual run
@@ -1140,9 +1144,9 @@ Implemented in the repository so far:
 
 # IF / THEN Automation Engine
 
-- [ ] Trigger system
-- [ ] Condition system
-- [ ] Action system
+- [x] Trigger system
+- [x] Condition system
+- [x] Action system
 - [ ] AND conditions
 - [ ] OR conditions
 - [ ] NOT conditions
@@ -1153,12 +1157,12 @@ Implemented in the repository so far:
 - [ ] Weather
 - [ ] Calendar
 - [ ] Email
-- [ ] Webhooks
+- [x] Webhooks
 - [ ] MQTT
 - [ ] System state
 - [ ] AI condition
 - [ ] Cooldown
-- [ ] Loop prevention
+- [x] Loop prevention
 
 ---
 
