@@ -32,6 +32,8 @@ import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
+import { utilitiesPlugin } from "./plugins/utilities-plugin.js";
+import { createYoutubePlugin } from "./plugins/youtube-plugin.js";
 import { wolPlugin } from "./plugins/wol-plugin.js";
 import { PiperTtsProvider } from "./voice/piper.js";
 import { PluginRegistry } from "./plugins/plugin-registry.js";
@@ -67,6 +69,7 @@ export async function createServer(ai: AiProvider) {
   const notificationsPlugin = createNotificationsPlugin(store, events);
   const searchPlugin = createSearchPlugin();
   const weatherPlugin = createWeatherPlugin();
+  const youtubePlugin = createYoutubePlugin();
   const spotifyPlugin = createSpotifyPlugin();
   const builtInPlugins = [
     systemPlugin,
@@ -83,6 +86,8 @@ export async function createServer(ai: AiProvider) {
     wolPlugin,
     searchPlugin,
     weatherPlugin,
+    youtubePlugin,
+    utilitiesPlugin,
     spotifyPlugin
   ];
 
