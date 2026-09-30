@@ -58,7 +58,12 @@ const schema = z.object({
 
   JARVIS_API_TOKEN: z.string().default(""),
   JARVIS_SECRET_KEY: z.string().default(""),
-  ADB_BIN: z.string().default("adb")
+  ADB_BIN: z.string().default("adb"),
+
+  HUE_BRIDGE_URL: z.string().default(""),
+  HUE_USERNAME: z.string().default(""),
+  SHELLY_DEVICES_JSON: z.string().default("{}"),
+  TASMOTA_DEVICES_JSON: z.string().default("{}")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -131,5 +136,11 @@ export const config = {
   },
   apiToken: parsed.data.JARVIS_API_TOKEN,
   secretKey: parsed.data.JARVIS_SECRET_KEY,
-  adbBin: parsed.data.ADB_BIN
+  adbBin: parsed.data.ADB_BIN,
+  hue: {
+    url: parsed.data.HUE_BRIDGE_URL,
+    username: parsed.data.HUE_USERNAME
+  },
+  shellyDevicesJson: parsed.data.SHELLY_DEVICES_JSON,
+  tasmotaDevicesJson: parsed.data.TASMOTA_DEVICES_JSON
 } as const;
