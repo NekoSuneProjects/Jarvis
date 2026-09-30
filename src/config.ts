@@ -20,7 +20,14 @@ const schema = z.object({
 
   MQTT_URL: z.string().default(""),
   MQTT_USERNAME: z.string().default(""),
-  MQTT_PASSWORD: z.string().default("")
+  MQTT_PASSWORD: z.string().default(""),
+
+  SEARXNG_URL: z.string().default(""),
+  SPOTIFY_ACCESS_TOKEN: z.string().default(""),
+  JARVIS_FILES_ROOT: z.string().default("./workspace"),
+
+  PIPER_BIN: z.string().default("piper"),
+  PIPER_MODEL: z.string().default("")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -52,5 +59,12 @@ export const config = {
     url: parsed.data.MQTT_URL,
     username: parsed.data.MQTT_USERNAME,
     password: parsed.data.MQTT_PASSWORD
+  },
+  searxngUrl: parsed.data.SEARXNG_URL,
+  spotifyAccessToken: parsed.data.SPOTIFY_ACCESS_TOKEN,
+  filesRoot: parsed.data.JARVIS_FILES_ROOT,
+  piper: {
+    bin: parsed.data.PIPER_BIN,
+    model: parsed.data.PIPER_MODEL
   }
 } as const;
