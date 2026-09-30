@@ -46,6 +46,8 @@ Implemented in the repository so far:
 - [x] sherpa-onnx CPU wake-word + VAD + SenseVoice satellite
 - [x] Secure device pairing and heartbeat registry
 - [x] Zero-dependency Node remote agent
+- [x] Remote agent command queue and result reporting
+- [x] PDF/DOCX/XLSX/PPTX generation tools
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -952,12 +954,12 @@ Implemented in the repository so far:
 - [x] macOS agent foundation
 - [x] Heartbeat
 - [x] Device online/offline state foundation
-- [ ] Remote commands
+- [x] Remote commands
 - [ ] Remote screenshots
-- [ ] Remote system stats
+- [x] Remote system stats
 - [ ] Remote notifications
 - [ ] Remote file transfer
-- [ ] Remote app launching
+- [x] Remote app launching
 - [ ] Remote power actions
 - [ ] Per-device permissions
 - [x] Device revoke
@@ -1243,7 +1245,7 @@ Implemented in the repository so far:
 
 ## PDF
 
-- [ ] Create PDF
+- [x] Create PDF
 - [ ] Read PDF
 - [ ] Search PDF
 - [ ] Summarise PDF
@@ -1253,7 +1255,7 @@ Implemented in the repository so far:
 
 ## DOCX
 
-- [ ] Create DOCX
+- [x] Create DOCX
 - [ ] Read DOCX
 - [ ] Edit DOCX
 - [ ] Search DOCX
@@ -1263,7 +1265,7 @@ Implemented in the repository so far:
 
 ## XLSX
 
-- [ ] Create XLSX
+- [x] Create XLSX
 - [ ] Read XLSX
 - [ ] Edit cells
 - [ ] Formulas
@@ -1273,7 +1275,7 @@ Implemented in the repository so far:
 
 ## PPTX
 
-- [ ] Create PPTX
+- [x] Create PPTX
 - [ ] Read PPTX
 - [ ] Edit PPTX
 - [ ] Add slides
