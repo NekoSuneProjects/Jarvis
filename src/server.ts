@@ -16,6 +16,7 @@ import { HomeAssistantIntegration } from "./integrations/home-assistant.js";
 import { MqttIntegration } from "./integrations/mqtt.js";
 import { PermissionManager } from "./permissions/permission-manager.js";
 import { createAssistantPlugin } from "./plugins/assistant-plugin.js";
+import { androidPlugin } from "./plugins/android-plugin.js";
 import { createBrowserPlugin } from "./plugins/browser-plugin.js";
 import { createDiscordPlugin } from "./plugins/discord-plugin.js";
 import { createDiscoveryPlugin } from "./plugins/discovery-plugin.js";
@@ -90,6 +91,7 @@ export async function createServer(ai: AiProvider) {
   const builtInPlugins = [
     systemPlugin,
     assistantPlugin,
+    androidPlugin,
     browserPlugin,
     computerPlugin,
     desktopInputPlugin,
