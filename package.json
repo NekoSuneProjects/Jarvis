@@ -31,7 +31,8 @@
     "music-metadata": "^10.6.4",
     "mathjs": "^14.6.0",
     "convert-units": "^3.0.0-beta.8",
-    "ssh2": "^1.16.0"
+    "ssh2": "^1.16.0",
+    "systeminformation": "^5.27.11"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
