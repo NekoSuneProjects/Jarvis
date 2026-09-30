@@ -13,7 +13,14 @@ const schema = z.object({
   AI_TEMPERATURE: z.coerce.number().min(0).max(2).default(0.7),
   AI_TIMEOUT_MS: z.coerce.number().int().positive().default(60000),
 
-  JARVIS_DATA_DIR: z.string().default("./data")
+  JARVIS_DATA_DIR: z.string().default("./data"),
+
+  HOME_ASSISTANT_URL: z.string().default(""),
+  HOME_ASSISTANT_TOKEN: z.string().default(""),
+
+  MQTT_URL: z.string().default(""),
+  MQTT_USERNAME: z.string().default(""),
+  MQTT_PASSWORD: z.string().default("")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -36,5 +43,14 @@ export const config = {
     temperature: parsed.data.AI_TEMPERATURE,
     timeoutMs: parsed.data.AI_TIMEOUT_MS
   },
-  dataDir: parsed.data.JARVIS_DATA_DIR
+  dataDir: parsed.data.JARVIS_DATA_DIR,
+  homeAssistant: {
+    url: parsed.data.HOME_ASSISTANT_URL,
+    token: parsed.data.HOME_ASSISTANT_TOKEN
+  },
+  mqtt: {
+    url: parsed.data.MQTT_URL,
+    username: parsed.data.MQTT_USERNAME,
+    password: parsed.data.MQTT_PASSWORD
+  }
 } as const;
