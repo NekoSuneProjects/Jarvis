@@ -32,6 +32,7 @@ const DEFAULT_RULES: PermissionRule[] = [
   { capability: "calendar.read", decision: "allow" },
   { capability: "calendar.write", decision: "ask" },
   { capability: "drive.read", decision: "allow" },
+  { capability: "drive.write", decision: "ask" },
   { capability: "development.read", decision: "allow" },
   { capability: "development.write", decision: "ask" },
   { capability: "memory.read", decision: "allow" },
