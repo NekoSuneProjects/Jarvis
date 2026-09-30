@@ -17,6 +17,7 @@ import { PermissionManager } from "./permissions/permission-manager.js";
 import { createAssistantPlugin } from "./plugins/assistant-plugin.js";
 import { createBrowserPlugin } from "./plugins/browser-plugin.js";
 import { createDiscordPlugin } from "./plugins/discord-plugin.js";
+import { documentsPlugin } from "./plugins/documents-plugin.js";
 import { createDevicesPlugin } from "./plugins/devices-plugin.js";
 import { computerPlugin } from "./plugins/computer-plugin.js";
 import { dockerPlugin } from "./plugins/docker-plugin.js";
@@ -68,6 +69,7 @@ export async function createServer(ai: AiProvider) {
     computerPlugin,
     devicesPlugin,
     discordPlugin,
+    documentsPlugin,
     filesPlugin,
     githubPlugin,
     googlePlugin,
