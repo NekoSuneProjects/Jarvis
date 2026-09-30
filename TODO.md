@@ -79,6 +79,7 @@ Implemented in the repository so far:
 - [x] AES-256-GCM encrypted local secret vault
 - [x] Persistent plugin enable/disable with execution enforcement
 - [x] Searchable sensitive-action audit log API
+- [x] Android ADB device/app/input/screenshot tools
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -738,13 +739,13 @@ Implemented in the repository so far:
 
 - [ ] Device discovery
 - [ ] Pairing
-- [ ] ADB support
-- [ ] Open app
+- [x] ADB support
+- [x] Open app
 - [ ] Media controls
 - [ ] Volume
-- [ ] Input navigation
-- [ ] Text input
-- [ ] Read current app
+- [x] Input navigation
+- [x] Text input
+- [x] Read current app
 
 ## LG webOS
 
