@@ -3,6 +3,7 @@ export interface RetryOptions {
   baseDelayMs?:number;
   maxDelayMs?:number;
   retryStatuses?:number[];
+  retryMethods?:string[];
 }
 
 function delay(ms:number){
@@ -26,6 +27,15 @@ export async function fetchWithRetry(
   init:RequestInit={},
   options:RetryOptions={}
 ):Promise<Response>{
+  const method=(init.method ?? (input instanceof Request ? input.method : "GET")).toUpperCase();
+  const retryMethods=new Set(
+    (options.retryMethods ?? ["GET","HEAD","OPTIONS"]).map((value)=>value.toUpperCase())
+  );
+
+  if(!retryMethods.has(method)){
+    return fetch(input,init);
+  }
+
   const retries=options.retries ?? 2;
   const baseDelayMs=options.baseDelayMs ?? 400;
   const maxDelayMs=options.maxDelayMs ?? 5000;
