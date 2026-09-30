@@ -145,6 +145,49 @@ export class AssistantStore {
     return this.database.db.prepare("UPDATE timers SET state=?, remaining_ms=? WHERE id=?").run(state, remainingMs, id).changes > 0;
   }
 
+  timer(id:number) {
+    return this.database.db.prepare("SELECT * FROM timers WHERE id=?").get(id);
+  }
+
+  pauseTimer(id:number) {
+    const timer=this.timer(id) as {state:string;ends_at:string}|undefined;
+    if(!timer || timer.state!=="running") return false;
+    const remaining=Math.max(0,new Date(timer.ends_at).getTime()-Date.now());
+    return this.database.db.prepare(
+      "UPDATE timers SET state='paused',remaining_ms=? WHERE id=?"
+    ).run(remaining,id).changes>0;
+  }
+
+  resumeTimer(id:number) {
+    const timer=this.timer(id) as {state:string;remaining_ms:number|null}|undefined;
+    if(!timer || timer.state!=="paused") return false;
+    const remaining=Math.max(0,timer.remaining_ms ?? 0);
+    const endsAt=new Date(Date.now()+remaining).toISOString();
+    return this.database.db.prepare(
+      "UPDATE timers SET state='running',remaining_ms=NULL,ends_at=? WHERE id=?"
+    ).run(endsAt,id).changes>0;
+  }
+
+  addTimerTime(id:number,deltaMs:number) {
+    const timer=this.timer(id) as {state:string;remaining_ms:number|null;ends_at:string}|undefined;
+    if(!timer) return false;
+    if(timer.state==="paused"){
+      const next=Math.max(0,(timer.remaining_ms ?? 0)+deltaMs);
+      return this.database.db.prepare("UPDATE timers SET remaining_ms=? WHERE id=?").run(next,id).changes>0;
+    }
+    if(timer.state==="running"){
+      const next=new Date(Math.max(Date.now(),new Date(timer.ends_at).getTime()+deltaMs)).toISOString();
+      return this.database.db.prepare("UPDATE timers SET ends_at=? WHERE id=?").run(next,id).changes>0;
+    }
+    return false;
+  }
+
+  cancelTimer(id:number) {
+    return this.database.db.prepare(
+      "UPDATE timers SET state='cancelled' WHERE id=? AND state IN ('running','paused')"
+    ).run(id).changes>0;
+  }
+
   createAlarm(name: string, fireAt: string, repeatRule?: string) {
     const result = this.database.db
       .prepare("INSERT INTO alarms (name,fire_at,repeat_rule,created_at) VALUES (?,?,?,?)")
@@ -160,6 +203,14 @@ export class AssistantStore {
     return this.database.db.prepare("UPDATE alarms SET enabled=0 WHERE id=?").run(id).changes > 0;
   }
 
+  updateAlarmFireAt(id:number,fireAt:string) {
+    return this.database.db.prepare("UPDATE alarms SET fire_at=? WHERE id=?").run(fireAt,id).changes>0;
+  }
+
+  deleteAlarm(id:number) {
+    return this.database.db.prepare("DELETE FROM alarms WHERE id=?").run(id).changes>0;
+  }
+
   createReminder(text: string, fireAt: string, repeatRule?: string) {
     const result = this.database.db
       .prepare("INSERT INTO reminders (text,fire_at,repeat_rule,created_at) VALUES (?,?,?,?)")
@@ -173,6 +224,20 @@ export class AssistantStore {
 
   completeReminder(id:number) {
     return this.database.db.prepare("UPDATE reminders SET completed=1 WHERE id=?").run(id).changes > 0;
+  }
+
+  updateReminderFireAt(id:number,fireAt:string) {
+    return this.database.db.prepare(
+      "UPDATE reminders SET fire_at=?,completed=0 WHERE id=?"
+    ).run(fireAt,id).changes>0;
+  }
+
+  snoozeReminder(id:number,durationMs:number) {
+    return this.updateReminderFireAt(id,new Date(Date.now()+durationMs).toISOString());
+  }
+
+  deleteReminder(id:number) {
+    return this.database.db.prepare("DELETE FROM reminders WHERE id=?").run(id).changes>0;
   }
 
   createNotification(title:string,body:string,priority="normal",source="jarvis") {
