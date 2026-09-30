@@ -25,6 +25,7 @@ import { filesPlugin } from "./plugins/files-plugin.js";
 import { createGithubPlugin } from "./plugins/github-plugin.js";
 import { createGooglePlugin } from "./plugins/google-plugin.js";
 import { createMemoryPlugin } from "./plugins/memory-plugin.js";
+import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
@@ -59,6 +60,7 @@ export async function createServer(ai: AiProvider) {
   const githubPlugin = createGithubPlugin();
   const googlePlugin = createGooglePlugin();
   const memoryPlugin = createMemoryPlugin(store);
+  const mediaServersPlugin = createMediaServersPlugin();
   const searchPlugin = createSearchPlugin();
   const weatherPlugin = createWeatherPlugin();
   const spotifyPlugin = createSpotifyPlugin();
