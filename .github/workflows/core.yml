@@ -11,7 +11,7 @@ permissions:
 jobs:
   typecheck:
     name: TypeScript build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, docker, buildx]
 
     steps:
       - name: Checkout
