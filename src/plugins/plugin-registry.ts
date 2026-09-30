@@ -2,6 +2,7 @@ export interface JarvisTool {
   name: string;
   description: string;
   capability: string;
+  parameters?: Record<string, unknown>;
   execute(input: unknown): Promise<unknown>;
 }
 
