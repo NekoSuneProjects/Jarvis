@@ -40,6 +40,12 @@ Implemented in the repository so far:
 - [x] Flutter cross-platform HUD client
 - [x] Animated Jarvis orb and responsive dashboard
 - [x] Flutter chat/API client and WebSocket event client
+- [x] OpenAI-compatible native function/tool calling loop
+- [x] Persistent conversation history
+- [x] Explicit SQLite long-term memory tools
+- [x] sherpa-onnx CPU wake-word + VAD + SenseVoice satellite
+- [x] Secure device pairing and heartbeat registry
+- [x] Zero-dependency Node remote agent
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -89,7 +95,7 @@ Implemented in the repository so far:
 - [ ] Add model auto-discovery
 - [x] Add chat completion support
 - [ ] Add streaming responses
-- [ ] Add tool calling support
+- [x] Add tool calling support
 - [ ] Add vision model support
 - [ ] Add embeddings support
 - [x] Add connection test
@@ -794,10 +800,10 @@ Implemented in the repository so far:
 - [ ] USB speaker support
 - [ ] Bluetooth audio
 - [ ] GPIO integration
-- [ ] Wake word
-- [ ] Local STT
-- [ ] Local TTS
-- [ ] Remote AI fallback
+- [x] Wake word
+- [x] Local STT
+- [x] Local TTS foundation
+- [x] Remote AI fallback
 - [ ] MQTT
 - [ ] Home Assistant
 - [ ] Intercom
@@ -936,16 +942,16 @@ Implemented in the repository so far:
 
 # Remote Jarvis Agents
 
-- [ ] Agent pairing
-- [ ] Device identity
+- [x] Agent pairing
+- [x] Device identity
 - [ ] TLS
 - [ ] Mutual authentication
-- [ ] Windows agent
-- [ ] Linux agent
-- [ ] Raspberry Pi agent
-- [ ] macOS agent
-- [ ] Heartbeat
-- [ ] Device online/offline state
+- [x] Windows agent foundation
+- [x] Linux agent foundation
+- [x] Raspberry Pi agent foundation
+- [x] macOS agent foundation
+- [x] Heartbeat
+- [x] Device online/offline state foundation
 - [ ] Remote commands
 - [ ] Remote screenshots
 - [ ] Remote system stats
@@ -954,8 +960,8 @@ Implemented in the repository so far:
 - [ ] Remote app launching
 - [ ] Remote power actions
 - [ ] Per-device permissions
-- [ ] Device revoke
-- [ ] Audit log
+- [x] Device revoke
+- [x] Audit log
 
 ---
 
