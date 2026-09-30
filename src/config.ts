@@ -47,7 +47,9 @@ const schema = z.object({
   KODI_URL: z.string().default(""),
   KODI_USERNAME: z.string().default(""),
   KODI_PASSWORD: z.string().default(""),
-  LOCAL_MUSIC_DIR: z.string().default("")
+  LOCAL_MUSIC_DIR: z.string().default(""),
+
+  SSH_HOSTS_JSON: z.string().default("{}")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -110,5 +112,6 @@ export const config = {
     username: parsed.data.KODI_USERNAME,
     password: parsed.data.KODI_PASSWORD
   },
-  localMusicDir: parsed.data.LOCAL_MUSIC_DIR
+  localMusicDir: parsed.data.LOCAL_MUSIC_DIR,
+  sshHostsJson: parsed.data.SSH_HOSTS_JSON
 } as const;
