@@ -23,6 +23,7 @@ const DEFAULT_RULES: PermissionRule[] = [
   { capability: "computer.screenshot", decision: "ask" },
   { capability: "computer.input", decision: "ask" },
   { capability: "computer.window", decision: "ask" },
+  { capability: "system.power", decision: "ask" },
   { capability: "browser.navigate", decision: "allow" },
   { capability: "browser.read", decision: "allow" },
   { capability: "browser.interact", decision: "ask" },
