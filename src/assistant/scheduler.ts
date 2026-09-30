@@ -31,9 +31,7 @@ export class Scheduler {
       this.events.publish("alarm.fired", alarm);
       // Repeating rules are intentionally kept for the recurrence engine.
       if (!alarm.repeat_rule) {
-        // Disable one-shot alarm after firing.
-        // Direct SQL is avoided here; recurrence support will move into the store.
-        (this.store as any).database.db.prepare("UPDATE alarms SET enabled=0 WHERE id=?").run(alarm.id);
+        this.store.disableAlarm(alarm.id);
       }
     }
 
