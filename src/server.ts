@@ -49,6 +49,7 @@ import { EdgeTtsProvider } from "./voice/edge-tts.js";
 import { PluginRegistry } from "./plugins/plugin-registry.js";
 import { systemPlugin } from "./plugins/system-plugin.js";
 import { JarvisDatabase } from "./storage/database.js";
+import { SecretVault } from "./security/secret-vault.js";
 import { ToolRouter } from "./tools/tool-router.js";
 
 export async function createServer(ai: AiProvider) {
@@ -57,6 +58,7 @@ export async function createServer(ai: AiProvider) {
 
   const database = new JarvisDatabase();
   const store = new AssistantStore(database);
+  const secrets = new SecretVault(database, config.dataDir, config.secretKey);
   const events = new EventBus();
   const devices = new DeviceRegistry(database);
   const discovery = new DiscoveryService();
@@ -217,6 +219,55 @@ export async function createServer(ai: AiProvider) {
   app.get("/api/v1/permissions", async () => ({
     permissions: permissions.list()
   }));
+
+  app.get("/api/v1/secrets", async () => {
+    permissions.assertAllowed("secrets.manage");
+    return { secrets: secrets.list() };
+  });
+
+  app.post<{ Body: { name: string; value: string } }>(
+    "/api/v1/secrets",
+    async (request, reply) => {
+      try {
+        permissions.assertAllowed("secrets.manage");
+        const name = request.body.name.trim();
+        if (!name) {
+          return reply.code(400).send({ error: "Secret name is required" });
+        }
+        const entry = secrets.set(name, request.body.value);
+        store.audit("api", "secret.set", { name });
+        events.publish("secret.updated", { name });
+        return { ok: true, secret: entry };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Secret update failed";
+        return reply.code(message.startsWith("Permission") ? 403 : 400).send({
+          ok: false,
+          error: message
+        });
+      }
+    }
+  );
+
+  app.delete<{ Params: { name: string } }>(
+    "/api/v1/secrets/:name",
+    async (request, reply) => {
+      try {
+        permissions.assertAllowed("secrets.manage");
+        const ok = secrets.delete(request.params.name);
+        if (ok) {
+          store.audit("api", "secret.delete", { name: request.params.name });
+          events.publish("secret.deleted", { name: request.params.name });
+        }
+        return { ok };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Secret delete failed";
+        return reply.code(message.startsWith("Permission") ? 403 : 400).send({
+          ok: false,
+          error: message
+        });
+      }
+    }
+  );
 
   app.get<{ Querystring: { limit?: string; actor?: string; action?: string } }>(
     "/api/v1/audit",
