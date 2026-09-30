@@ -16,6 +16,26 @@ on:
         required: true
         default: http://127.0.0.1:3000
         type: string
+      build_portable:
+        description: Build and upload portable ZIP
+        required: true
+        default: true
+        type: boolean
+      build_installer:
+        description: Build and upload Windows Setup EXE
+        required: true
+        default: true
+        type: boolean
+      publish_release:
+        description: Publish outputs to GitHub Releases
+        required: true
+        default: false
+        type: boolean
+      release_tag:
+        description: Release tag for manual publishing (example v0.1.0)
+        required: false
+        default: ""
+        type: string
   push:
     branches: ["main"]
     tags: ["v*"]
@@ -112,6 +132,7 @@ jobs:
           }
 
       - name: Prepare standalone Windows package
+        if: github.event_name != 'workflow_dispatch' || inputs.build_portable || inputs.build_installer
         run: |
           $configuration = if ($env:BUILD_TYPE -eq "debug") { "Debug" } else { "Release" }
           $uiBuild = Join-Path "apps/jarvis_ui/build/windows/x64/runner" $configuration
@@ -153,12 +174,16 @@ jobs:
           exit /b 0
           '@ | Set-Content -Path "package/Stop NekoSune Jarvis.cmd" -Encoding ascii
 
-          Compress-Archive -Path "package/*" -DestinationPath "NekoSune-Jarvis-Windows-${{ github.run_number }}.zip" -Force
+          if ("${{ github.event_name }}" -ne "workflow_dispatch" -or "${{ inputs.build_portable }}" -eq "true") {
+            Compress-Archive -Path "package/*" -DestinationPath "NekoSune-Jarvis-Windows-${{ github.run_number }}.zip" -Force
+          }
 
       - name: Install Inno Setup
+        if: github.event_name != 'workflow_dispatch' || inputs.build_installer
         run: choco install innosetup --no-progress -y
 
       - name: Build Windows Setup EXE
+        if: github.event_name != 'workflow_dispatch' || inputs.build_installer
         run: |
           $versionLine = Select-String -Path "apps/jarvis_ui/pubspec.yaml" -Pattern '^version:\s*([^+\s]+)'
           $appVersion = if ($versionLine) { $versionLine.Matches[0].Groups[1].Value } else { "0.1.0" }
@@ -202,6 +227,7 @@ jobs:
           & $iscc "jarvis.iss"
 
       - name: Upload portable Windows build
+        if: github.event_name != 'workflow_dispatch' || inputs.build_portable
         uses: actions/upload-artifact@v4
         with:
           name: NekoSune-Jarvis-Windows-Portable
@@ -210,6 +236,7 @@ jobs:
           retention-days: 14
 
       - name: Upload Windows Setup
+        if: github.event_name != 'workflow_dispatch' || inputs.build_installer
         uses: actions/upload-artifact@v4
         with:
           name: NekoSune-Jarvis-Windows-Setup
@@ -217,12 +244,24 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+      - name: Validate manual release settings
+        if: github.event_name == 'workflow_dispatch' && inputs.publish_release
+        run: |
+          if ([string]::IsNullOrWhiteSpace("${{ inputs.release_tag }}")) {
+            throw "release_tag is required when Publish outputs to GitHub Releases is enabled."
+          }
+          if (-not "${{ inputs.release_tag }}".StartsWith("v")) {
+            throw "release_tag must start with v, for example v0.1.0."
+          }
+
       - name: Publish GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish_release)
         uses: softprops/action-gh-release@v2
         with:
-          name: NekoSune Jarvis ${{ github.ref_name }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
+          name: NekoSune Jarvis ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
           generate_release_notes: true
+          fail_on_unmatched_files: false
           files: |
             installer/NekoSune-Jarvis-Setup.exe
             NekoSune-Jarvis-Windows-${{ github.run_number }}.zip
