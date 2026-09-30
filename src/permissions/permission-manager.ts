@@ -7,6 +7,11 @@ export interface PermissionRule {
 
 const DEFAULT_RULES: PermissionRule[] = [
   { capability: "assistant.chat", decision: "allow" },
+  { capability: "assistant.local", decision: "allow" },
+  { capability: "smart-home.read", decision: "allow" },
+  { capability: "smart-home.control", decision: "ask" },
+  { capability: "mqtt.subscribe", decision: "allow" },
+  { capability: "mqtt.publish", decision: "ask" },
   { capability: "system.read", decision: "allow" },
   { capability: "computer.open_app", decision: "ask" },
   { capability: "computer.keyboard", decision: "ask" },
