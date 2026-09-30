@@ -1,0 +1,217 @@
+name: Windows Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: Flutter build type
+        required: true
+        default: release
+        type: choice
+        options:
+          - release
+          - debug
+      jarvis_base_url:
+        description: Core URL compiled into the Flutter client
+        required: true
+        default: http://127.0.0.1:3000
+        type: string
+  push:
+    branches: ["main"]
+    paths:
+      - "apps/jarvis_ui/**"
+      - "src/**"
+      - "services/**"
+      - "agents/**"
+      - "package.json"
+      - "tsconfig.json"
+      - ".github/workflows/windows.yml"
+  pull_request:
+    paths:
+      - "apps/jarvis_ui/**"
+      - "src/**"
+      - "services/**"
+      - "agents/**"
+      - "package.json"
+      - "tsconfig.json"
+      - ".github/workflows/windows.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows:
+    name: Windows app + installer
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    env:
+      JARVIS_BASE_URL: ${{ github.event.inputs.jarvis_base_url || 'http://127.0.0.1:3000' }}
+      BUILD_TYPE: ${{ github.event.inputs.build_type || 'release' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Install core dependencies
+        run: npm install
+
+      - name: Typecheck core
+        run: npm run typecheck
+
+      - name: Build core
+        run: npm run build
+
+      - name: Keep production core dependencies only
+        run: npm prune --omit=dev
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Generate Windows runner files
+        working-directory: apps/jarvis_ui
+        run: |
+          if (-not (Test-Path "windows")) {
+            flutter create --platforms=windows --project-name nekosune_jarvis_ui .
+          }
+
+      - name: Install Flutter dependencies
+        working-directory: apps/jarvis_ui
+        run: flutter pub get
+
+      - name: Analyze Flutter app
+        working-directory: apps/jarvis_ui
+        run: flutter analyze
+
+      - name: Build Flutter Windows app
+        working-directory: apps/jarvis_ui
+        run: |
+          if ($env:BUILD_TYPE -eq "debug") {
+            flutter build windows --debug --dart-define=JARVIS_BASE_URL=$env:JARVIS_BASE_URL
+          } else {
+            flutter build windows --release --dart-define=JARVIS_BASE_URL=$env:JARVIS_BASE_URL
+          }
+
+      - name: Prepare standalone Windows package
+        run: |
+          $configuration = if ($env:BUILD_TYPE -eq "debug") { "Debug" } else { "Release" }
+          $uiBuild = Join-Path "apps/jarvis_ui/build/windows/x64/runner" $configuration
+          if (-not (Test-Path $uiBuild)) {
+            throw "Flutter Windows output was not found at $uiBuild"
+          }
+
+          New-Item -ItemType Directory -Force -Path "package/ui" | Out-Null
+          New-Item -ItemType Directory -Force -Path "package/core" | Out-Null
+          New-Item -ItemType Directory -Force -Path "package/runtime" | Out-Null
+
+          Copy-Item "$uiBuild/*" "package/ui/" -Recurse -Force
+          Copy-Item "dist" "package/core/dist" -Recurse -Force
+          Copy-Item "node_modules" "package/core/node_modules" -Recurse -Force
+          Copy-Item "package.json" "package/core/package.json" -Force
+          if (Test-Path ".env.example") {
+            Copy-Item ".env.example" "package/core/.env.example" -Force
+          }
+
+          $nodeExe = (Get-Command node.exe).Source
+          Copy-Item $nodeExe "package/runtime/node.exe" -Force
+
+          @'
+          @echo off
+          setlocal
+          set "JARVIS_ROOT=%~dp0"
+          if not exist "%JARVIS_ROOT%core\.env" (
+            if exist "%JARVIS_ROOT%core\.env.example" copy /Y "%JARVIS_ROOT%core\.env.example" "%JARVIS_ROOT%core\.env" >nul
+          )
+          start "NekoSune Jarvis Core" /min /D "%JARVIS_ROOT%core" "%JARVIS_ROOT%runtime\node.exe" "dist\index.js"
+          timeout /t 2 /nobreak >nul
+          start "" "%JARVIS_ROOT%ui\nekosune_jarvis_ui.exe"
+          endlocal
+          '@ | Set-Content -Path "package/Start NekoSune Jarvis.cmd" -Encoding ascii
+
+          @'
+          @echo off
+          taskkill /FI "WINDOWTITLE eq NekoSune Jarvis Core" /T /F >nul 2>&1
+          exit /b 0
+          '@ | Set-Content -Path "package/Stop NekoSune Jarvis.cmd" -Encoding ascii
+
+          Compress-Archive -Path "package/*" -DestinationPath "NekoSune-Jarvis-Windows-${{ github.run_number }}.zip" -Force
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build Windows Setup EXE
+        run: |
+          $versionLine = Select-String -Path "apps/jarvis_ui/pubspec.yaml" -Pattern '^version:\s*([^+\s]+)'
+          $appVersion = if ($versionLine) { $versionLine.Matches[0].Groups[1].Value } else { "0.1.0" }
+
+          @"
+          [Setup]
+          AppId={{7D2765E4-3D71-4D8D-8D61-9D652A47D71A}
+          AppName=NekoSune Jarvis
+          AppVersion=$appVersion
+          AppPublisher=NekoSuneProjects
+          DefaultDirName={autopf}\NekoSune Jarvis
+          DefaultGroupName=NekoSune Jarvis
+          DisableProgramGroupPage=yes
+          OutputDir=installer
+          OutputBaseFilename=NekoSune-Jarvis-Setup
+          Compression=lzma2
+          SolidCompression=yes
+          WizardStyle=modern
+          ArchitecturesAllowed=x64compatible
+          ArchitecturesInstallIn64BitMode=x64compatible
+          UninstallDisplayIcon={app}\ui\nekosune_jarvis_ui.exe
+
+          [Files]
+          Source: "package\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+          [Icons]
+          Name: "{autoprograms}\NekoSune Jarvis"; Filename: "{app}\Start NekoSune Jarvis.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\ui\nekosune_jarvis_ui.exe"
+          Name: "{autodesktop}\NekoSune Jarvis"; Filename: "{app}\Start NekoSune Jarvis.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\ui\nekosune_jarvis_ui.exe"; Tasks: desktopicon
+
+          [Tasks]
+          Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"
+
+          [Run]
+          Filename: "{app}\Start NekoSune Jarvis.cmd"; Description: "Launch NekoSune Jarvis"; Flags: nowait postinstall skipifsilent
+          "@ | Set-Content -Path "jarvis.iss" -Encoding utf8
+
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            $iscc = "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          }
+          & $iscc "jarvis.iss"
+
+      - name: Upload portable Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: NekoSune-Jarvis-Windows-Portable
+          path: NekoSune-Jarvis-Windows-${{ github.run_number }}.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Windows Setup
+        uses: actions/upload-artifact@v4
+        with:
+          name: NekoSune-Jarvis-Windows-Setup
+          path: installer/NekoSune-Jarvis-Setup.exe
+          if-no-files-found: error
+          retention-days: 14
