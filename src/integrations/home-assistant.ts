@@ -57,7 +57,7 @@ export class HomeAssistantIntegration implements JarvisIntegration {
     return this.request("/api/states");
   }
 
-  async state(entityId:string) {
+  async entityState(entityId:string) {
     return this.request(`/api/states/${encodeURIComponent(entityId)}`);
   }
 
