@@ -118,6 +118,30 @@ export async function createServer(ai: AiProvider) {
   const piper = new PiperTtsProvider();
   const edgeTts = new EdgeTtsProvider();
 
+  app.addHook("onRequest", async (request, reply) => {
+    if (!config.apiToken) return;
+    if (request.url === "/health") return;
+
+    // Remote agents have their own per-device bearer tokens.
+    if (request.url.startsWith("/api/v1/agents/")) return;
+
+    const authorization = request.headers.authorization ?? "";
+    const bearer = authorization.startsWith("Bearer ")
+      ? authorization.slice(7)
+      : "";
+    const queryToken =
+      typeof (request.query as any)?.token === "string"
+        ? (request.query as any).token
+        : "";
+
+    if (bearer !== config.apiToken && queryToken !== config.apiToken) {
+      return reply.code(401).send({
+        ok: false,
+        error: "Jarvis API authentication required"
+      });
+    }
+  });
+
   const homeAssistant = new HomeAssistantIntegration({
     baseUrl: config.homeAssistant.url,
     token: config.homeAssistant.token
