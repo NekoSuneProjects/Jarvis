@@ -27,7 +27,11 @@ const schema = z.object({
   JARVIS_FILES_ROOT: z.string().default("./workspace"),
 
   PIPER_BIN: z.string().default("piper"),
-  PIPER_MODEL: z.string().default("")
+  PIPER_MODEL: z.string().default(""),
+
+  BROWSER_EXECUTABLE_PATH: z.string().default(""),
+  BROWSER_CHANNEL: z.string().default("chrome"),
+  BROWSER_HEADLESS: z.string().default("false")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -66,5 +70,10 @@ export const config = {
   piper: {
     bin: parsed.data.PIPER_BIN,
     model: parsed.data.PIPER_MODEL
+  },
+  browser: {
+    executablePath: parsed.data.BROWSER_EXECUTABLE_PATH,
+    channel: parsed.data.BROWSER_CHANNEL,
+    headless: parsed.data.BROWSER_HEADLESS.toLowerCase() === "true"
   }
 } as const;
