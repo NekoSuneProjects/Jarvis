@@ -28,6 +28,7 @@ import { createHomeAssistantPlugin } from "./plugins/home-assistant-plugin.js";
 import { createMemoryPlugin } from "./plugins/memory-plugin.js";
 import { createNotificationsPlugin } from "./plugins/notifications-plugin.js";
 import { createMqttPlugin } from "./plugins/mqtt-plugin.js";
+import { monitoringPlugin } from "./plugins/monitoring-plugin.js";
 import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
