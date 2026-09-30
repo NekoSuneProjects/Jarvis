@@ -73,6 +73,9 @@ Implemented in the repository so far:
 - [x] Optional bearer-token Core API protection for LAN clients
 - [x] Flutter REST/WebSocket API-token support
 - [x] Approval-gated local shell and process termination
+- [x] AI model discovery and embeddings APIs
+- [x] Expanded Spotify queue/library/device/playlist controls
+- [x] Expanded Gmail/Calendar/Drive management tools
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -119,12 +122,12 @@ Implemented in the repository so far:
 - [x] Add Ollama-compatible endpoint setting
 - [x] Add custom base URL
 - [x] Add model selection
-- [ ] Add model auto-discovery
+- [x] Add model auto-discovery
 - [x] Add chat completion support
 - [ ] Add streaming responses
 - [x] Add tool calling support
 - [ ] Add vision model support
-- [ ] Add embeddings support
+- [x] Add embeddings support
 - [x] Add connection test
 - [x] Add timeout / reconnect handling
 - [ ] Add per-model settings
@@ -137,9 +140,9 @@ Implemented in the repository so far:
 - [x] Add generic OpenAI-compatible provider
 - [x] Add endpoint setting
 - [x] Add API key setting
-- [ ] Add model selection
+- [x] Add model selection foundation
 - [ ] Add streaming
-- [ ] Add tool calls
+- [x] Add tool calls
 - [ ] Add vision
 - [ ] Add embeddings
 - [ ] Add provider presets
@@ -262,19 +265,19 @@ Implemented in the repository so far:
 
 - [ ] Add Google OAuth
 - [x] Add Gmail connection
-- [ ] Read inbox
+- [x] Read inbox foundation
 - [x] Search email
 - [x] Read email thread
 - [ ] Read attachments
-- [ ] Draft email
-- [ ] Reply to email
+- [x] Draft email
+- [x] Reply to email foundation
 - [ ] Forward email
 - [x] Send email
-- [ ] Mark read/unread
-- [ ] Archive email
-- [ ] Delete email
-- [ ] Apply labels
-- [ ] Create labels
+- [x] Mark read/unread
+- [x] Archive email
+- [x] Delete email
+- [x] Apply labels
+- [x] Create labels
 - [ ] Important-email detection
 - [ ] Email summaries
 - [ ] New-email notifications
@@ -283,19 +286,19 @@ Implemented in the repository so far:
 
 ## Google Calendar
 
-- [ ] Read calendars
+- [x] Read calendars
 - [x] List events
 - [x] Read event details
 - [x] Create event
-- [ ] Update event
-- [ ] Delete event
+- [x] Update event
+- [x] Delete event
 - [ ] RSVP to event
-- [ ] Find free time
+- [x] Find free time
 - [ ] Read upcoming schedule
 - [ ] Reminder integration
 - [ ] Timezone support
 - [ ] Recurring event support
-- [ ] Multiple calendar support
+- [x] Multiple calendar support
 - [ ] Calendar notifications
 
 ## Google Drive
@@ -305,8 +308,8 @@ Implemented in the repository so far:
 - [ ] Read Google Docs
 - [ ] Read Sheets
 - [ ] Read Slides
-- [ ] Download files
-- [ ] Upload files
+- [x] Download files
+- [x] Upload files
 - [x] Create folders
 - [x] Move files
 - [x] Rename files
@@ -333,7 +336,7 @@ Implemented in the repository so far:
 - [x] Resume
 - [x] Next track
 - [x] Previous track
-- [ ] Seek
+- [x] Seek
 - [x] Volume control
 - [x] Search tracks
 - [x] Search artists
@@ -342,18 +345,18 @@ Implemented in the repository so far:
 - [x] Play playlist
 - [ ] Play album
 - [ ] Play artist
-- [ ] Queue track
-- [ ] Read queue
-- [ ] Read liked songs
-- [ ] Like track
-- [ ] Unlike track
-- [ ] Create playlist
-- [ ] Add track to playlist
-- [ ] Remove track from playlist
-- [ ] Select playback device
-- [ ] Transfer playback
-- [ ] Read recently played
-- [ ] Read user library
+- [x] Queue track
+- [x] Read queue
+- [x] Read liked songs
+- [x] Like track
+- [x] Unlike track
+- [x] Create playlist
+- [x] Add track to playlist
+- [x] Remove track from playlist
+- [x] Select playback device
+- [x] Transfer playback
+- [x] Read recently played
+- [x] Read user library foundation
 - [ ] Handle no-active-device state
 
 ---
