@@ -1,3 +1,5 @@
+import { fetchWithRetry } from "../utils/http.js";
+
 export interface WeatherNow {
   latitude:number;
   longitude:number;
@@ -17,7 +19,7 @@ export class WeatherIntegration {
     url.searchParams.set("current","temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m");
     url.searchParams.set("timezone","auto");
 
-    const response=await fetch(url,{signal:AbortSignal.timeout(15000)});
+    const response=await fetchWithRetry(url,{signal:AbortSignal.timeout(15000)});
     if(!response.ok) throw new Error(`Weather HTTP ${response.status}`);
     const body=await response.json() as any;
     return {
