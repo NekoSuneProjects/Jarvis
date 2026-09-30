@@ -45,10 +45,16 @@ export interface EmbeddingResponse {
   provider: string;
 }
 
+export interface VisionImage {
+  mimeType:string;
+  base64:string;
+}
+
 export interface AiProvider {
   readonly id: string;
   chat(request: ChatRequest): Promise<ChatResponse>;
   health(): Promise<{ ok: boolean; detail?: string }>;
   models?(): Promise<AiModelInfo[]>;
   embeddings?(input: string | string[], model?: string): Promise<EmbeddingResponse>;
+  vision?(prompt:string,images:VisionImage[],model?:string):Promise<ChatResponse>;
 }
