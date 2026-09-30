@@ -98,6 +98,12 @@ export async function createServer(ai: AiProvider) {
     filesPlugin,
     githubPlugin,
     googlePlugin,
+    memoryPlugin,
+    mediaServersPlugin,
+    monitoringPlugin,
+    nativeNotificationPlugin,
+    notificationsPlugin,
+    powerPlugin,
     dockerPlugin,
     wolPlugin,
     searchPlugin,
@@ -257,6 +263,33 @@ export async function createServer(ai: AiProvider) {
   app.get("/api/v1/tools", async () => ({
     tools: tools.list()
   }));
+
+  app.get("/api/v1/ai/models", async (_request, reply) => {
+    if (!ai.models) {
+      return reply.code(501).send({
+        error: "AI provider does not support model discovery"
+      });
+    }
+
+    return {
+      provider: ai.id,
+      selected: config.ai.model,
+      models: await ai.models()
+    };
+  });
+
+  app.post<{ Body: { input: string | string[]; model?: string } }>(
+    "/api/v1/ai/embeddings",
+    async (request, reply) => {
+      if (!ai.embeddings) {
+        return reply.code(501).send({
+          error: "AI provider does not support embeddings"
+        });
+      }
+
+      return ai.embeddings(request.body.input, request.body.model);
+    }
+  );
 
   app.get("/api/v1/voice", async () => ({
     providers: [
