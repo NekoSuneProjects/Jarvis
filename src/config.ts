@@ -35,7 +35,10 @@ const schema = z.object({
 
   GOOGLE_ACCESS_TOKEN: z.string().default(""),
   DISCORD_BOT_TOKEN: z.string().default(""),
-  GITHUB_TOKEN: z.string().default("")
+  GITHUB_TOKEN: z.string().default(""),
+
+  JARVIS_PAIRING_CODE: z.string().default(""),
+  AGENT_HEARTBEAT_SECONDS: z.coerce.number().int().min(5).max(3600).default(30)
 });
 
 const parsed = schema.safeParse(process.env);
@@ -82,5 +85,7 @@ export const config = {
   },
   googleAccessToken: parsed.data.GOOGLE_ACCESS_TOKEN,
   discordBotToken: parsed.data.DISCORD_BOT_TOKEN,
-  githubToken: parsed.data.GITHUB_TOKEN
+  githubToken: parsed.data.GITHUB_TOKEN,
+  pairingCode: parsed.data.JARVIS_PAIRING_CODE,
+  agentHeartbeatSeconds: parsed.data.AGENT_HEARTBEAT_SECONDS
 } as const;
