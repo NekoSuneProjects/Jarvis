@@ -3,7 +3,7 @@ import { config } from "./config.js";
 import { createServer } from "./server.js";
 
 const ai = new OpenAiCompatibleProvider();
-const server = createServer(ai);
+const server = await createServer(ai);
 
 try {
   await server.listen({
