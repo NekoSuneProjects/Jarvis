@@ -1,3 +1,5 @@
+import { fetchWithRetry } from "../utils/http.js";
+
 export class SpotifyIntegration {
   constructor(private readonly accessToken:string) {}
 
@@ -7,7 +9,7 @@ export class SpotifyIntegration {
 
   private async request(path:string,init:RequestInit={}){
     if(!this.accessToken) throw new Error("Spotify is not configured");
-    const response=await fetch(`https://api.spotify.com/v1${path}`,{
+    const response=await fetchWithRetry(`https://api.spotify.com/v1${path}`,{
       ...init,
       headers:{
         authorization:`Bearer ${this.accessToken}`,
