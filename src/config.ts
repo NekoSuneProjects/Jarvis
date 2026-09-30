@@ -38,7 +38,16 @@ const schema = z.object({
   GITHUB_TOKEN: z.string().default(""),
 
   JARVIS_PAIRING_CODE: z.string().default(""),
-  AGENT_HEARTBEAT_SECONDS: z.coerce.number().int().min(5).max(3600).default(30)
+  AGENT_HEARTBEAT_SECONDS: z.coerce.number().int().min(5).max(3600).default(30),
+
+  JELLYFIN_URL: z.string().default(""),
+  JELLYFIN_API_KEY: z.string().default(""),
+  PLEX_URL: z.string().default(""),
+  PLEX_TOKEN: z.string().default(""),
+  KODI_URL: z.string().default(""),
+  KODI_USERNAME: z.string().default(""),
+  KODI_PASSWORD: z.string().default(""),
+  LOCAL_MUSIC_DIR: z.string().default("")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -87,5 +96,19 @@ export const config = {
   discordBotToken: parsed.data.DISCORD_BOT_TOKEN,
   githubToken: parsed.data.GITHUB_TOKEN,
   pairingCode: parsed.data.JARVIS_PAIRING_CODE,
-  agentHeartbeatSeconds: parsed.data.AGENT_HEARTBEAT_SECONDS
+  agentHeartbeatSeconds: parsed.data.AGENT_HEARTBEAT_SECONDS,
+  jellyfin: {
+    url: parsed.data.JELLYFIN_URL,
+    apiKey: parsed.data.JELLYFIN_API_KEY
+  },
+  plex: {
+    url: parsed.data.PLEX_URL,
+    token: parsed.data.PLEX_TOKEN
+  },
+  kodi: {
+    url: parsed.data.KODI_URL,
+    username: parsed.data.KODI_USERNAME,
+    password: parsed.data.KODI_PASSWORD
+  },
+  localMusicDir: parsed.data.LOCAL_MUSIC_DIR
 } as const;
