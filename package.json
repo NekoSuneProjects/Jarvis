@@ -17,11 +17,15 @@
   "dependencies": {
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
-    "zod": "^3.24.2"
+    "zod": "^3.24.2",
+    "@fastify/websocket": "^11.0.1",
+    "better-sqlite3": "^11.8.1",
+    "mqtt": "^5.10.3"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
     "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "@types/better-sqlite3": "^7.6.12"
   }
 }
