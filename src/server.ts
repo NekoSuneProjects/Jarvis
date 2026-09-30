@@ -10,6 +10,7 @@ import { Scheduler } from "./assistant/scheduler.js";
 import { RoutineEngine } from "./assistant/routine-engine.js";
 import { EventBus } from "./events/event-bus.js";
 import { DeviceRegistry } from "./devices/device-registry.js";
+import { DiscoveryService } from "./devices/discovery.js";
 import { IntegrationManager } from "./integrations/manager.js";
 import { HomeAssistantIntegration } from "./integrations/home-assistant.js";
 import { MqttIntegration } from "./integrations/mqtt.js";
@@ -17,6 +18,7 @@ import { PermissionManager } from "./permissions/permission-manager.js";
 import { createAssistantPlugin } from "./plugins/assistant-plugin.js";
 import { createBrowserPlugin } from "./plugins/browser-plugin.js";
 import { createDiscordPlugin } from "./plugins/discord-plugin.js";
+import { createDiscoveryPlugin } from "./plugins/discovery-plugin.js";
 import { documentsPlugin } from "./plugins/documents-plugin.js";
 import { createDevicesPlugin } from "./plugins/devices-plugin.js";
 import { computerPlugin } from "./plugins/computer-plugin.js";
@@ -51,6 +53,7 @@ export async function createServer(ai: AiProvider) {
   const store = new AssistantStore(database);
   const events = new EventBus();
   const devices = new DeviceRegistry(database);
+  const discovery = new DiscoveryService();
   const scheduler = new Scheduler(store, events);
   const permissions = new PermissionManager();
   const plugins = new PluginRegistry();
@@ -63,6 +66,7 @@ export async function createServer(ai: AiProvider) {
   const assistantPlugin = createAssistantPlugin(store);
   const browserPlugin = createBrowserPlugin(browser);
   const devicesPlugin = createDevicesPlugin(devices);
+  const discoveryPlugin = createDiscoveryPlugin(discovery);
   const discordPlugin = createDiscordPlugin();
   const githubPlugin = createGithubPlugin();
   const googlePlugin = createGooglePlugin();
@@ -80,6 +84,7 @@ export async function createServer(ai: AiProvider) {
     browserPlugin,
     computerPlugin,
     devicesPlugin,
+    discoveryPlugin,
     discordPlugin,
     documentsPlugin,
     filesPlugin,
@@ -126,6 +131,7 @@ export async function createServer(ai: AiProvider) {
   tools.registerMany(homeAssistantPlugin.tools);
   tools.registerMany(mqttPlugin.tools);
 
+  discovery.advertise(config.port);
   scheduler.start();
   routines.start();
   void integrations.connectEnabled();
@@ -133,6 +139,7 @@ export async function createServer(ai: AiProvider) {
   app.addHook("onClose", async () => {
     scheduler.stop();
     routines.stop();
+    discovery.close();
     await integrations.disconnectAll();
     await browser.close();
     database.close();
