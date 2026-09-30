@@ -16,54 +16,68 @@ class JarvisReply {
 }
 
 class JarvisClient {
-  JarvisClient({required this.baseUrl});
+  JarvisClient({
+    required this.baseUrl,
+    this.apiToken = '',
+  });
 
   final String baseUrl;
+  final String apiToken;
   String? conversationId;
+
+  Map<String, String> get _headers => {
+        if (apiToken.isNotEmpty) 'authorization': 'Bearer $apiToken',
+      };
+
+  Map<String, String> get _jsonHeaders => {
+        'content-type': 'application/json',
+        ..._headers,
+      };
 
   Uri _uri(String path) => Uri.parse('$baseUrl$path');
 
   Future<Map<String, dynamic>> health() async {
-    final response = await http.get(_uri('/health'));
+    final response = await http.get(_uri('/health'), headers: _headers);
     return _json(response);
   }
 
   Future<List<dynamic>> integrations() async {
-    final response = await http.get(_uri('/api/v1/integrations'));
+    final response = await http.get(_uri('/api/v1/integrations'), headers: _headers);
     return (_json(response)['integrations'] as List<dynamic>? ?? []);
   }
 
   Future<List<dynamic>> timers() async {
-    final response = await http.get(_uri('/api/v1/timers'));
+    final response = await http.get(_uri('/api/v1/timers'), headers: _headers);
     return (_json(response)['timers'] as List<dynamic>? ?? []);
   }
 
   Future<List<dynamic>> alarms() async {
-    final response = await http.get(_uri('/api/v1/alarms'));
+    final response = await http.get(_uri('/api/v1/alarms'), headers: _headers);
     return (_json(response)['alarms'] as List<dynamic>? ?? []);
   }
 
   Future<List<dynamic>> reminders() async {
-    final response = await http.get(_uri('/api/v1/reminders'));
+    final response = await http.get(_uri('/api/v1/reminders'), headers: _headers);
     return (_json(response)['reminders'] as List<dynamic>? ?? []);
   }
 
   Future<List<dynamic>> notifications({bool unreadOnly = false}) async {
     final response = await http.get(
       _uri('/api/v1/notifications?unreadOnly=$unreadOnly'),
+      headers: _headers,
     );
     return (_json(response)['notifications'] as List<dynamic>? ?? []);
   }
 
   Future<List<dynamic>> devices() async {
-    final response = await http.get(_uri('/api/v1/devices'));
+    final response = await http.get(_uri('/api/v1/devices'), headers: _headers);
     return (_json(response)['devices'] as List<dynamic>? ?? []);
   }
 
   Future<JarvisReply> chat(String message) async {
     final response = await http.post(
       _uri('/api/v1/chat'),
-      headers: {'content-type': 'application/json'},
+      headers: _jsonHeaders,
       body: jsonEncode({
         'message': message,
         if (conversationId != null) 'conversationId': conversationId,
@@ -85,7 +99,7 @@ class JarvisClient {
   Future<void> markNotificationRead(int id, bool read) async {
     final response = await http.patch(
       _uri('/api/v1/notifications/$id'),
-      headers: {'content-type': 'application/json'},
+      headers: _jsonHeaders,
       body: jsonEncode({'read': read}),
     );
     _json(response);
@@ -96,6 +110,7 @@ class JarvisClient {
     final wsUri = httpUri.replace(
       scheme: httpUri.scheme == 'https' ? 'wss' : 'ws',
       path: '/api/v1/events',
+      queryParameters: apiToken.isEmpty ? null : {'token': apiToken},
     );
     return WebSocketChannel.connect(wsUri);
   }
