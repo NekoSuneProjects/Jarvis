@@ -1,6 +1,7 @@
 import websocket from "@fastify/websocket";
 import Fastify from "fastify";
 import { config } from "./config.js";
+import { BrowserAutomation } from "./browser/automation.js";
 import type { AiProvider, ChatMessage } from "./ai/types.js";
 import { AssistantStore } from "./assistant/store.js";
 import { Scheduler } from "./assistant/scheduler.js";
@@ -10,6 +11,8 @@ import { HomeAssistantIntegration } from "./integrations/home-assistant.js";
 import { MqttIntegration } from "./integrations/mqtt.js";
 import { PermissionManager } from "./permissions/permission-manager.js";
 import { createAssistantPlugin } from "./plugins/assistant-plugin.js";
+import { createBrowserPlugin } from "./plugins/browser-plugin.js";
+import { computerPlugin } from "./plugins/computer-plugin.js";
 import { dockerPlugin } from "./plugins/docker-plugin.js";
 import { filesPlugin } from "./plugins/files-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
@@ -35,13 +38,17 @@ export async function createServer(ai: AiProvider) {
   const tools = new ToolRouter(permissions);
   const integrations = new IntegrationManager();
 
+  const browser = new BrowserAutomation();
   const assistantPlugin = createAssistantPlugin(store);
+  const browserPlugin = createBrowserPlugin(browser);
   const searchPlugin = createSearchPlugin();
   const weatherPlugin = createWeatherPlugin();
   const spotifyPlugin = createSpotifyPlugin();
   const builtInPlugins = [
     systemPlugin,
     assistantPlugin,
+    browserPlugin,
+    computerPlugin,
     filesPlugin,
     dockerPlugin,
     wolPlugin,
@@ -80,6 +87,7 @@ export async function createServer(ai: AiProvider) {
   app.addHook("onClose", async () => {
     scheduler.stop();
     await integrations.disconnectAll();
+    await browser.close();
     database.close();
   });
 
@@ -114,6 +122,22 @@ export async function createServer(ai: AiProvider) {
   app.get("/api/v1/permissions", async () => ({
     permissions: permissions.list()
   }));
+
+  app.patch<{ Params: { capability: string }; Body: { decision: "allow" | "ask" | "deny" } }>(
+    "/api/v1/permissions/:capability",
+    async (request) => {
+      permissions.set(request.params.capability, request.body.decision);
+      store.audit("api", "permission.update", {
+        capability: request.params.capability,
+        decision: request.body.decision
+      });
+      events.publish("permission.updated", {
+        capability: request.params.capability,
+        decision: request.body.decision
+      });
+      return { ok: true };
+    }
+  );
 
   app.get("/api/v1/plugins", async () => ({
     plugins: plugins.list().map((plugin) => ({
