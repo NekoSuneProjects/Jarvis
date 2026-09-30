@@ -53,7 +53,7 @@ export class MqttIntegration implements JarvisIntegration {
 
   async disconnect(): Promise<void> {
     if (!this.client) return;
-    await new Promise<void>((resolve)=>this.client!.end(false,{},resolve));
+    await new Promise<void>((resolve,reject)=>this.client!.end(false,{},(error)=>error?reject(error):resolve()));
     this.state="disconnected";
   }
 
