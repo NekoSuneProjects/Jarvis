@@ -55,6 +55,10 @@ Implemented in the repository so far:
 - [x] Persistent notification center and notification tools
 - [x] Home Assistant AI tool integration
 - [x] MQTT AI publish/subscribe tools
+- [x] Calculator/unit conversion/time utilities
+- [x] Place geocoding and weather-by-place
+- [x] No-key YouTube search through SearXNG
+- [x] Flutter persistent conversations, devices and notification panels
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -615,7 +619,7 @@ Implemented in the repository so far:
 - [ ] Fabric management
 - [ ] Secure credential storage
 - [ ] Linux support
-- [ ] Windows support
+- [x] Windows support
 - [ ] Android support
 - [ ] macOS support
 - [ ] Future iOS support
@@ -860,9 +864,9 @@ Implemented in the repository so far:
 - [ ] STT
 - [ ] TTS
 - [ ] Push-to-talk
-- [ ] Assistant chat
+- [x] Assistant chat
 - [ ] Smart-home control
-- [ ] Device status
+- [x] Device status foundation
 - [ ] Battery status
 - [ ] Network status
 - [ ] Notification reading
@@ -996,13 +1000,13 @@ Implemented in the repository so far:
 
 # Weather
 
-- [ ] Weather provider interface
-- [ ] Current conditions
+- [x] Weather provider interface
+- [x] Current conditions
 - [ ] Hourly forecast
 - [ ] Daily forecast
 - [ ] Rain probability
-- [ ] Temperature
-- [ ] Feels-like temperature
+- [x] Temperature
+- [x] Feels-like temperature
 - [ ] Wind
 - [ ] Sunrise
 - [ ] Sunset
@@ -1032,7 +1036,7 @@ Implemented in the repository so far:
 # Maps / Directions
 
 - [ ] Location provider interface
-- [ ] Search places
+- [x] Search places
 - [ ] Get directions
 - [ ] Travel time
 - [ ] Distance
