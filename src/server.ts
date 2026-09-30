@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import websocket from "@fastify/websocket";
 import Fastify from "fastify";
 import { config } from "./config.js";
@@ -20,6 +21,7 @@ import { dockerPlugin } from "./plugins/docker-plugin.js";
 import { filesPlugin } from "./plugins/files-plugin.js";
 import { createGithubPlugin } from "./plugins/github-plugin.js";
 import { createGooglePlugin } from "./plugins/google-plugin.js";
+import { createMemoryPlugin } from "./plugins/memory-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
@@ -51,6 +53,7 @@ export async function createServer(ai: AiProvider) {
   const discordPlugin = createDiscordPlugin();
   const githubPlugin = createGithubPlugin();
   const googlePlugin = createGooglePlugin();
+  const memoryPlugin = createMemoryPlugin(store);
   const searchPlugin = createSearchPlugin();
   const weatherPlugin = createWeatherPlugin();
   const spotifyPlugin = createSpotifyPlugin();
@@ -234,6 +237,31 @@ export async function createServer(ai: AiProvider) {
     }
   );
 
+  app.get("/api/v1/conversations", async () => ({
+    conversations: store.listConversations()
+  }));
+
+  app.get<{ Params: { id: string } }>("/api/v1/conversations/:id/messages", async (request) => ({
+    messages: store.conversationMessages(request.params.id, 100)
+  }));
+
+  app.get<{ Querystring: { category?: string } }>("/api/v1/memories", async (request) => {
+    permissions.assertAllowed("memory.read");
+    return { memories: store.listMemories(request.query.category) };
+  });
+
+  app.delete<{ Params: { id: string } }>("/api/v1/memories/:id", async (request, reply) => {
+    try {
+      permissions.assertAllowed("memory.write");
+      return { ok: store.forgetMemory(Number(request.params.id)) };
+    } catch (error) {
+      return reply.code(403).send({
+        ok: false,
+        error: error instanceof Error ? error.message : "Memory permission denied"
+      });
+    }
+  });
+
   app.get("/api/v1/notes", async () => ({ notes: store.listNotes() }));
   app.post<{ Body: { title: string; body?: string; tags?: string[] } }>("/api/v1/notes", async (request) => ({
     note: store.createNote(request.body.title, request.body.body ?? "", request.body.tags ?? [])
@@ -385,9 +413,19 @@ export async function createServer(ai: AiProvider) {
         return { ok: true };
       }
 
+      const conversationId = `satellite:${request.body.deviceId ?? "default"}`;
+      const history = store.conversationMessages(conversationId, 24) as Array<{
+        role: "user" | "assistant";
+        content: string;
+      }>;
+      store.appendConversationMessage(conversationId, "user", request.body.text);
+
       const response = await agent.chat([
+        ...history.map((item) => ({ role: item.role, content: item.content })),
         { role: "user", content: request.body.text }
       ]);
+
+      store.appendConversationMessage(conversationId, "assistant", response.content);
 
       events.publish("voice.reply", {
         text: response.content,
@@ -397,31 +435,55 @@ export async function createServer(ai: AiProvider) {
       return {
         ok: true,
         reply: response.content,
-        trace: response.trace
+        trace: response.trace,
+        conversationId
       };
     }
   );
 
-  app.post<{ Body: { message?: string; messages?: ChatMessage[] } }>(
+  app.post<{ Body: { message?: string; messages?: ChatMessage[]; conversationId?: string } }>(
     "/api/v1/chat",
     async (request, reply) => {
       permissions.assertAllowed("assistant.chat");
 
       const supplied = request.body?.messages;
-      const messages: ChatMessage[] =
-        supplied && supplied.length > 0
-          ? supplied
-          : request.body?.message
-            ? [{ role: "user", content: request.body.message }]
-            : [];
 
-      if (messages.length === 0) {
+      if (supplied && supplied.length > 0) {
+        const response = await agent.chat(supplied);
+        return {
+          ...response,
+          conversationId: request.body.conversationId ?? null
+        };
+      }
+
+      if (!request.body?.message) {
         return reply.code(400).send({
           error: "Provide either message or messages"
         });
       }
 
-      return agent.chat(messages);
+      const conversationId = request.body.conversationId ?? randomUUID();
+      const history = store.conversationMessages(conversationId, 30) as Array<{
+        role: "user" | "assistant";
+        content: string;
+      }>;
+
+      store.appendConversationMessage(conversationId, "user", request.body.message);
+
+      const response = await agent.chat([
+        ...history.map((item) => ({
+          role: item.role,
+          content: item.content
+        } as ChatMessage)),
+        { role: "user", content: request.body.message }
+      ]);
+
+      store.appendConversationMessage(conversationId, "assistant", response.content);
+
+      return {
+        ...response,
+        conversationId
+      };
     }
   );
 
