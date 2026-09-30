@@ -24,8 +24,10 @@ import { dockerPlugin } from "./plugins/docker-plugin.js";
 import { filesPlugin } from "./plugins/files-plugin.js";
 import { createGithubPlugin } from "./plugins/github-plugin.js";
 import { createGooglePlugin } from "./plugins/google-plugin.js";
+import { createHomeAssistantPlugin } from "./plugins/home-assistant-plugin.js";
 import { createMemoryPlugin } from "./plugins/memory-plugin.js";
 import { createNotificationsPlugin } from "./plugins/notifications-plugin.js";
+import { createMqttPlugin } from "./plugins/mqtt-plugin.js";
 import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
@@ -107,6 +109,13 @@ export async function createServer(ai: AiProvider) {
 
   integrations.register(homeAssistant);
   integrations.register(mqtt);
+
+  const homeAssistantPlugin = createHomeAssistantPlugin(homeAssistant);
+  const mqttPlugin = createMqttPlugin(mqtt);
+  plugins.register(homeAssistantPlugin);
+  plugins.register(mqttPlugin);
+  tools.registerMany(homeAssistantPlugin.tools);
+  tools.registerMany(mqttPlugin.tools);
 
   scheduler.start();
   routines.start();
