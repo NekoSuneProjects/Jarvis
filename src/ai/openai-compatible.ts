@@ -1,4 +1,5 @@
 import { config } from "../config.js";
+import { fetchWithRetry } from "../utils/http.js";
 import type {
   AiProvider,
   AiToolCall,
@@ -73,7 +74,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
     const timeout = setTimeout(() => controller.abort(), config.ai.timeoutMs);
 
     try {
-      const response = await fetch(`${config.ai.baseUrl}/chat/completions`, {
+      const response = await fetchWithRetry(`${config.ai.baseUrl}/chat/completions`, {
         method: "POST",
         headers: this.headers(),
         signal: controller.signal,
@@ -140,7 +141,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
 
 
   async models() {
-    const response = await fetch(`${config.ai.baseUrl}/models`, {
+    const response = await fetchWithRetry(`${config.ai.baseUrl}/models`, {
       headers: this.headers(),
       signal: AbortSignal.timeout(10000)
     });
@@ -163,7 +164,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
   }
 
   async embeddings(input: string | string[], model?: string) {
-    const response = await fetch(`${config.ai.baseUrl}/embeddings`, {
+    const response = await fetchWithRetry(`${config.ai.baseUrl}/embeddings`, {
       method: "POST",
       headers: this.headers(),
       signal: AbortSignal.timeout(config.ai.timeoutMs),
@@ -202,7 +203,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
       const timeout = setTimeout(() => controller.abort(), 5000);
 
       try {
-        const response = await fetch(`${config.ai.baseUrl}/models`, {
+        const response = await fetchWithRetry(`${config.ai.baseUrl}/models`, {
           headers: this.headers(),
           signal: controller.signal
         });
