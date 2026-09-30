@@ -78,4 +78,52 @@ export class DeviceRegistry {
   revoke(id:string){
     return this.database.db.prepare("UPDATE devices SET revoked=1 WHERE id=?").run(id).changes>0;
   }
+
+  enqueueCommand(deviceId:string,command:string,args:Record<string,unknown>={}){
+    const device=this.database.db.prepare("SELECT id,revoked FROM devices WHERE id=?").get(deviceId) as {id:string;revoked:number}|undefined;
+    if(!device || device.revoked) throw new Error("Device not found or revoked");
+    const id=randomUUID();
+    const at=now();
+    this.database.db.prepare(
+      "INSERT INTO agent_commands (id,device_id,command,args_json,status,created_at,updated_at) VALUES (?,?,?,?,?,?,?)"
+    ).run(id,deviceId,command,JSON.stringify(args),"queued",at,at);
+    return {id,deviceId,command,args,status:"queued",createdAt:at};
+  }
+
+  pendingCommands(deviceId:string,limit=20){
+    const rows=this.database.db.prepare(
+      "SELECT * FROM agent_commands WHERE device_id=? AND status IN ('queued','dispatched') ORDER BY created_at LIMIT ?"
+    ).all(deviceId,limit) as any[];
+    const at=now();
+    const mark=this.database.db.prepare("UPDATE agent_commands SET status='dispatched',updated_at=? WHERE id=? AND status='queued'");
+    for(const row of rows) mark.run(at,row.id);
+    return rows.map((row)=>({
+      id:row.id,
+      command:row.command,
+      args:JSON.parse(row.args_json),
+      status:row.status
+    }));
+  }
+
+  completeCommand(deviceId:string,id:string,ok:boolean,result:unknown){
+    const at=now();
+    return this.database.db.prepare(
+      "UPDATE agent_commands SET status=?,result_json=?,updated_at=? WHERE id=? AND device_id=?"
+    ).run(ok?"completed":"failed",JSON.stringify(result),at,id,deviceId).changes>0;
+  }
+
+  listCommands(deviceId:string,limit=50){
+    return (this.database.db.prepare(
+      "SELECT * FROM agent_commands WHERE device_id=? ORDER BY created_at DESC LIMIT ?"
+    ).all(deviceId,limit) as any[]).map((row)=>({
+      id:row.id,
+      deviceId:row.device_id,
+      command:row.command,
+      args:JSON.parse(row.args_json),
+      status:row.status,
+      result:row.result_json?JSON.parse(row.result_json):null,
+      createdAt:row.created_at,
+      updatedAt:row.updated_at
+    }));
+  }
 }
