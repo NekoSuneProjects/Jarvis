@@ -4,6 +4,7 @@ import { config } from "./config.js";
 import { BrowserAutomation } from "./browser/automation.js";
 import type { AiProvider, ChatMessage } from "./ai/types.js";
 import { AssistantStore } from "./assistant/store.js";
+import { JarvisAgent } from "./agent/jarvis-agent.js";
 import { Scheduler } from "./assistant/scheduler.js";
 import { RoutineEngine } from "./assistant/routine-engine.js";
 import { EventBus } from "./events/event-bus.js";
@@ -42,6 +43,7 @@ export async function createServer(ai: AiProvider) {
   const tools = new ToolRouter(permissions);
   const integrations = new IntegrationManager();
   const routines = new RoutineEngine(store, tools, events);
+  const agent = new JarvisAgent(ai, tools, events, store);
 
   const browser = new BrowserAutomation();
   const assistantPlugin = createAssistantPlugin(store);
@@ -348,6 +350,58 @@ export async function createServer(ai: AiProvider) {
     return { ok: true };
   });
 
+  app.post<{ Body: { keyword?: string; deviceId?: string } }>(
+    "/api/v1/satellite/wake",
+    async (request) => {
+      events.publish("voice.listening", {
+        keyword: request.body.keyword ?? null,
+        deviceId: request.body.deviceId ?? null
+      });
+      return { ok: true };
+    }
+  );
+
+  app.post<{ Body: { state: string; deviceId?: string } }>(
+    "/api/v1/satellite/state",
+    async (request) => {
+      const allowed = new Set(["idle", "listening", "thinking", "speaking", "error"]);
+      const state = allowed.has(request.body.state) ? request.body.state : "idle";
+      events.publish(`voice.${state}`, {
+        deviceId: request.body.deviceId ?? null
+      });
+      return { ok: true, state };
+    }
+  );
+
+  app.post<{ Body: { text: string; respond?: boolean; deviceId?: string } }>(
+    "/api/v1/satellite/transcript",
+    async (request) => {
+      events.publish("voice.transcript", {
+        text: request.body.text,
+        deviceId: request.body.deviceId ?? null
+      });
+
+      if (!request.body.respond) {
+        return { ok: true };
+      }
+
+      const response = await agent.chat([
+        { role: "user", content: request.body.text }
+      ]);
+
+      events.publish("voice.reply", {
+        text: response.content,
+        deviceId: request.body.deviceId ?? null
+      });
+
+      return {
+        ok: true,
+        reply: response.content,
+        trace: response.trace
+      };
+    }
+  );
+
   app.post<{ Body: { message?: string; messages?: ChatMessage[] } }>(
     "/api/v1/chat",
     async (request, reply) => {
@@ -367,17 +421,7 @@ export async function createServer(ai: AiProvider) {
         });
       }
 
-      const response = await ai.chat({
-        messages: [
-          {
-            role: "system",
-            content: `You are ${config.assistantName}, a helpful personal assistant.`
-          },
-          ...messages
-        ]
-      });
-
-      return response;
+      return agent.chat(messages);
     }
   );
 
