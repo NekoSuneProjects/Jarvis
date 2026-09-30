@@ -16,6 +16,10 @@ class JarvisApp extends StatelessWidget {
       'JARVIS_BASE_URL',
       defaultValue: 'http://127.0.0.1:3000',
     );
+    const apiToken = String.fromEnvironment(
+      'JARVIS_API_TOKEN',
+      defaultValue: '',
+    );
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -37,7 +41,10 @@ class JarvisApp extends StatelessWidget {
         ),
       ),
       home: DashboardScreen(
-        client: JarvisClient(baseUrl: baseUrl),
+        client: JarvisClient(
+          baseUrl: baseUrl,
+          apiToken: apiToken,
+        ),
       ),
     );
   }
