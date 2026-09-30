@@ -64,8 +64,8 @@ export async function createServer(ai: AiProvider) {
   const discovery = new DiscoveryService();
   const scheduler = new Scheduler(store, events);
   const permissions = new PermissionManager();
-  const plugins = new PluginRegistry();
-  const tools = new ToolRouter(permissions);
+  const plugins = new PluginRegistry(database);
+  const tools = new ToolRouter(permissions, plugins);
   const integrations = new IntegrationManager();
   const routines = new RoutineEngine(store, tools, events);
   const agent = new JarvisAgent(ai, tools, events, store);
@@ -120,7 +120,7 @@ export async function createServer(ai: AiProvider) {
 
   for (const plugin of builtInPlugins) {
     plugins.register(plugin);
-    tools.registerMany(plugin.tools);
+    tools.registerMany(plugin.tools, plugin.id);
   }
 
   const piper = new PiperTtsProvider();
@@ -171,8 +171,8 @@ export async function createServer(ai: AiProvider) {
   const mqttPlugin = createMqttPlugin(mqtt);
   plugins.register(homeAssistantPlugin);
   plugins.register(mqttPlugin);
-  tools.registerMany(homeAssistantPlugin.tools);
-  tools.registerMany(mqttPlugin.tools);
+  tools.registerMany(homeAssistantPlugin.tools, homeAssistantPlugin.id);
+  tools.registerMany(mqttPlugin.tools, mqttPlugin.id);
 
   discovery.advertise(config.port);
   scheduler.start();
@@ -297,11 +297,12 @@ export async function createServer(ai: AiProvider) {
   );
 
   app.get("/api/v1/plugins", async () => ({
-    plugins: plugins.list().map((plugin) => ({
+    plugins: plugins.listStatus().map((plugin) => ({
       id: plugin.id,
       name: plugin.name,
       version: plugin.version,
       description: plugin.description,
+      enabled: plugin.enabled,
       tools: plugin.tools.map((tool) => ({
         name: tool.name,
         description: tool.description,
@@ -309,6 +310,29 @@ export async function createServer(ai: AiProvider) {
       }))
     }))
   }));
+
+  app.patch<{ Params: { id: string }; Body: { enabled: boolean } }>(
+    "/api/v1/plugins/:id",
+    async (request, reply) => {
+      try {
+        plugins.setEnabled(request.params.id, request.body.enabled);
+        store.audit("api", "plugin.enabled", {
+          pluginId: request.params.id,
+          enabled: request.body.enabled
+        });
+        events.publish("plugin.updated", {
+          pluginId: request.params.id,
+          enabled: request.body.enabled
+        });
+        return { ok: true };
+      } catch (error) {
+        return reply.code(404).send({
+          ok: false,
+          error: error instanceof Error ? error.message : "Plugin update failed"
+        });
+      }
+    }
+  );
 
   app.get("/api/v1/integrations", async () => ({
     integrations: await Promise.all(
