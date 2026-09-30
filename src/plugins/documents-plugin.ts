@@ -8,7 +8,6 @@ import {
   Paragraph
 } from "docx";
 import ExcelJS from "exceljs";
-import PptxGenJS from "pptxgenjs";
 import { z } from "zod";
 import { workspacePath } from "../utils/workspace-path.js";
 import type { JarvisPlugin } from "./plugin-registry.js";
@@ -179,7 +178,9 @@ export const documentsPlugin:JarvisPlugin={
 
         const file=workspacePath(value.path);
         await ensureParent(file);
-        const pptx=new PptxGenJS();
+        const module=await import("pptxgenjs");
+        const PptxCtor:any=(module as any).default ?? module;
+        const pptx=new PptxCtor();
         pptx.layout="LAYOUT_WIDE";
         pptx.author="NekoSune Jarvis";
         pptx.subject=value.title;
