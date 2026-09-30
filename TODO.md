@@ -6,12 +6,41 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 ---
 
+# Current Implementation Progress
+
+Implemented in the repository so far:
+
+- [x] TypeScript Jarvis Core
+- [x] Environment configuration and validation
+- [x] Ollama / OpenAI-compatible chat endpoint
+- [x] Permission manager
+- [x] Plugin registry and permission-aware tool router
+- [x] SQLite persistence
+- [x] WebSocket event stream
+- [x] Local notes, lists, timers, alarms and reminders
+- [x] Local scheduler for timer/alarm/reminder events
+- [x] Integration manager and health/status reporting
+- [x] Home Assistant REST integration
+- [x] MQTT publish/subscribe integration
+- [x] SearXNG web search integration
+- [x] Open-Meteo current weather integration
+- [x] Spotify search/basic playback controls
+- [x] Sandboxed local text file tools
+- [x] Docker list/log/start/stop/restart tools
+- [x] Wake-on-LAN tool
+- [x] Piper CPU TTS provider
+- [x] GitHub Actions TypeScript CI
+
+> Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
+
+---
+
 # Core Integration Framework
 
-- [ ] Create shared integration interface
+- [x] Create shared integration interface
 - [ ] Create plugin manifest format
 - [ ] Add integration enable/disable toggle
-- [ ] Add per-integration permissions
+- [x] Add per-integration permissions
 - [ ] Add per-device permissions
 - [ ] Add OAuth token storage
 - [ ] Add API key storage
@@ -19,20 +48,20 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 - [ ] Add connection status UI
 - [ ] Add reconnect support
 - [ ] Add refresh-token support
-- [ ] Add integration health checks
+- [x] Add integration health checks
 - [ ] Add rate-limit handling
 - [ ] Add retry handling
-- [ ] Add timeout handling
+- [x] Add timeout handling
 - [ ] Add integration logs
 - [ ] Add audit logs for sensitive actions
 - [ ] Add integration capability discovery
-- [ ] Add integration versioning
+- [x] Add integration versioning
 - [ ] Add plugin dependency system
 - [ ] Add plugin update system
 - [ ] Add integration test framework
 - [ ] Add mock integration mode for development
 - [ ] Add offline fallback support where possible
-- [ ] Add WebSocket event support
+- [x] Add WebSocket event support
 - [ ] Add webhook event support
 - [ ] Add scheduled polling support
 - [ ] Add background event queue
@@ -44,27 +73,27 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 ## Ollama
 
-- [ ] Add Ollama-compatible endpoint setting
-- [ ] Add custom base URL
-- [ ] Add model selection
+- [x] Add Ollama-compatible endpoint setting
+- [x] Add custom base URL
+- [x] Add model selection
 - [ ] Add model auto-discovery
-- [ ] Add chat completion support
+- [x] Add chat completion support
 - [ ] Add streaming responses
 - [ ] Add tool calling support
 - [ ] Add vision model support
 - [ ] Add embeddings support
-- [ ] Add connection test
-- [ ] Add timeout / reconnect handling
+- [x] Add connection test
+- [x] Add timeout / reconnect handling
 - [ ] Add per-model settings
 - [ ] Add context length setting
-- [ ] Add temperature setting
-- [ ] Add system prompt setting
+- [x] Add temperature setting
+- [x] Add system prompt setting
 
 ## OpenAI-Compatible APIs
 
-- [ ] Add generic OpenAI-compatible provider
-- [ ] Add endpoint setting
-- [ ] Add API key setting
+- [x] Add generic OpenAI-compatible provider
+- [x] Add endpoint setting
+- [x] Add API key setting
 - [ ] Add model selection
 - [ ] Add streaming
 - [ ] Add tool calls
@@ -105,7 +134,7 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 ## Piper
 
-- [ ] Add Piper TTS provider
+- [x] Add Piper TTS provider
 - [ ] Add local voice model selection
 - [ ] Add UK English voices
 - [ ] Add speed control
@@ -141,12 +170,12 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 ## SearXNG
 
-- [ ] Add SearXNG endpoint
-- [ ] Add search query tool
-- [ ] Add categories
-- [ ] Add safe-search setting
-- [ ] Add result count setting
-- [ ] Add language setting
+- [x] Add SearXNG endpoint
+- [x] Add search query tool
+- [x] Add categories
+- [x] Add safe-search setting
+- [x] Add result count setting
+- [x] Add language setting
 - [ ] Add timeout handling
 - [ ] Add fallback search provider
 
@@ -255,18 +284,18 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 # Spotify
 
 - [ ] Add Spotify OAuth
-- [ ] Read current playback
-- [ ] Play
-- [ ] Pause
-- [ ] Resume
-- [ ] Next track
-- [ ] Previous track
+- [x] Read current playback
+- [x] Play
+- [x] Pause
+- [x] Resume
+- [x] Next track
+- [x] Previous track
 - [ ] Seek
-- [ ] Volume control
-- [ ] Search tracks
-- [ ] Search artists
-- [ ] Search albums
-- [ ] Search playlists
+- [x] Volume control
+- [x] Search tracks
+- [x] Search artists
+- [x] Search albums
+- [x] Search playlists
 - [ ] Play playlist
 - [ ] Play album
 - [ ] Play artist
@@ -504,13 +533,13 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Home Assistant
 
-- [ ] Add Home Assistant URL
-- [ ] Add long-lived access token
+- [x] Add Home Assistant URL
+- [x] Add long-lived access token
 - [ ] Connection test
-- [ ] Read entities
+- [x] Read entities
 - [ ] Read devices
 - [ ] Read areas
-- [ ] Turn entity on/off
+- [x] Turn entity on/off
 - [ ] Set brightness
 - [ ] Set colour
 - [ ] Set temperature
@@ -519,7 +548,7 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 - [ ] Run scenes
 - [ ] Run automations
 - [ ] Read automation state
-- [ ] Trigger service calls
+- [x] Trigger service calls
 - [ ] Subscribe to state changes
 - [ ] Presence integration
 - [ ] Alarm panel support
@@ -530,13 +559,13 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # MQTT
 
-- [ ] Add MQTT broker settings
-- [ ] Username/password
+- [x] Add MQTT broker settings
+- [x] Username/password
 - [ ] TLS
-- [ ] Subscribe topics
-- [ ] Publish topics
-- [ ] Retained messages
-- [ ] QoS support
+- [x] Subscribe topics
+- [x] Publish topics
+- [x] Retained messages
+- [x] QoS support
 - [ ] Topic browser
 - [ ] Device auto-discovery
 - [ ] Home Assistant MQTT discovery
@@ -852,12 +881,12 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Docker
 
-- [ ] List containers
-- [ ] Read container status
-- [ ] Start container
-- [ ] Stop container
-- [ ] Restart container
-- [ ] Read logs
+- [x] List containers
+- [x] Read container status
+- [x] Start container
+- [x] Stop container
+- [x] Restart container
+- [x] Read logs
 - [ ] Inspect container
 - [ ] Read stats
 - [ ] List images
@@ -993,7 +1022,7 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 # Alarms
 
 - [ ] Local alarm database
-- [ ] One-time alarms
+- [x] One-time alarms
 - [ ] Recurring alarms
 - [ ] Weekday alarms
 - [ ] Named alarms
@@ -1008,8 +1037,8 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Timers
 
-- [ ] Multiple timers
-- [ ] Named timers
+- [x] Multiple timers
+- [x] Named timers
 - [ ] Pause timer
 - [ ] Resume timer
 - [ ] Add time
@@ -1024,8 +1053,8 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Reminders
 
-- [ ] Time reminder
-- [ ] Date reminder
+- [x] Time reminder
+- [x] Date reminder
 - [ ] Recurring reminder
 - [ ] Device-state reminder
 - [ ] Presence reminder
@@ -1040,9 +1069,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Notes
 
-- [ ] Create note
+- [x] Create note
 - [ ] Edit note
-- [ ] Delete note
+- [x] Delete note
 - [ ] Search notes
 - [ ] Tag notes
 - [ ] Pin notes
@@ -1055,13 +1084,13 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Lists
 
-- [ ] Shopping list
-- [ ] Todo list
-- [ ] Custom lists
-- [ ] Add item
+- [x] Shopping list
+- [x] Todo list
+- [x] Custom lists
+- [x] Add item
 - [ ] Remove item
-- [ ] Check item
-- [ ] Clear checked
+- [x] Check item
+- [x] Clear checked
 - [ ] Read list aloud
 - [ ] Share list
 - [ ] Cross-device sync
@@ -1182,9 +1211,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Wake-on-LAN
 
-- [ ] Add device MAC address
-- [ ] Add broadcast address
-- [ ] Send magic packet
+- [x] Add device MAC address
+- [x] Add broadcast address
+- [x] Send magic packet
 - [ ] Android sender
 - [ ] Windows sender
 - [ ] Linux sender
@@ -1238,9 +1267,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 ## General Files
 
-- [ ] TXT
+- [x] TXT
 - [ ] Markdown
-- [ ] JSON
+- [x] JSON
 - [ ] CSV
 - [ ] HTML
 - [ ] ZIP
@@ -1256,9 +1285,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # System Monitoring
 
-- [ ] CPU usage
+- [x] CPU usage
 - [ ] CPU temperature
-- [ ] RAM usage
+- [x] RAM usage
 - [ ] GPU usage
 - [ ] GPU VRAM
 - [ ] GPU temperature
@@ -1271,7 +1300,7 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 - [ ] Running processes
 - [ ] Running services
 - [ ] Docker stats
-- [ ] Uptime
+- [x] Uptime
 - [ ] Alerts
 - [ ] History graphs
 
