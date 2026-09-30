@@ -49,7 +49,12 @@ const schema = z.object({
   KODI_PASSWORD: z.string().default(""),
   LOCAL_MUSIC_DIR: z.string().default(""),
 
-  SSH_HOSTS_JSON: z.string().default("{}")
+  SSH_HOSTS_JSON: z.string().default("{}"),
+
+  EDGE_TTS_BIN: z.string().default("edge-tts"),
+  EDGE_TTS_VOICE: z.string().default("en-GB-SoniaNeural"),
+  EDGE_TTS_RATE: z.string().default("+0%"),
+  EDGE_TTS_PITCH: z.string().default("+0Hz")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -113,5 +118,11 @@ export const config = {
     password: parsed.data.KODI_PASSWORD
   },
   localMusicDir: parsed.data.LOCAL_MUSIC_DIR,
-  sshHostsJson: parsed.data.SSH_HOSTS_JSON
+  sshHostsJson: parsed.data.SSH_HOSTS_JSON,
+  edgeTts: {
+    bin: parsed.data.EDGE_TTS_BIN,
+    voice: parsed.data.EDGE_TTS_VOICE,
+    rate: parsed.data.EDGE_TTS_RATE,
+    pitch: parsed.data.EDGE_TTS_PITCH
+  }
 } as const;
