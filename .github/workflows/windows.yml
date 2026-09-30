@@ -18,6 +18,7 @@ on:
         type: string
   push:
     branches: ["main"]
+    tags: ["v*"]
     paths:
       - "apps/jarvis_ui/**"
       - "src/**"
@@ -37,7 +38,7 @@ on:
       - ".github/workflows/windows.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: windows-build-${{ github.ref }}
@@ -215,3 +216,13 @@ jobs:
           path: installer/NekoSune-Jarvis-Setup.exe
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: NekoSune Jarvis ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            installer/NekoSune-Jarvis-Setup.exe
+            NekoSune-Jarvis-Windows-${{ github.run_number }}.zip
