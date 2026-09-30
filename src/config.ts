@@ -56,7 +56,8 @@ const schema = z.object({
   EDGE_TTS_RATE: z.string().default("+0%"),
   EDGE_TTS_PITCH: z.string().default("+0Hz"),
 
-  JARVIS_API_TOKEN: z.string().default("")
+  JARVIS_API_TOKEN: z.string().default(""),
+  JARVIS_SECRET_KEY: z.string().default("")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -127,5 +128,6 @@ export const config = {
     rate: parsed.data.EDGE_TTS_RATE,
     pitch: parsed.data.EDGE_TTS_PITCH
   },
-  apiToken: parsed.data.JARVIS_API_TOKEN
+  apiToken: parsed.data.JARVIS_API_TOKEN,
+  secretKey: parsed.data.JARVIS_SECRET_KEY
 } as const;
