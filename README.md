@@ -1572,3 +1572,40 @@ NekoSune Jarvis is currently a planned project / work in progress.
 
 The architecture and feature set may change during development.
 
+
+
+## LAN security
+
+Jarvis binds to `127.0.0.1` by default. If you expose the Core on your LAN for Android, Raspberry Pi or another computer, set a strong API token:
+
+```env
+JARVIS_HOST=0.0.0.0
+JARVIS_API_TOKEN=replace-with-a-long-random-token
+```
+
+Regular `/api/v1/*` endpoints then require:
+
+```http
+Authorization: Bearer <JARVIS_API_TOKEN>
+```
+
+Remote Node agents do not use this shared token. They pair once through `JARVIS_PAIRING_CODE` and receive their own device bearer token.
+
+Flutter example:
+
+```bash
+flutter run \
+  --dart-define=JARVIS_BASE_URL=http://192.168.1.10:3000 \
+  --dart-define=JARVIS_API_TOKEN=replace-with-a-long-random-token
+```
+
+## Desktop automation requirements
+
+Mouse/keyboard automation uses `@nut-tree-fork/nut-js`.
+
+- Windows: supported through the native provider.
+- Linux: X11/XWayland is required by the current nut.js stack; Wayland-native automation is not available through nut.js.
+- macOS: Accessibility permission is required for input automation.
+- Linux window focus/minimize/maximize/close additionally uses `wmctrl`.
+
+Desktop input, window control, local shell and power operations are permission-gated and default to `ask`.
