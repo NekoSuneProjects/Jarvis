@@ -31,6 +31,8 @@ const DEFAULT_RULES: PermissionRule[] = [
   { capability: "drive.read", decision: "allow" },
   { capability: "development.read", decision: "allow" },
   { capability: "development.write", decision: "ask" },
+  { capability: "memory.read", decision: "allow" },
+  { capability: "memory.write", decision: "ask" },
   { capability: "system.read", decision: "allow" },
   { capability: "computer.open_app", decision: "ask" },
   { capability: "computer.keyboard", decision: "ask" },
