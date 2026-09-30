@@ -42,6 +42,7 @@ const DEFAULT_RULES: PermissionRule[] = [
   { capability: "notifications.read", decision: "allow" },
   { capability: "notifications.send", decision: "allow" },
   { capability: "utility.read", decision: "allow" },
+  { capability: "secrets.manage", decision: "ask" },
   { capability: "system.read", decision: "allow" },
   { capability: "computer.open_app", decision: "ask" },
   { capability: "computer.keyboard", decision: "ask" },
