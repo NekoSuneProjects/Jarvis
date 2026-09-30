@@ -34,6 +34,7 @@ import { createMqttPlugin } from "./plugins/mqtt-plugin.js";
 import { monitoringPlugin } from "./plugins/monitoring-plugin.js";
 import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
+import { powerPlugin } from "./plugins/power-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
 import { createSshPlugin } from "./plugins/ssh-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
