@@ -1,0 +1,44 @@
+import 'package:flutter/material.dart';
+
+import 'api/jarvis_client.dart';
+import 'screens/dashboard.dart';
+
+void main() {
+  runApp(const JarvisApp());
+}
+
+class JarvisApp extends StatelessWidget {
+  const JarvisApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    const baseUrl = String.fromEnvironment(
+      'JARVIS_BASE_URL',
+      defaultValue: 'http://127.0.0.1:3000',
+    );
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'NekoSune Jarvis',
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF020705),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF57FF9A),
+          brightness: Brightness.dark,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF0B1511),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+      home: DashboardScreen(
+        client: JarvisClient(baseUrl: baseUrl),
+      ),
+    );
+  }
+}
