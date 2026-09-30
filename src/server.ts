@@ -35,6 +35,7 @@ import { createNativeNotificationPlugin } from "./plugins/native-notification-pl
 import { createMqttPlugin } from "./plugins/mqtt-plugin.js";
 import { monitoringPlugin } from "./plugins/monitoring-plugin.js";
 import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
+import { createLanSmartHomePlugin } from "./plugins/lan-smart-home-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { powerPlugin } from "./plugins/power-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
@@ -81,6 +82,7 @@ export async function createServer(ai: AiProvider) {
   const googlePlugin = createGooglePlugin();
   const memoryPlugin = createMemoryPlugin(store);
   const mediaServersPlugin = createMediaServersPlugin();
+  const lanSmartHomePlugin = createLanSmartHomePlugin();
   const notificationsPlugin = createNotificationsPlugin(store, events);
   const nativeNotificationPlugin = createNativeNotificationPlugin(store, events);
   const searchPlugin = createSearchPlugin();
@@ -104,6 +106,7 @@ export async function createServer(ai: AiProvider) {
     googlePlugin,
     memoryPlugin,
     mediaServersPlugin,
+    lanSmartHomePlugin,
     monitoringPlugin,
     nativeNotificationPlugin,
     notificationsPlugin,
