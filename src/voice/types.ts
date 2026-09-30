@@ -1,6 +1,10 @@
 export interface TtsRequest {
   text:string;
   outputPath:string;
+  voice?:string;
+  rate?:string;
+  pitch?:string;
+  volume?:string;
 }
 
 export interface TtsProvider {
