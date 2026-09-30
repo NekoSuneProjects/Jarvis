@@ -31,7 +31,11 @@ const schema = z.object({
 
   BROWSER_EXECUTABLE_PATH: z.string().default(""),
   BROWSER_CHANNEL: z.string().default("chrome"),
-  BROWSER_HEADLESS: z.string().default("false")
+  BROWSER_HEADLESS: z.string().default("false"),
+
+  GOOGLE_ACCESS_TOKEN: z.string().default(""),
+  DISCORD_BOT_TOKEN: z.string().default(""),
+  GITHUB_TOKEN: z.string().default("")
 });
 
 const parsed = schema.safeParse(process.env);
@@ -75,5 +79,8 @@ export const config = {
     executablePath: parsed.data.BROWSER_EXECUTABLE_PATH,
     channel: parsed.data.BROWSER_CHANNEL,
     headless: parsed.data.BROWSER_HEADLESS.toLowerCase() === "true"
-  }
+  },
+  googleAccessToken: parsed.data.GOOGLE_ACCESS_TOKEN,
+  discordBotToken: parsed.data.DISCORD_BOT_TOKEN,
+  githubToken: parsed.data.GITHUB_TOKEN
 } as const;
