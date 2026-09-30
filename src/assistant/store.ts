@@ -87,6 +87,10 @@ export class AssistantStore {
     return this.database.db.prepare("SELECT * FROM alarms WHERE enabled=1 ORDER BY fire_at").all();
   }
 
+  disableAlarm(id:number) {
+    return this.database.db.prepare("UPDATE alarms SET enabled=0 WHERE id=?").run(id).changes > 0;
+  }
+
   createReminder(text: string, fireAt: string, repeatRule?: string) {
     const result = this.database.db
       .prepare("INSERT INTO reminders (text,fire_at,repeat_rule,created_at) VALUES (?,?,?,?)")
