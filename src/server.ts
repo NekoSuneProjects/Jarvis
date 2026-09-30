@@ -5,6 +5,7 @@ import { BrowserAutomation } from "./browser/automation.js";
 import type { AiProvider, ChatMessage } from "./ai/types.js";
 import { AssistantStore } from "./assistant/store.js";
 import { Scheduler } from "./assistant/scheduler.js";
+import { RoutineEngine } from "./assistant/routine-engine.js";
 import { EventBus } from "./events/event-bus.js";
 import { IntegrationManager } from "./integrations/manager.js";
 import { HomeAssistantIntegration } from "./integrations/home-assistant.js";
@@ -40,6 +41,7 @@ export async function createServer(ai: AiProvider) {
   const plugins = new PluginRegistry();
   const tools = new ToolRouter(permissions);
   const integrations = new IntegrationManager();
+  const routines = new RoutineEngine(store, tools, events);
 
   const browser = new BrowserAutomation();
   const assistantPlugin = createAssistantPlugin(store);
@@ -260,6 +262,35 @@ export async function createServer(ai: AiProvider) {
   app.post<{ Body: { name?: string; fireAt: string; repeatRule?: string } }>("/api/v1/alarms", async (request) => ({
     alarm: store.createAlarm(request.body.name ?? "Alarm", request.body.fireAt, request.body.repeatRule)
   }));
+
+  app.get("/api/v1/routines", async () => ({ routines: store.listRoutines() }));
+  app.post<{ Body: { name: string; trigger?: unknown; actions: unknown[]; conditions?: unknown[] } }>(
+    "/api/v1/routines",
+    async (request) => ({
+      routine: store.createRoutine(
+        request.body.name,
+        request.body.trigger ?? { type: "manual" },
+        request.body.actions,
+        request.body.conditions ?? []
+      )
+    })
+  );
+  app.patch<{ Params: { id: string }; Body: { enabled: boolean } }>(
+    "/api/v1/routines/:id",
+    async (request) => ({
+      ok: store.setRoutineEnabled(Number(request.params.id), request.body.enabled)
+    })
+  );
+  app.post<{ Params: { id: string } }>("/api/v1/routines/:id/run", async (request, reply) => {
+    try {
+      return { ok: true, result: await routines.run(Number(request.params.id)) };
+    } catch (error) {
+      return reply.code(400).send({
+        ok: false,
+        error: error instanceof Error ? error.message : "Routine failed"
+      });
+    }
+  });
 
   app.get("/api/v1/reminders", async () => ({ reminders: store.listReminders() }));
   app.post<{ Body: { text: string; fireAt: string; repeatRule?: string } }>("/api/v1/reminders", async (request) => ({
