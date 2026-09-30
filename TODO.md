@@ -80,6 +80,7 @@ Implemented in the repository so far:
 - [x] Persistent plugin enable/disable with execution enforcement
 - [x] Searchable sensitive-action audit log API
 - [x] Android ADB device/app/input/screenshot tools
+- [x] Direct LAN Hue/Shelly/Tasmota integrations
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -476,7 +477,7 @@ Implemented in the repository so far:
 
 # Chromecast / Google Cast
 
-- [ ] Device discovery
+- [x] Device discovery foundation
 - [ ] Cast YouTube
 - [ ] Cast local media
 - [ ] Cast URLs
@@ -669,7 +670,7 @@ Implemented in the repository so far:
 - [ ] List rooms
 - [ ] List lights
 - [ ] Turn lights on/off
-- [ ] Brightness
+- [x] Brightness
 - [ ] Colour
 - [ ] Colour temperature
 - [ ] Scenes
@@ -698,7 +699,7 @@ Implemented in the repository so far:
 - [ ] HTTP control
 - [ ] MQTT control
 - [ ] Device discovery
-- [ ] Power control
+- [x] Power control
 - [ ] Sensor values
 - [ ] Energy values
 - [ ] Device information
@@ -709,7 +710,7 @@ Implemented in the repository so far:
 
 # Shelly
 
-- [ ] Shelly discovery
+- [x] Shelly foundation discovery
 - [ ] Gen1 support
 - [ ] Gen2+ RPC support
 - [ ] Switch control
@@ -1444,7 +1445,7 @@ Implemented in the repository so far:
 - [ ] Matter
 - [ ] Hue
 - [ ] Tuya
-- [ ] Tasmota
+- [x] Tasmota foundation
 - [ ] Shelly
 - [ ] Chromecast
 - [ ] DLNA
