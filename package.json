@@ -23,7 +23,11 @@
     "mqtt": "^5.10.3",
     "clipboardy": "^4.0.0",
     "playwright-core": "^1.55.0",
-    "screenshot-desktop": "^1.15.1"
+    "screenshot-desktop": "^1.15.1",
+    "pdf-lib": "^1.17.1",
+    "docx": "^9.5.1",
+    "exceljs": "^4.4.0",
+    "pptxgenjs": "^3.12.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
