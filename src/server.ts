@@ -40,6 +40,7 @@ import { utilitiesPlugin } from "./plugins/utilities-plugin.js";
 import { createYoutubePlugin } from "./plugins/youtube-plugin.js";
 import { wolPlugin } from "./plugins/wol-plugin.js";
 import { PiperTtsProvider } from "./voice/piper.js";
+import { EdgeTtsProvider } from "./voice/edge-tts.js";
 import { PluginRegistry } from "./plugins/plugin-registry.js";
 import { systemPlugin } from "./plugins/system-plugin.js";
 import { JarvisDatabase } from "./storage/database.js";
@@ -106,6 +107,7 @@ export async function createServer(ai: AiProvider) {
   }
 
   const piper = new PiperTtsProvider();
+  const edgeTts = new EdgeTtsProvider();
 
   const homeAssistant = new HomeAssistantIntegration({
     baseUrl: config.homeAssistant.url,
@@ -227,20 +229,62 @@ export async function createServer(ai: AiProvider) {
     providers: [
       {
         id: piper.id,
-        available: await piper.available()
+        available: await piper.available(),
+        offline: true
+      },
+      {
+        id: edgeTts.id,
+        available: await edgeTts.available(),
+        offline: false
       }
     ]
   }));
 
-  app.post<{ Body: { text: string; outputPath?: string } }>("/api/v1/voice/tts", async (request, reply) => {
+  app.get("/api/v1/voice/edge/voices", async (_request, reply) => {
     try {
-      const outputPath = request.body.outputPath ?? `${config.dataDir}/tts/output.wav`;
-      const result = await piper.synthesize({
-        text: request.body.text,
-        outputPath
+      return { voices: await edgeTts.voices() };
+    } catch (error) {
+      return reply.code(503).send({
+        voices: [],
+        error: error instanceof Error ? error.message : "Unable to list voices"
       });
-      events.publish("voice.tts.completed", result);
-      return { ok: true, ...result };
+    }
+  });
+
+  app.post<{
+    Body: {
+      text: string;
+      provider?: "piper" | "edge";
+      outputPath?: string;
+      voice?: string;
+      rate?: string;
+      pitch?: string;
+      volume?: string;
+    };
+  }>("/api/v1/voice/tts", async (request, reply) => {
+    try {
+      const provider = request.body.provider ?? (
+        await piper.available() ? "piper" : "edge"
+      );
+      const outputPath = request.body.outputPath ?? (
+        provider === "edge"
+          ? `${config.dataDir}/tts/output.mp3`
+          : `${config.dataDir}/tts/output.wav`
+      );
+      const selected = provider === "edge" ? edgeTts : piper;
+      const result = await selected.synthesize({
+        text: request.body.text,
+        outputPath,
+        voice: request.body.voice,
+        rate: request.body.rate,
+        pitch: request.body.pitch,
+        volume: request.body.volume
+      });
+      events.publish("voice.tts.completed", {
+        provider,
+        ...result
+      });
+      return { ok: true, provider, ...result };
     } catch (error) {
       return reply.code(503).send({
         ok: false,
