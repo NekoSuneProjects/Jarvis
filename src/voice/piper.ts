@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import path from "node:path";
 import { spawn } from "node:child_process";
 import { config } from "../config.js";
 import type { TtsProvider, TtsRequest } from "./types.js";
@@ -18,7 +19,7 @@ export class PiperTtsProvider implements TtsProvider {
 
   async synthesize(request:TtsRequest):Promise<{outputPath:string}>{
     if(!(await this.available())) throw new Error("Piper model is not configured or missing");
-    await fs.mkdir(new URL(".",`file://${request.outputPath}`).pathname,{recursive:true}).catch(()=>{});
+    await fs.mkdir(path.dirname(path.resolve(request.outputPath)),{recursive:true});
 
     await new Promise<void>((resolve,reject)=>{
       const child=spawn(config.piper.bin,["--model",config.piper.model,"--output_file",request.outputPath],{
