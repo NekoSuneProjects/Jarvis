@@ -15,7 +15,7 @@ function detached(command:string,args:string[]=[]){
 }
 
 function openUrl(url:string){
-  if(process.platform==="win32") detached("powershell.exe",["-NoProfile","-Command","Start-Process","$args[0]","--",url]);
+  if(process.platform==="win32") detached("rundll32.exe",["url.dll,FileProtocolHandler",url]);
   else if(process.platform==="darwin") detached("open",[url]);
   else detached("xdg-open",[url]);
 }
