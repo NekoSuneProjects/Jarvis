@@ -27,7 +27,7 @@ const schema = z.object({
   JARVIS_FILES_ROOT: z.string().default("./workspace"),
 
   PIPER_BIN: z.string().default("piper"),
-  PIPER_MODEL: z.string().default(""),
+  PIPER_VOICE: z.enum(["en_GB-jarvis-medium", "en_GB-jarvis-high"]).default("en_GB-jarvis-medium"),
 
   BROWSER_EXECUTABLE_PATH: z.string().default(""),
   BROWSER_CHANNEL: z.string().default("chrome"),
@@ -101,7 +101,7 @@ export const config = {
   filesRoot: parsed.data.JARVIS_FILES_ROOT,
   piper: {
     bin: parsed.data.PIPER_BIN,
-    model: parsed.data.PIPER_MODEL
+    voice: parsed.data.PIPER_VOICE
   },
   browser: {
     executablePath: parsed.data.BROWSER_EXECUTABLE_PATH,
