@@ -81,6 +81,12 @@ Implemented in the repository so far:
 - [x] Searchable sensitive-action audit log API
 - [x] Android ADB device/app/input/screenshot tools
 - [x] Direct LAN Hue/Shelly/Tasmota integrations
+- [x] Workspace-safe multimodal vision endpoint
+- [x] Safe-method HTTP retry/rate-limit handling
+- [x] News/image/video/site/date-filtered SearXNG search tools
+- [x] PDF/DOCX reading and search tools
+- [x] XLSX reading and cell/formula editing
+- [x] PPTX text extraction
 
 > Checked items below mean the implementation exists in code. Items may still need UI, platform testing, OAuth setup, richer error handling, or end-to-end tests before the overall integration is considered production-ready.
 
@@ -100,8 +106,8 @@ Implemented in the repository so far:
 - [ ] Add reconnect support
 - [ ] Add refresh-token support
 - [x] Add integration health checks
-- [ ] Add rate-limit handling
-- [ ] Add retry handling
+- [x] Add rate-limit handling foundation
+- [x] Add retry handling
 - [x] Add timeout handling
 - [ ] Add integration logs
 - [x] Add audit logs for sensitive actions
@@ -131,7 +137,7 @@ Implemented in the repository so far:
 - [x] Add chat completion support
 - [ ] Add streaming responses
 - [x] Add tool calling support
-- [ ] Add vision model support
+- [x] Add vision model support
 - [x] Add embeddings support
 - [x] Add connection test
 - [x] Add timeout / reconnect handling
@@ -148,7 +154,7 @@ Implemented in the repository so far:
 - [x] Add model selection foundation
 - [ ] Add streaming
 - [x] Add tool calls
-- [ ] Add vision
+- [x] Add vision
 - [ ] Add embeddings
 - [ ] Add provider presets
 - [ ] Add connection test
@@ -233,11 +239,11 @@ Implemented in the repository so far:
 ## General Web Search
 
 - [ ] Add pluggable search provider interface
-- [ ] Add news search
-- [ ] Add image search
-- [ ] Add video search
-- [ ] Add site-specific search
-- [ ] Add date-filtered search
+- [x] Add news search
+- [x] Add image search
+- [x] Add video search
+- [x] Add site-specific search
+- [x] Add date-filtered search
 - [ ] Add source citations
 - [ ] Add search result summarisation
 
@@ -1250,8 +1256,8 @@ Implemented in the repository so far:
 - [ ] Jarvis agent discovery
 - [ ] Chromecast discovery
 - [ ] DLNA discovery
-- [ ] Hue bridge discovery
-- [ ] Shelly discovery
+- [x] Hue foundation bridge discovery
+- [x] Shelly foundation discovery
 - [ ] Manual device add
 - [ ] Device naming
 - [ ] Room assignment
@@ -1279,8 +1285,8 @@ Implemented in the repository so far:
 ## PDF
 
 - [x] Create PDF
-- [ ] Read PDF
-- [ ] Search PDF
+- [x] Read PDF
+- [x] Search PDF
 - [ ] Summarise PDF
 - [ ] Add images
 - [ ] Add tables
@@ -1289,9 +1295,9 @@ Implemented in the repository so far:
 ## DOCX
 
 - [x] Create DOCX
-- [ ] Read DOCX
+- [x] Read DOCX
 - [ ] Edit DOCX
-- [ ] Search DOCX
+- [x] Search DOCX
 - [ ] Add headings
 - [ ] Add tables
 - [ ] Add images
@@ -1299,17 +1305,17 @@ Implemented in the repository so far:
 ## XLSX
 
 - [x] Create XLSX
-- [ ] Read XLSX
-- [ ] Edit cells
-- [ ] Formulas
+- [x] Read XLSX
+- [x] Edit cells
+- [x] Formulas
 - [ ] Tables
 - [ ] Charts
-- [ ] Multiple sheets
+- [x] Multiple sheets foundation
 
 ## PPTX
 
 - [x] Create PPTX
-- [ ] Read PPTX
+- [x] Read PPTX
 - [ ] Edit PPTX
 - [ ] Add slides
 - [ ] Add images
