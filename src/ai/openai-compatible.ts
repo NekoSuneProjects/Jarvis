@@ -78,7 +78,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
         headers: this.headers(),
         signal: controller.signal,
         body: JSON.stringify({
-          model: config.ai.model,
+          model: request.model ?? config.ai.model,
           messages: request.messages.map((message) => this.wireMessage(message)),
           temperature: request.temperature ?? config.ai.temperature,
           stream: false,
@@ -129,13 +129,71 @@ export class OpenAiCompatibleProvider implements AiProvider {
 
       return {
         content,
-        model: data.model ?? config.ai.model,
+        model: data.model ?? request.model ?? config.ai.model,
         provider: this.id,
         toolCalls
       };
     } finally {
       clearTimeout(timeout);
     }
+  }
+
+
+  async models() {
+    const response = await fetch(`${config.ai.baseUrl}/models`, {
+      headers: this.headers(),
+      signal: AbortSignal.timeout(10000)
+    });
+
+    if (!response.ok) {
+      throw new Error(`AI model discovery failed (HTTP ${response.status})`);
+    }
+
+    const data = (await response.json()) as {
+      data?: Array<{ id?: string; owned_by?: string; created?: number }>;
+    };
+
+    return (data.data ?? [])
+      .filter((model) => Boolean(model.id))
+      .map((model) => ({
+        id: model.id!,
+        ownedBy: model.owned_by,
+        created: model.created
+      }));
+  }
+
+  async embeddings(input: string | string[], model?: string) {
+    const response = await fetch(`${config.ai.baseUrl}/embeddings`, {
+      method: "POST",
+      headers: this.headers(),
+      signal: AbortSignal.timeout(config.ai.timeoutMs),
+      body: JSON.stringify({
+        model: model ?? config.ai.model,
+        input
+      })
+    });
+
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(
+        `AI embeddings failed (${response.status}): ${body.slice(0, 500)}`
+      );
+    }
+
+    const data = (await response.json()) as {
+      model?: string;
+      data?: Array<{ embedding?: number[]; index?: number }>;
+    };
+
+    const rows = [...(data.data ?? [])].sort(
+      (a, b) => (a.index ?? 0) - (b.index ?? 0)
+    );
+
+    return {
+      model: data.model ?? model ?? config.ai.model,
+      embeddings: rows.map((row) => row.embedding ?? []),
+      provider: this.id
+    };
   }
 
   async health(): Promise<{ ok: boolean; detail?: string }> {
