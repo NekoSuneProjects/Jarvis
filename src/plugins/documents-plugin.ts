@@ -1,6 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { PDFDocument, StandardFonts } from "pdf-lib";
+import { PDFParse } from "pdf-parse";
+import mammoth from "mammoth";
+import JSZip from "jszip";
 import {
   Document,
   HeadingLevel,
