@@ -25,6 +25,39 @@ export class PlexIntegration {
   recentlyAdded(limit=20){return this.request(`/library/recentlyAdded?X-Plex-Container-Size=${limit}`);}
   continueWatching(){return this.request("/hubs/home/continueWatching");}
   clients(){return this.request("/clients");}
+  async playerCommand(playerUrl:string,command:"play"|"pause"|"stop",clientIdentifier?:string){
+    if(!this.token) throw new Error("Plex token is not configured");
+    const url=new URL(`/player/playback/${command}`,playerUrl);
+    url.searchParams.set("X-Plex-Token",this.token);
+    url.searchParams.set("X-Plex-Client-Identifier",clientIdentifier ?? "nekosune-jarvis");
+    const response=await fetch(url,{method:"GET",signal:AbortSignal.timeout(10000)});
+    if(!response.ok) throw new Error(`Plex player HTTP ${response.status}: ${await response.text()}`);
+    return {ok:true,command};
+  }
+
+  async playMedia(playerUrl:string,input:{
+    key:string;
+    machineIdentifier:string;
+    serverAddress:string;
+    serverPort?:number;
+    serverProtocol?:"http"|"https";
+    clientIdentifier?:string;
+  }){
+    if(!this.token) throw new Error("Plex token is not configured");
+    const url=new URL("/player/playback/playMedia",playerUrl);
+    url.searchParams.set("key",input.key);
+    url.searchParams.set("machineIdentifier",input.machineIdentifier);
+    url.searchParams.set("address",input.serverAddress);
+    url.searchParams.set("port",String(input.serverPort ?? 32400));
+    url.searchParams.set("protocol",input.serverProtocol ?? "http");
+    url.searchParams.set("providerIdentifier","com.plexapp.plugins.library");
+    url.searchParams.set("X-Plex-Token",this.token);
+    url.searchParams.set("X-Plex-Client-Identifier",input.clientIdentifier ?? "nekosune-jarvis");
+    const response=await fetch(url,{signal:AbortSignal.timeout(10000)});
+    if(!response.ok) throw new Error(`Plex playMedia HTTP ${response.status}: ${await response.text()}`);
+    return {ok:true};
+  }
+
   async discoverServers(){
     if(!this.token) throw new Error("Plex token is not configured");
     const response=await fetch("https://plex.tv/api/v2/resources?includeHttps=1&includeRelay=1",{
