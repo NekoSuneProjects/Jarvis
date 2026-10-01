@@ -72,7 +72,7 @@ export class ShellyIntegration {
       headers:{
         "content-type":"application/json",
         ...basicHeaders(device)
-      },
+      } satisfies Record<string,string>,
       body:JSON.stringify({id:1,method,params}),
       signal:AbortSignal.timeout(10000)
     });
