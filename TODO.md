@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 942 / 1215
-- **Remaining:** 273
-- **Progress:** **77.53%**
+- **Completed:** 946 / 1215
+- **Remaining:** 269
+- **Progress:** **77.86%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -633,7 +633,7 @@ Implemented in the repository so far:
 - [x] Retained messages
 - [x] QoS support
 - [x] Topic browser
-- [ ] Device auto-discovery
+- [x] Device auto-discovery
 - [x] Home Assistant MQTT discovery
 - [x] Trigger Jarvis routine from MQTT
 - [x] Publish Jarvis state to MQTT
@@ -681,7 +681,7 @@ Implemented in the repository so far:
 # Philips Hue
 
 - [ ] Bridge discovery
-- [ ] Bridge pairing
+- [x] Bridge pairing
 - [x] List rooms
 - [x] List lights
 - [x] Turn lights on/off
@@ -726,7 +726,7 @@ Implemented in the repository so far:
 # Shelly
 
 - [x] Shelly foundation discovery
-- [ ] Gen1 support
+- [x] Gen1 support
 - [x] Gen2+ RPC support
 - [x] Switch control
 - [x] Relay control
@@ -1260,7 +1260,7 @@ Implemented in the repository so far:
 - [x] mDNS
 - [x] SSDP
 - [x] UPnP
-- [ ] MQTT discovery
+- [x] MQTT discovery
 - [ ] Home Assistant discovery
 - [x] Jarvis agent discovery
 - [ ] Chromecast discovery
