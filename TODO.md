@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 579 / 1215
-- **Remaining:** 636
-- **Progress:** **47.65%**
+- **Completed:** 593 / 1215
+- **Remaining:** 622
+- **Progress:** **48.81%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -1534,14 +1534,14 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [x] 022. Add manual GitHub Actions installer EXE toggle
 - [x] 023. Add manual GitHub Actions release publishing toggle
 - [x] 024. Add manual GitHub Actions release tag input
-- [ ] 025. Add manual GitHub Actions Jarvis base URL input validation
-- [ ] 026. Add manual GitHub Actions Piper voice preset input
+- [x] 025. Add manual GitHub Actions Jarvis base URL input validation
+- [x] 026. Add manual GitHub Actions Piper voice preset input
 - [ ] 027. Add GitHub Actions build summary with artifact links
 - [ ] 028. Add GitHub Actions cache for npm dependencies
 - [x] 029. Add GitHub Actions cache for Flutter pub dependencies
-- [ ] 030. Add GitHub Actions timeout limits for stuck builds
+- [x] 030. Add GitHub Actions timeout limits for stuck builds
 - [ ] 031. Add CI job that verifies TypeScript formatting
-- [ ] 032. Add CI job that runs TypeScript tests
+- [x] 032. Add CI job that runs TypeScript tests
 - [ ] 033. Add CI job that validates environment schema defaults
 - [ ] 034. Add CI job that validates Flutter formatting
 - [ ] 035. Add CI job that runs Flutter tests
@@ -1570,16 +1570,16 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [ ] 058. Add WebSocket connection metrics
 - [ ] 059. Add integration reconnect metrics
 - [ ] 060. Add optional diagnostics export ZIP
-- [ ] 061. Add settings API for assistant name
-- [ ] 062. Add settings API for AI endpoint
-- [ ] 063. Add settings API for AI model
-- [ ] 064. Add settings API for TTS provider
-- [ ] 065. Add settings API for Piper voice
-- [ ] 066. Add settings API for wake-word mode
-- [ ] 067. Add settings persistence in SQLite
+- [x] 061. Add settings API for assistant name
+- [x] 062. Add settings API for AI endpoint
+- [x] 063. Add settings API for AI model
+- [x] 064. Add settings API for TTS provider
+- [x] 065. Add settings API for Piper voice
+- [x] 066. Add settings API for wake-word mode
+- [x] 067. Add settings persistence in SQLite
 - [ ] 068. Add settings validation errors to UI
-- [ ] 069. Add settings import/export
-- [ ] 070. Add settings reset-to-defaults
+- [x] 069. Add settings import/export
+- [x] 070. Add settings reset-to-defaults
 - [ ] 071. Add first-run setup wizard
 - [ ] 072. Add first-run AI provider test
 - [ ] 073. Add first-run microphone test
@@ -1593,7 +1593,7 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [x] 081. Add conversation history search
 - [x] 082. Add conversation delete controls
 - [x] 083. Add per-conversation export
-- [ ] 084. Add memory enable/disable control
+- [x] 084. Add memory enable/disable control
 - [ ] 085. Add memory review screen
 - [ ] 086. Add tool permission confirmation UI
 - [ ] 087. Add dangerous action confirmation flow
