@@ -833,6 +833,21 @@ export async function createServer(ai: AiProvider) {
     async (request)=>piper.cleanupCache(request.query.voice)
   );
 
+  app.post<{Body:{voice?:string;text?:string}}>("/api/v1/voice/edge/preview", async (request, reply) => {
+    try{
+      const result=await edgeTts.preview(
+        request.body?.voice ?? config.edgeTts.voice,
+        request.body?.text ?? "Jarvis Edge TTS voice preview."
+      );
+      return {ok:true,voice:request.body?.voice ?? config.edgeTts.voice,...result};
+    }catch(error){
+      return reply.code(503).send({
+        ok:false,
+        error:error instanceof Error?error.message:"Edge TTS preview failed"
+      });
+    }
+  });
+
   app.get("/api/v1/voice/edge/voices", async (_request, reply) => {
     try {
       return { voices: await edgeTts.voices() };
