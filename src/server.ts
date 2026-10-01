@@ -197,19 +197,72 @@ export async function createServer(ai: AiProvider) {
 
   app.get("/health", async () => {
     const aiHealth = await ai.health();
+    const piperAvailable = await piper.available();
+
+    let databaseOk=true;
+    let databaseDetail="ok";
+    try{
+      database.db.prepare("SELECT 1 AS ok").get();
+    }catch(error){
+      databaseOk=false;
+      databaseDetail=error instanceof Error?error.message:String(error);
+    }
+
+    let dataDirectoryWritable=true;
+    let dataDirectoryDetail="ok";
+    try{
+      await fs.mkdir(config.dataDir,{recursive:true});
+      const probe=`${config.dataDir}/.jarvis-health-${randomUUID()}`;
+      await fs.writeFile(probe,"ok","utf8");
+      await fs.unlink(probe);
+    }catch(error){
+      dataDirectoryWritable=false;
+      dataDirectoryDetail=error instanceof Error?error.message:String(error);
+    }
+
+    const integrationHealth = await Promise.all(
+      integrations.list().map(async (item)=>({
+        id:item.id,
+        state:item.state,
+        capabilities:item.capabilities,
+        health:await item.health()
+      }))
+    );
+    const smartHome=integrationHealth.filter((item)=>
+      item.capabilities.some((capability)=>capability.startsWith("smart-home"))
+    );
+    const degraded =
+      !aiHealth.ok ||
+      !piperAvailable ||
+      !databaseOk ||
+      !dataDirectoryWritable ||
+      integrationHealth.some((item)=>item.health.ok===false);
 
     return {
-      ok: true,
+      ok: !degraded,
+      degraded,
       service: "nekosune-jarvis",
       assistant: config.assistantName,
       ai: {
         provider: ai.id,
+        reachable: aiHealth.ok,
         ...aiHealth
       },
-      integrations: integrations.list().map((item) => ({
-        id: item.id,
-        state: item.state
-      }))
+      piper: {
+        available: piperAvailable,
+        selectedVoice: config.piper.voice
+      },
+      database: {
+        ok: databaseOk,
+        detail: databaseDetail
+      },
+      dataDirectory: {
+        path: config.dataDir,
+        writable: dataDirectoryWritable,
+        detail: dataDirectoryDetail
+      },
+      smartHome,
+      integrations: integrationHealth
     };
   });
 
