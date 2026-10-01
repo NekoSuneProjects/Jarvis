@@ -53,6 +53,8 @@ import { createSshPlugin } from "./plugins/ssh-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
 import { utilitiesPlugin } from "./plugins/utilities-plugin.js";
 import { createYoutubePlugin } from "./plugins/youtube-plugin.js";
+import { createZigbeePlugin } from "./plugins/zigbee-plugin.js";
+import { createTuyaPlugin } from "./plugins/tuya-plugin.js";
 import { wolPlugin } from "./plugins/wol-plugin.js";
 import { windowPlugin } from "./plugins/window-plugin.js";
 import { PiperTtsProvider } from "./voice/piper.js";
@@ -266,12 +268,18 @@ export async function createServer(ai: AiProvider) {
   const homeAssistantPlugin = createHomeAssistantPlugin(homeAssistant);
   const presencePlugin = createPresencePlugin(store,events,homeAssistant);
   const mqttPlugin = createMqttPlugin(mqtt);
+  const zigbeePlugin = createZigbeePlugin(mqtt,homeAssistant);
+  const tuyaPlugin = createTuyaPlugin(homeAssistant);
   plugins.register(homeAssistantPlugin);
   plugins.register(presencePlugin);
   plugins.register(mqttPlugin);
+  plugins.register(zigbeePlugin);
+  plugins.register(tuyaPlugin);
   tools.registerMany(homeAssistantPlugin.tools, homeAssistantPlugin.id);
   tools.registerMany(presencePlugin.tools, presencePlugin.id);
   tools.registerMany(mqttPlugin.tools, mqttPlugin.id);
+  tools.registerMany(zigbeePlugin.tools, zigbeePlugin.id);
+  tools.registerMany(tuyaPlugin.tools, tuyaPlugin.id);
 
   discovery.advertise(config.port);
   scheduler.start();
