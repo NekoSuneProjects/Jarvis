@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { config } from "../config.js";
 import type { TtsProvider, TtsRequest } from "./types.js";
 
@@ -38,25 +39,62 @@ async function exists(filePath: string): Promise<boolean> {
   }
 }
 
+async function sha256(filePath:string){
+  const data=await fs.readFile(filePath);
+  return createHash("sha256").update(data).digest("hex");
+}
+
 async function downloadFile(url: string, destination: string): Promise<void> {
+  const tempPath = `${destination}.download`;
+  let offset=0;
+  try{offset=(await fs.stat(tempPath)).size;}catch{}
+
   const response = await fetch(url, {
     redirect: "follow",
     headers: {
-      "user-agent": "NekoSune-Jarvis/1.0"
+      "user-agent": "NekoSune-Jarvis/1.0",
+      ...(offset>0?{range:`bytes=${offset}-`}:{})
     }
   });
 
-  if (!response.ok) {
+  if (!response.ok && response.status!==206) {
     throw new Error(`Failed to download ${url}: HTTP ${response.status} ${response.statusText}`);
   }
 
-  const buffer = Buffer.from(await response.arrayBuffer());
-  if (buffer.length === 0) {
-    throw new Error(`Downloaded file from ${url} was empty`);
+  if(offset>0 && response.status!==206){
+    offset=0;
+    await fs.rm(tempPath,{force:true});
   }
 
-  const tempPath = `${destination}.download`;
-  await fs.writeFile(tempPath, buffer);
+  const totalHeader=response.headers.get("content-length");
+  const total=totalHeader ? Number(totalHeader)+offset : 0;
+  const expectedEtag=(response.headers.get("etag") ?? "").replace(/^W\//,"").replace(/"/g,"");
+  const handle=await fs.open(tempPath,offset>0?"a":"w");
+  let received=offset;
+  try{
+    if(!response.body) throw new Error("Download response had no body");
+    for await(const chunk of response.body as any){
+      const buffer=Buffer.from(chunk);
+      await handle.write(buffer);
+      received+=buffer.length;
+      if(total>0){
+        const percent=Math.floor(received/total*100);
+        if(percent%10===0) console.log(`[piper] download ${percent}% (${received}/${total})`);
+      }
+    }
+  }finally{
+    await handle.close();
+  }
+
+  if(received===0) throw new Error(`Downloaded file from ${url} was empty`);
+
+  if(/^[a-f0-9]{64}$/i.test(expectedEtag)){
+    const actual=await sha256(tempPath);
+    if(actual.toLowerCase()!==expectedEtag.toLowerCase()){
+      throw new Error(`Checksum mismatch for ${url}`);
+    }
+  }
+
   await fs.rename(tempPath, destination);
 }
 
@@ -70,6 +108,8 @@ export class PiperTtsProvider implements TtsProvider {
   private get modelDirectory(): string {
     return path.resolve(config.dataDir, "models", "piper", this.voice.id);
   }
+
+  static readonly voices=Object.keys(VOICES) as JarvisVoiceId[];
 
   private get modelPath(): string {
     return path.join(this.modelDirectory, `${this.voice.id}.onnx`);
@@ -101,10 +141,32 @@ export class PiperTtsProvider implements TtsProvider {
     };
   }
 
+  async resolveBinary():Promise<string>{
+    const candidates=[
+      path.resolve(process.cwd(),"runtime","piper",process.platform==="win32"?"piper.exe":"piper"),
+      path.resolve(process.cwd(),"piper",process.platform==="win32"?"piper.exe":"piper"),
+      config.piper.bin
+    ];
+    for(const candidate of candidates){
+      if(candidate===config.piper.bin && !candidate.includes(path.sep)) return candidate;
+      if(await exists(candidate)) return candidate;
+    }
+    return config.piper.bin;
+  }
+
+  async cleanupCache(voice?:JarvisVoiceId){
+    const root=path.resolve(config.dataDir,"models","piper");
+    if(voice) await fs.rm(path.join(root,voice),{recursive:true,force:true});
+    else await fs.rm(root,{recursive:true,force:true});
+    return {ok:true,voice:voice ?? null};
+  }
+
   async available(): Promise<boolean> {
     try {
       await this.ensureVoiceDownloaded();
-      return true;
+      const binary=await this.resolveBinary();
+      if(binary===config.piper.bin && !binary.includes(path.sep)) return true;
+      return exists(binary);
     } catch (error) {
       console.error("[piper] Jarvis voice unavailable:", error);
       return false;
@@ -117,7 +179,7 @@ export class PiperTtsProvider implements TtsProvider {
 
     await new Promise<void>((resolve, reject) => {
       const child = spawn(
-        config.piper.bin,
+        await this.resolveBinary(),
         ["--model", modelPath, "--output_file", request.outputPath],
         {
           shell: false,
@@ -127,7 +189,10 @@ export class PiperTtsProvider implements TtsProvider {
 
       let stderr = "";
       child.stderr.on("data", (chunk) => (stderr += chunk.toString()));
-      child.on("error", reject);
+      child.on("error",(error:any)=>{
+        if(error?.code==="ENOENT") reject(new Error("Piper binary was not found. Install Piper or bundle it under runtime/piper."));
+        else reject(error);
+      });
       child.on("close", (code) =>
         code === 0
           ? resolve()
