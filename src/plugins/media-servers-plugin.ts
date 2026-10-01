@@ -40,6 +40,72 @@ export function createMediaServersPlugin():JarvisPlugin{
         }
       },
       {
+        name:"jellyfin.browse",
+        description:"Browse Jellyfin media.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({limit:z.number().int().min(1).max(500).default(100)}).parse(input ?? {});
+          return jellyfin.browse(value.limit);
+        }
+      },
+      {
+        name:"jellyfin.latest",
+        description:"Read recently added Jellyfin media.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({limit:z.number().int().min(1).max(100).default(20)}).parse(input ?? {});
+          return jellyfin.latest(value.limit);
+        }
+      },
+      {
+        name:"jellyfin.resume",
+        description:"Read continue-watching items for a Jellyfin user.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({userId:z.string().min(1),limit:z.number().int().min(1).max(100).default(20)}).parse(input);
+          return jellyfin.resume(value.userId,value.limit);
+        }
+      },
+      {
+        name:"jellyfin.users",
+        description:"List Jellyfin user profiles.",
+        capability:"media.read",
+        async execute(){return jellyfin.users();}
+      },
+      {
+        name:"jellyfin.libraries",
+        description:"Read Jellyfin library status.",
+        capability:"media.read",
+        async execute(){return jellyfin.libraries();}
+      },
+      {
+        name:"jellyfin.play",
+        description:"Play one or more Jellyfin items on a selected active session/device.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({sessionId:z.string().min(1),itemIds:z.array(z.string().min(1)).min(1)}).parse(input);
+          return jellyfin.play(value.sessionId,value.itemIds);
+        }
+      },
+      {
+        name:"jellyfin.pause",
+        description:"Pause a Jellyfin playback session.",
+        capability:"media.control",
+        async execute(input){const value=z.object({sessionId:z.string().min(1)}).parse(input);return jellyfin.playbackCommand(value.sessionId,"Pause");}
+      },
+      {
+        name:"jellyfin.resume_playback",
+        description:"Resume a Jellyfin playback session.",
+        capability:"media.control",
+        async execute(input){const value=z.object({sessionId:z.string().min(1)}).parse(input);return jellyfin.playbackCommand(value.sessionId,"Unpause");}
+      },
+      {
+        name:"jellyfin.stop",
+        description:"Stop a Jellyfin playback session.",
+        capability:"media.control",
+        async execute(input){const value=z.object({sessionId:z.string().min(1)}).parse(input);return jellyfin.playbackCommand(value.sessionId,"Stop");}
+      },
+      {
         name:"jellyfin.sessions",
         description:"Read active Jellyfin sessions.",
         capability:"media.read",
