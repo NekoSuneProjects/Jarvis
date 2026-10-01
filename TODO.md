@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 546 / 1215
-- **Remaining:** 669
-- **Progress:** **44.94%**
+- **Completed:** 579 / 1215
+- **Remaining:** 636
+- **Progress:** **47.65%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -128,7 +128,7 @@ Implemented in the repository so far:
 - [ ] Add mock integration mode for development
 - [ ] Add offline fallback support where possible
 - [x] Add WebSocket event support
-- [ ] Add webhook event support
+- [x] Add webhook event support
 - [ ] Add scheduled polling support
 - [ ] Add background event queue
 - [ ] Add integration error notifications
@@ -216,8 +216,8 @@ Implemented in the repository so far:
 - [x] Add voice list
 - [x] Add locale selection foundation
 - [ ] Add voice preview
-- [ ] Add speed control
-- [ ] Add pitch control
+- [x] Add speed control
+- [x] Add pitch control
 - [x] Add online/offline detection
 - [ ] Add fallback voice if service fails
 
@@ -253,7 +253,7 @@ Implemented in the repository so far:
 - [x] Add video search
 - [x] Add site-specific search
 - [x] Add date-filtered search
-- [ ] Add source citations
+- [x] Add source citations
 - [ ] Add search result summarisation
 
 ## Playwright
@@ -1039,14 +1039,14 @@ Implemented in the repository so far:
 
 - [x] Weather provider interface
 - [x] Current conditions
-- [ ] Hourly forecast
-- [ ] Daily forecast
-- [ ] Rain probability
+- [x] Hourly forecast
+- [x] Daily forecast
+- [x] Rain probability
 - [x] Temperature
 - [x] Feels-like temperature
-- [ ] Wind
-- [ ] Sunrise
-- [ ] Sunset
+- [x] Wind
+- [x] Sunrise
+- [x] Sunset
 - [ ] Weather alerts
 - [ ] Multiple saved locations
 - [ ] Home location setting
@@ -1056,13 +1056,13 @@ Implemented in the repository so far:
 
 # News
 
-- [ ] General news search
-- [ ] Technology news
-- [ ] Gaming news
-- [ ] Local news
-- [ ] Custom topics
+- [x] General news search
+- [x] Technology news
+- [x] Gaming news
+- [x] Local news
+- [x] Custom topics
 - [ ] Daily briefing
-- [ ] Source citations
+- [x] Source citations
 - [ ] Avoid duplicate stories
 - [ ] Read-aloud mode
 - [ ] User-defined blocked sources
@@ -1090,14 +1090,14 @@ Implemented in the repository so far:
 - [x] Local alarm database
 - [x] One-time alarms
 - [x] Recurring alarms
-- [ ] Weekday alarms
+- [x] Weekday alarms
 - [x] Named alarms
 - [ ] Custom alarm sounds
 - [ ] TTS alarm
-- [ ] Snooze
-- [ ] Dismiss
+- [x] Snooze
+- [x] Dismiss
 - [ ] Cross-device sync
-- [ ] Offline operation
+- [x] Offline operation
 
 ---
 
@@ -1110,10 +1110,10 @@ Implemented in the repository so far:
 - [x] Add time
 - [x] Remove time
 - [x] Cancel timer
-- [ ] Timer notifications
+- [x] Timer notifications
 - [ ] Timer TTS
 - [ ] Cross-device sync
-- [ ] Offline operation
+- [x] Offline operation
 
 ---
 
@@ -1178,7 +1178,7 @@ Implemented in the repository so far:
 - [ ] Branching
 - [x] Enable / disable
 - [x] Manual run
-- [ ] Routine logs
+- [x] Routine logs
 - [ ] Import / export routines
 
 ---
@@ -1550,15 +1550,15 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [ ] 038. Add CI job that verifies release assets exist
 - [ ] 039. Add CI failure log artifact upload
 - [ ] 040. Add CI dependency vulnerability audit
-- [ ] 041. Add /health details for Piper availability
-- [ ] 042. Add /health details for selected voice
-- [ ] 043. Add /health details for AI provider reachability
-- [ ] 044. Add /health details for database state
-- [ ] 045. Add /health details for writable data directory
+- [x] 041. Add /health details for Piper availability
+- [x] 042. Add /health details for selected voice
+- [x] 043. Add /health details for AI provider reachability
+- [x] 044. Add /health details for database state
+- [x] 045. Add /health details for writable data directory
 - [ ] 046. Add /health details for browser automation availability
 - [ ] 047. Add /health details for ADB availability
-- [ ] 048. Add /health details for smart-home integrations
-- [ ] 049. Add /health degraded-state reporting
+- [x] 048. Add /health details for smart-home integrations
+- [x] 049. Add /health degraded-state reporting
 - [ ] 050. Add /health startup diagnostics history
 - [ ] 051. Add structured JSON logging
 - [ ] 052. Add rotating local log files
@@ -1590,9 +1590,9 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [ ] 078. Add first-run Home Assistant optional setup
 - [ ] 079. Add first-run Discord optional setup
 - [ ] 080. Add first-run completion health check
-- [ ] 081. Add conversation history search
-- [ ] 082. Add conversation delete controls
-- [ ] 083. Add per-conversation export
+- [x] 081. Add conversation history search
+- [x] 082. Add conversation delete controls
+- [x] 083. Add per-conversation export
 - [ ] 084. Add memory enable/disable control
 - [ ] 085. Add memory review screen
 - [ ] 086. Add tool permission confirmation UI
