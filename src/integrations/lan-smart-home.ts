@@ -36,6 +36,22 @@ export class HueIntegration {
 
   lights(){return this.request("/lights");}
   groups(){return this.request("/groups");}
+  scenes(){return this.request("/scenes");}
+  async entertainmentZones(){
+    const groups=await this.groups() as Record<string,any>;
+    return Object.entries(groups).filter(([,group])=>group?.type==="Entertainment").map(([id,group])=>({id,...group}));
+  }
+
+  static async pair(baseUrl:string,deviceType="nekosune_jarvis#assistant"){
+    const response=await fetch(`${baseUrl.replace(/\/$/,"")}/api`,{
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({devicetype:deviceType}),
+      signal:AbortSignal.timeout(10000)
+    });
+    if(!response.ok) throw new Error(`Hue pairing HTTP ${response.status}`);
+    return response.json();
+  }
 
   lightState(id:string,state:Record<string,unknown>){
     return this.request(`/lights/${encodeURIComponent(id)}/state`,{
@@ -88,6 +104,21 @@ export class ShellyIntegration {
     return this.rpc(name,"Switch.Set",{
       id,on,...(toggleAfter!==undefined?{toggle_after:toggleAfter}:{})
     });
+  }
+
+  async gen1(name:string,path:string){
+    const device=this.device(name);
+    const response=await fetch(`${device.url.replace(/\/$/,"")}${path}`,{
+      headers:basicHeaders(device),
+      signal:AbortSignal.timeout(10000)
+    });
+    if(!response.ok) throw new Error(`Shelly Gen1 HTTP ${response.status}: ${await response.text()}`);
+    return response.json();
+  }
+
+  gen1Status(name:string){return this.gen1(name,"/status");}
+  gen1Relay(name:string,id:number,on:boolean){
+    return this.gen1(name,`/relay/${id}?turn=${on?"on":"off"}`);
   }
 }
 
