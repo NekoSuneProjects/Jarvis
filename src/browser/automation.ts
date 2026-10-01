@@ -22,6 +22,21 @@ export class BrowserAutomation {
     return this.page;
   }
 
+  async available(){
+    try{
+      const browser=await chromium.launch({
+        headless:true,
+        ...(config.browser.executablePath
+          ? {executablePath:config.browser.executablePath}
+          : {channel:config.browser.channel as "chrome"})
+      });
+      await browser.close();
+      return {ok:true};
+    }catch(error){
+      return {ok:false,error:error instanceof Error?error.message:String(error)};
+    }
+  }
+
   async open(url:string,newTab=false){
     const current=await this.ensurePage();
     const page=newTab ? await this.context!.newPage() : current;
