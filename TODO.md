@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 513 / 1215
-- **Remaining:** 702
-- **Progress:** **42.22%**
+- **Completed:** 546 / 1215
+- **Remaining:** 669
+- **Progress:** **44.94%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -104,7 +104,7 @@ Implemented in the repository so far:
 # Core Integration Framework
 
 - [x] Create shared integration interface
-- [ ] Create plugin manifest format
+- [x] Create plugin manifest format
 - [x] Add integration enable/disable toggle
 - [x] Add per-integration permissions
 - [ ] Add per-device permissions
@@ -120,7 +120,7 @@ Implemented in the repository so far:
 - [x] Add timeout handling
 - [ ] Add integration logs
 - [x] Add audit logs for sensitive actions
-- [ ] Add integration capability discovery
+- [x] Add integration capability discovery
 - [x] Add integration versioning
 - [ ] Add plugin dependency system
 - [ ] Add plugin update system
@@ -164,9 +164,9 @@ Implemented in the repository so far:
 - [ ] Add streaming
 - [x] Add tool calls
 - [x] Add vision
-- [ ] Add embeddings
+- [x] Add embeddings
 - [ ] Add provider presets
-- [ ] Add connection test
+- [x] Add connection test
 
 ## Future AI Providers
 
@@ -363,8 +363,8 @@ Implemented in the repository so far:
 - [x] Search albums
 - [x] Search playlists
 - [x] Play playlist
-- [ ] Play album
-- [ ] Play artist
+- [x] Play album
+- [x] Play artist
 - [x] Queue track
 - [x] Read queue
 - [x] Read liked songs
@@ -477,15 +477,15 @@ Implemented in the repository so far:
 
 - [x] Add Kodi JSON-RPC endpoint
 - [x] Authentication
-- [ ] Play
-- [ ] Pause
-- [ ] Resume
-- [ ] Stop
+- [x] Play
+- [x] Pause
+- [x] Resume
+- [x] Stop
 - [ ] Navigation controls
-- [ ] Volume
+- [x] Volume
 - [ ] Search library
 - [ ] Open media
-- [ ] Read now playing
+- [x] Read now playing
 - [x] Device discovery foundation
 
 ---
@@ -601,19 +601,19 @@ Implemented in the repository so far:
 
 - [x] Add Home Assistant URL
 - [x] Add long-lived access token
-- [ ] Connection test
+- [x] Connection test
 - [x] Read entities
 - [ ] Read devices
 - [ ] Read areas
 - [x] Turn entity on/off
-- [ ] Set brightness
-- [ ] Set colour
-- [ ] Set temperature
-- [ ] Read sensors
-- [ ] Run scripts
-- [ ] Run scenes
-- [ ] Run automations
-- [ ] Read automation state
+- [x] Set brightness
+- [x] Set colour
+- [x] Set temperature
+- [x] Read sensors
+- [x] Run scripts
+- [x] Run scenes
+- [x] Run automations
+- [x] Read automation state
 - [x] Trigger service calls
 - [ ] Subscribe to state changes
 - [ ] Presence integration
@@ -877,7 +877,7 @@ Implemented in the repository so far:
 - [x] Screenshots
 - [x] Clipboard
 - [ ] AppleScript support
-- [ ] Shell support
+- [x] Shell support
 - [x] Notifications
 - [ ] Audio control
 - [x] CPU / RAM / disk
@@ -957,10 +957,10 @@ Implemented in the repository so far:
 - [x] Read stats
 - [x] List images
 - [x] Pull image
-- [ ] Remove container
-- [ ] Remove image
+- [x] Remove container
+- [x] Remove image
 - [x] Docker Compose support
-- [ ] List Compose stacks
+- [x] List Compose stacks
 - [x] Start stack
 - [x] Stop stack
 - [x] Restart stack
@@ -1017,9 +1017,9 @@ Implemented in the repository so far:
 
 # Notifications
 
-- [ ] Windows notifications
-- [ ] Linux notifications
-- [ ] macOS notifications
+- [x] Windows notifications
+- [x] Linux notifications
+- [x] macOS notifications
 - [ ] Android notifications
 - [ ] Future iOS notifications
 - [ ] Email notifications
@@ -1136,11 +1136,11 @@ Implemented in the repository so far:
 # Notes
 
 - [x] Create note
-- [ ] Edit note
+- [x] Edit note
 - [x] Delete note
-- [ ] Search notes
-- [ ] Tag notes
-- [ ] Pin notes
+- [x] Search notes
+- [x] Tag notes
+- [x] Pin notes
 - [ ] Voice-created notes
 - [ ] Markdown support
 - [ ] Sync between devices
@@ -1154,7 +1154,7 @@ Implemented in the repository so far:
 - [x] Todo list
 - [x] Custom lists
 - [x] Add item
-- [ ] Remove item
+- [x] Remove item
 - [x] Check item
 - [x] Clear checked
 - [ ] Read list aloud
