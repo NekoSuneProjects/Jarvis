@@ -4,7 +4,7 @@ export interface NamedHttpDevice {
   password?:string;
 }
 
-function basicHeaders(device:NamedHttpDevice){
+function basicHeaders(device:NamedHttpDevice):Record<string,string>{
   if(!device.username && !device.password) return {};
   return {
     authorization:`Basic ${Buffer.from(`${device.username ?? ""}:${device.password ?? ""}`).toString("base64")}`
