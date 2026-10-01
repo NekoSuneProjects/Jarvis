@@ -99,9 +99,9 @@ export async function createServer(ai: AiProvider) {
   });
 
   const database = new JarvisDatabase();
-  const store = new AssistantStore(database);
-  const secrets = new SecretVault(database, config.dataDir, config.secretKey);
   const events = new EventBus();
+  const store = new AssistantStore(database,events);
+  const secrets = new SecretVault(database, config.dataDir, config.secretKey);
   const devices = new DeviceRegistry(database);
   const discovery = new DiscoveryService();
   const scheduler = new Scheduler(store, events);
