@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 884 / 1215
-- **Remaining:** 331
-- **Progress:** **72.76%**
+- **Completed:** 890 / 1215
+- **Remaining:** 325
+- **Progress:** **73.25%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -994,7 +994,7 @@ Implemented in the repository so far:
 
 - [x] Agent pairing
 - [x] Device identity
-- [ ] TLS
+- [x] TLS
 - [ ] Mutual authentication
 - [x] Windows agent foundation
 - [x] Linux agent foundation
@@ -1391,8 +1391,8 @@ Implemented in the repository so far:
 - [ ] Local user accounts
 - [x] Device pairing code
 - [ ] QR pairing
-- [ ] TLS
-- [ ] Secure WebSocket
+- [x] TLS
+- [x] Secure WebSocket
 - [ ] Refresh tokens
 - [ ] Session expiry
 - [x] Device revoke
@@ -1403,9 +1403,9 @@ Implemented in the repository so far:
 - [ ] macOS Keychain
 - [ ] Future iOS Keychain
 - [x] Audit logs
-- [ ] Emergency disable
-- [ ] Local-only mode
-- [ ] LAN-only remote control
+- [x] Emergency disable
+- [x] Local-only mode
+- [x] LAN-only remote control
 - [x] Permission profiles
 
 ---
