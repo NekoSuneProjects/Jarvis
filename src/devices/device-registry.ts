@@ -63,16 +63,53 @@ export class DeviceRegistry {
   }
 
   list(){
+    const cutoff=Date.now()-(config.agentHeartbeatSeconds*3*1000);
     return this.database.db.prepare(
       "SELECT id,name,platform,arch,capabilities_json,metadata_json,last_seen_at,created_at,revoked FROM devices ORDER BY name"
     ).all().map((row:any)=>({
       ...row,
       capabilities:JSON.parse(row.capabilities_json),
       metadata:JSON.parse(row.metadata_json),
+      online:Boolean(!row.revoked && row.last_seen_at && new Date(row.last_seen_at).getTime()>=cutoff),
       revoked:Boolean(row.revoked),
       capabilities_json:undefined,
       metadata_json:undefined
     }));
+  }
+
+  addManual(input:{name:string;platform?:string;arch?:string;capabilities?:string[];metadata?:Record<string,unknown>}){
+    const id=randomUUID();
+    const token=randomBytes(32).toString("base64url");
+    const at=now();
+    this.database.db.prepare(
+      `INSERT INTO devices
+       (id,name,platform,arch,token_hash,capabilities_json,metadata_json,created_at,last_seen_at)
+       VALUES (?,?,?,?,?,?,?,?,?)`
+    ).run(
+      id,
+      input.name,
+      input.platform ?? "manual",
+      input.arch ?? "unknown",
+      hash(token),
+      JSON.stringify(input.capabilities ?? []),
+      JSON.stringify(input.metadata ?? {}),
+      at,
+      null
+    );
+    return {id,token};
+  }
+
+  updateDevice(id:string,fields:{name?:string;room?:string;icon?:string;metadata?:Record<string,unknown>}){
+    const row=this.database.db.prepare(
+      "SELECT name,metadata_json FROM devices WHERE id=?"
+    ).get(id) as {name:string;metadata_json:string}|undefined;
+    if(!row) return false;
+    const metadata={...JSON.parse(row.metadata_json),...(fields.metadata ?? {})};
+    if(fields.room!==undefined) metadata.room=fields.room;
+    if(fields.icon!==undefined) metadata.icon=fields.icon;
+    return this.database.db.prepare(
+      "UPDATE devices SET name=?,metadata_json=? WHERE id=?"
+    ).run(fields.name ?? row.name,JSON.stringify(metadata),id).changes>0;
   }
 
   revoke(id:string){
