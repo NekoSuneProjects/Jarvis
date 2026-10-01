@@ -67,7 +67,11 @@ import { workspacePath } from "./utils/workspace-path.js";
 import { runProcess } from "./utils/process.js";
 
 export async function createServer(ai: AiProvider) {
-  const app = Fastify({ logger: true });
+  const tlsEnabled=Boolean(config.tls.cert && config.tls.key);
+  const tls=tlsEnabled
+    ? {cert:await fs.readFile(config.tls.cert),key:await fs.readFile(config.tls.key)}
+    : undefined;
+  const app = Fastify({ logger: true, ...(tls?{https:tls}:{}) });
   await app.register(websocket);
 
   const database = new JarvisDatabase();
