@@ -80,7 +80,7 @@ export async function createServer(ai: AiProvider) {
   const permissions = new PermissionManager();
   const plugins = new PluginRegistry(database);
   const tools = new ToolRouter(permissions, plugins);
-  const integrations = new IntegrationManager();
+  const integrations = new IntegrationManager(events);
   const routines = new RoutineEngine(store, tools, events);
   const agent = new JarvisAgent(ai, tools, events, store);
   const metrics={
@@ -637,6 +637,28 @@ export async function createServer(ai: AiProvider) {
       }))
     )
   }));
+
+  app.post<{ Params:{id:string} }>("/api/v1/integrations/:id/reconnect", async (request, reply) => {
+    try{
+      await integrations.reconnect(request.params.id);
+      return {ok:true,id:request.params.id};
+    }catch(error){
+      return reply.code(400).send({
+        ok:false,
+        error:error instanceof Error?error.message:"Reconnect failed"
+      });
+    }
+  });
+
+  app.get<{ Params:{id:string}; Querystring:{limit?:string} }>(
+    "/api/v1/integrations/:id/logs",
+    async (request)=>({
+      logs:integrations.listLogs(
+        request.params.id,
+        Math.max(1,Math.min(1000,Number(request.query.limit ?? 200)))
+      )
+    })
+  );
 
   app.get("/api/v1/tools", async () => ({
     tools: tools.list()
