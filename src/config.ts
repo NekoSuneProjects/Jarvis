@@ -32,6 +32,9 @@ const schema = z.object({
   BROWSER_EXECUTABLE_PATH: z.string().default(""),
   BROWSER_CHANNEL: z.string().default("chrome"),
   BROWSER_HEADLESS: z.string().default("false"),
+  BROWSER_ENGINE: z.enum(["chromium","firefox"]).default("chromium"),
+  BROWSER_PROFILE_DIR: z.string().default("./data/browser-profile"),
+  BROWSER_MAX_ACTIONS_PER_MINUTE: z.coerce.number().int().min(5).max(1000).default(120),
 
   GOOGLE_ACCESS_TOKEN: z.string().default(""),
   DISCORD_BOT_TOKEN: z.string().default(""),
@@ -111,7 +114,10 @@ export const config = {
   browser: {
     executablePath: parsed.data.BROWSER_EXECUTABLE_PATH,
     channel: parsed.data.BROWSER_CHANNEL,
-    headless: parsed.data.BROWSER_HEADLESS.toLowerCase() === "true"
+    headless: parsed.data.BROWSER_HEADLESS.toLowerCase() === "true",
+    engine:parsed.data.BROWSER_ENGINE,
+    profileDir:parsed.data.BROWSER_PROFILE_DIR,
+    maxActionsPerMinute:parsed.data.BROWSER_MAX_ACTIONS_PER_MINUTE
   },
   googleAccessToken: parsed.data.GOOGLE_ACCESS_TOKEN,
   discordBotToken: parsed.data.DISCORD_BOT_TOKEN,
