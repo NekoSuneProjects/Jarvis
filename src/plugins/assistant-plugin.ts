@@ -142,12 +142,45 @@ export function createAssistantPlugin(store:AssistantStore):JarvisPlugin {
         }
       },
       {
+        name:"assistant.note.update",
+        description:"Edit a note title, body, tags or pinned state.",
+        capability:"assistant.local",
+        async execute(input){
+          const value=z.object({
+            id:z.number().int().positive(),
+            title:z.string().min(1).optional(),
+            body:z.string().optional(),
+            tags:z.array(z.string()).optional(),
+            pinned:z.boolean().optional()
+          }).parse(input);
+          return store.updateNote(value.id,value);
+        }
+      },
+      {
+        name:"assistant.note.search",
+        description:"Search notes by title, body or tags.",
+        capability:"assistant.local",
+        async execute(input){
+          const value=z.object({query:z.string().min(1),limit:z.number().int().min(1).max(500).default(100)}).parse(input);
+          return store.searchNotes(value.query,value.limit);
+        }
+      },
+      {
         name:"assistant.list.add",
         description:"Add an item to a named list.",
         capability:"assistant.local",
         async execute(input){
           const value=z.object({list:z.string().min(1),text:z.string().min(1)}).parse(input);
           return store.addListItem(value.list,value.text);
+        }
+      },
+      {
+        name:"assistant.list.remove",
+        description:"Remove a list item by ID.",
+        capability:"assistant.local",
+        async execute(input){
+          const value=z.object({id:z.number().int().positive()}).parse(input);
+          return {ok:store.removeListItem(value.id)};
         }
       }
     ]
