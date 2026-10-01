@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 593 / 1215
-- **Remaining:** 622
-- **Progress:** **48.81%**
+- **Completed:** 659 / 1215
+- **Remaining:** 556
+- **Progress:** **54.24%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -312,12 +312,12 @@ Implemented in the repository so far:
 - [x] Create event
 - [x] Update event
 - [x] Delete event
-- [ ] RSVP to event
+- [x] RSVP to event
 - [x] Find free time
 - [ ] Read upcoming schedule
-- [ ] Reminder integration
-- [ ] Timezone support
-- [ ] Recurring event support
+- [x] Reminder integration
+- [x] Timezone support
+- [x] Recurring event support
 - [x] Multiple calendar support
 - [ ] Calendar notifications
 
@@ -325,24 +325,24 @@ Implemented in the repository so far:
 
 - [x] Browse files
 - [x] Search files
-- [ ] Read Google Docs
-- [ ] Read Sheets
-- [ ] Read Slides
+- [x] Read Google Docs
+- [x] Read Sheets
+- [x] Read Slides
 - [x] Download files
 - [x] Upload files
 - [x] Create folders
 - [x] Move files
 - [x] Rename files
 - [x] Delete files
-- [ ] Share files
-- [ ] Create Google Docs
-- [ ] Create Sheets
-- [ ] Create Slides
+- [x] Share files
+- [x] Create Google Docs
+- [x] Create Sheets
+- [x] Create Slides
 - [ ] Edit Docs
 - [ ] Edit Sheets
 - [ ] Edit Slides
-- [ ] Read comments
-- [ ] Reply to comments
+- [x] Read comments
+- [x] Reply to comments
 - [ ] Multiple Drive account support
 
 ---
@@ -481,10 +481,10 @@ Implemented in the repository so far:
 - [x] Pause
 - [x] Resume
 - [x] Stop
-- [ ] Navigation controls
+- [x] Navigation controls
 - [x] Volume
-- [ ] Search library
-- [ ] Open media
+- [x] Search library
+- [x] Open media
 - [x] Read now playing
 - [x] Device discovery foundation
 
@@ -555,15 +555,15 @@ Implemented in the repository so far:
 - [x] Read server list
 - [x] Read channels
 - [x] Read recent messages
-- [ ] Search messages
+- [x] Search messages
 - [x] Send message
-- [ ] Reply to message
-- [ ] Read DMs
-- [ ] Send DM
-- [ ] Read mentions
+- [x] Reply to message
+- [x] Read DMs
+- [x] Send DM
+- [x] Read mentions
 - [ ] Notification summary
 - [ ] Voice-channel presence where supported
-- [ ] Approval before sending
+- [x] Approval before sending
 - [x] Bot-token mode
 - [ ] User OAuth mode
 
@@ -573,27 +573,27 @@ Implemented in the repository so far:
 
 - [x] GitHub OAuth / PAT support
 - [x] List repositories
-- [ ] Search repositories
+- [x] Search repositories
 - [x] Read repository
 - [ ] Clone repository
 - [ ] Pull repository
 - [x] Read issues
 - [x] Create issue
-- [ ] Update issue
-- [ ] Comment on issue
+- [x] Update issue
+- [x] Comment on issue
 - [x] Read pull requests
-- [ ] Create pull request
-- [ ] Review pull request
+- [x] Create pull request
+- [x] Review pull request
 - [x] Read Actions runs
 - [ ] Read build logs
-- [ ] Re-run workflow
-- [ ] Read releases
-- [ ] Create release
-- [ ] Read branches
-- [ ] Create branch
+- [x] Re-run workflow
+- [x] Read releases
+- [x] Create release
+- [x] Read branches
+- [x] Create branch
 - [ ] Commit files
 - [ ] Push changes
-- [ ] Permission confirmations for write actions
+- [x] Permission confirmations for write actions
 
 ---
 
@@ -627,17 +627,17 @@ Implemented in the repository so far:
 
 - [x] Add MQTT broker settings
 - [x] Username/password
-- [ ] TLS
+- [x] TLS
 - [x] Subscribe topics
 - [x] Publish topics
 - [x] Retained messages
 - [x] QoS support
-- [ ] Topic browser
+- [x] Topic browser
 - [ ] Device auto-discovery
-- [ ] Home Assistant MQTT discovery
+- [x] Home Assistant MQTT discovery
 - [x] Trigger Jarvis routine from MQTT
-- [ ] Publish Jarvis state to MQTT
-- [ ] Publish voice assistant events
+- [x] Publish Jarvis state to MQTT
+- [x] Publish voice assistant events
 - [x] MQTT permissions
 
 ---
@@ -975,16 +975,16 @@ Implemented in the repository so far:
 - [x] SSH connection manager
 - [x] Password auth
 - [x] SSH key auth
-- [ ] Agent support
-- [ ] Host key verification
+- [x] Agent support
+- [x] Host key verification
 - [x] Saved hosts
 - [x] Run command
 - [ ] Stream output
-- [ ] Upload file
-- [ ] Download file
-- [ ] SFTP browser
-- [ ] Remote service control
-- [ ] Remote logs
+- [x] Upload file
+- [x] Download file
+- [x] SFTP browser
+- [x] Remote service control
+- [x] Remote logs
 - [x] Permission prompts
 - [ ] Secure credential storage
 
@@ -1168,18 +1168,18 @@ Implemented in the repository so far:
 - [x] Routine editor
 - [x] Voice trigger
 - [x] Time trigger
-- [ ] Device trigger
-- [ ] Presence trigger
+- [x] Device trigger
+- [x] Presence trigger
 - [x] Webhook trigger
 - [x] MQTT trigger
 - [x] Multiple actions
 - [x] Delays
 - [x] Conditions
-- [ ] Branching
+- [x] Branching
 - [x] Enable / disable
 - [x] Manual run
 - [x] Routine logs
-- [ ] Import / export routines
+- [x] Import / export routines
 
 ---
 
@@ -1188,21 +1188,21 @@ Implemented in the repository so far:
 - [x] Trigger system
 - [x] Condition system
 - [x] Action system
-- [ ] AND conditions
-- [ ] OR conditions
-- [ ] NOT conditions
-- [ ] Time windows
+- [x] AND conditions
+- [x] OR conditions
+- [x] NOT conditions
+- [x] Time windows
 - [ ] Device state
 - [ ] Network state
-- [ ] Presence
+- [x] Presence
 - [ ] Weather
 - [ ] Calendar
 - [ ] Email
 - [x] Webhooks
-- [ ] MQTT
+- [x] MQTT
 - [ ] System state
 - [ ] AI condition
-- [ ] Cooldown
+- [x] Cooldown
 - [x] Loop prevention
 
 ---
@@ -1267,11 +1267,11 @@ Implemented in the repository so far:
 - [ ] DLNA discovery
 - [x] Hue foundation bridge discovery
 - [x] Shelly foundation discovery
-- [ ] Manual device add
-- [ ] Device naming
-- [ ] Room assignment
-- [ ] Device icons
-- [ ] Device online/offline state
+- [x] Manual device add
+- [x] Device naming
+- [x] Room assignment
+- [x] Device icons
+- [x] Device online/offline state
 
 ---
 
@@ -1284,7 +1284,7 @@ Implemented in the repository so far:
 - [x] Windows sender
 - [x] Linux sender
 - [x] Raspberry Pi sender
-- [ ] Device online detection
+- [x] Device online detection
 - [ ] Optional automatic app launch after wake
 
 ---
@@ -1338,13 +1338,13 @@ Implemented in the repository so far:
 - [x] JSON
 - [x] CSV
 - [x] HTML
-- [ ] ZIP
+- [x] ZIP
 - [x] File search
 - [x] Folder search
 - [x] Rename
 - [x] Move
 - [x] Copy
-- [ ] Delete with confirmation
+- [x] Delete with confirmation
 - [ ] File watcher
 
 ---
@@ -1358,13 +1358,13 @@ Implemented in the repository so far:
 - [x] GPU VRAM
 - [x] GPU temperature
 - [x] Disk usage
-- [ ] Disk health
+- [x] Disk health
 - [x] Network upload
 - [x] Network download
 - [x] Wi-Fi information
 - [x] Battery
 - [x] Running processes
-- [ ] Running services
+- [x] Running services
 - [x] Docker stats
 - [x] Uptime
 - [ ] Alerts
