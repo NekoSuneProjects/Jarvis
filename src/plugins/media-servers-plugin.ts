@@ -17,6 +17,11 @@ export function createMediaServersPlugin():JarvisPlugin{
   );
   const radio=new RadioIntegration();
   const local=new LocalMusicIntegration(config.localMusicDir);
+  const localPlaylists=new Map<string,string[]>();
+  const localQueue:string[]=[];
+  let localShuffle=false;
+  let localRepeat:"off"|"one"|"all"="off";
+  const radioFavorites=new Map<string,unknown>();
 
   return {
     id:"media-servers",
@@ -242,6 +247,31 @@ export function createMediaServersPlugin():JarvisPlugin{
         }
       },
       {
+        name:"radio.favorite.add",
+        description:"Save an internet radio station as a runtime favourite.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({id:z.string().min(1),station:z.unknown()}).parse(input);
+          radioFavorites.set(value.id,value.station);
+          return {ok:true,id:value.id};
+        }
+      },
+      {
+        name:"radio.favorite.remove",
+        description:"Remove an internet radio favourite.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({id:z.string().min(1)}).parse(input);
+          return {ok:radioFavorites.delete(value.id)};
+        }
+      },
+      {
+        name:"radio.favorites",
+        description:"List saved runtime internet radio favourites.",
+        capability:"media.read",
+        async execute(){return [...radioFavorites.entries()].map(([id,station])=>({id,station}));}
+      },
+      {
         name:"radio.top",
         description:"List popular internet radio stations.",
         capability:"media.read",
@@ -258,6 +288,68 @@ export function createMediaServersPlugin():JarvisPlugin{
           const value=z.object({query:z.string().min(1),limit:z.number().int().min(1).max(100).default(50)}).parse(input);
           return local.search(value.query,value.limit);
         }
+      },
+      {
+        name:"music.local.artists",
+        description:"Search/list artists in the local music library.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({query:z.string().default(""),limit:z.number().int().min(1).max(500).default(100)}).parse(input??{});
+          return local.artists(value.query,value.limit);
+        }
+      },
+      {
+        name:"music.local.albums",
+        description:"Search/list albums in the local music library.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({query:z.string().default(""),limit:z.number().int().min(1).max(500).default(100)}).parse(input??{});
+          return local.albums(value.query,value.limit);
+        }
+      },
+      {
+        name:"music.local.playlist.create",
+        description:"Create or replace a local music playlist.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({name:z.string().min(1),tracks:z.array(z.string().min(1)).default([])}).parse(input);
+          localPlaylists.set(value.name,[...value.tracks]);
+          return {ok:true,name:value.name,tracks:value.tracks};
+        }
+      },
+      {
+        name:"music.local.playlists",
+        description:"List local music playlists.",
+        capability:"media.read",
+        async execute(){return [...localPlaylists.entries()].map(([name,tracks])=>({name,tracks}));}
+      },
+      {
+        name:"music.local.queue.add",
+        description:"Add one or more local music paths to the queue.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({tracks:z.array(z.string().min(1)).min(1)}).parse(input);
+          localQueue.push(...value.tracks);
+          return {queue:[...localQueue]};
+        }
+      },
+      {
+        name:"music.local.queue",
+        description:"Read the local music queue and shuffle/repeat state.",
+        capability:"media.read",
+        async execute(){return {queue:[...localQueue],shuffle:localShuffle,repeat:localRepeat};}
+      },
+      {
+        name:"music.local.shuffle",
+        description:"Enable or disable local music shuffle.",
+        capability:"media.control",
+        async execute(input){const value=z.object({enabled:z.boolean()}).parse(input);localShuffle=value.enabled;return {shuffle:localShuffle};}
+      },
+      {
+        name:"music.local.repeat",
+        description:"Set local music repeat mode.",
+        capability:"media.control",
+        async execute(input){const value=z.object({mode:z.enum(["off","one","all"])}).parse(input);localRepeat=value.mode;return {repeat:localRepeat};}
       },
       {
         name:"music.local.scan",
