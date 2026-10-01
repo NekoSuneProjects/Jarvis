@@ -15,6 +15,9 @@ const schema = z.object({
   AI_FALLBACKS_JSON: z.string().default("[]"),
 
   JARVIS_DATA_DIR: z.string().default("./data"),
+  JARVIS_TLS_CERT: z.string().default(""),
+  JARVIS_TLS_KEY: z.string().default(""),
+  JARVIS_LOCAL_ONLY: z.string().default("true"),
 
   HOME_ASSISTANT_URL: z.string().default(""),
   HOME_ASSISTANT_TOKEN: z.string().default(""),
@@ -108,6 +111,11 @@ export const config = {
     fallbacksJson: parsed.data.AI_FALLBACKS_JSON
   },
   dataDir: parsed.data.JARVIS_DATA_DIR,
+  tls:{
+    cert:parsed.data.JARVIS_TLS_CERT,
+    key:parsed.data.JARVIS_TLS_KEY
+  },
+  localOnly:parsed.data.JARVIS_LOCAL_ONLY.toLowerCase()!=="false",
   homeAssistant: {
     url: parsed.data.HOME_ASSISTANT_URL,
     token: parsed.data.HOME_ASSISTANT_TOKEN
