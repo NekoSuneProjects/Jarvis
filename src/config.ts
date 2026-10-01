@@ -6,12 +6,13 @@ const schema = z.object({
   JARVIS_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   JARVIS_NAME: z.string().min(1).default("Neko"),
 
-  AI_PROVIDER: z.enum(["ollama", "openai-compatible"]).default("ollama"),
-  AI_BASE_URL: z.string().url().default("http://127.0.0.1:11434/v1"),
+  AI_PROVIDER: z.enum(["ollama","openai-compatible","groq","openrouter","lm-studio","llama.cpp","gemini","custom-http"]).default("ollama"),
+  AI_BASE_URL: z.string().default(""),
   AI_MODEL: z.string().min(1).default("qwen2.5:3b"),
   AI_API_KEY: z.string().default(""),
   AI_TEMPERATURE: z.coerce.number().min(0).max(2).default(0.7),
   AI_TIMEOUT_MS: z.coerce.number().int().positive().default(60000),
+  AI_FALLBACKS_JSON: z.string().default("[]"),
 
   JARVIS_DATA_DIR: z.string().default("./data"),
 
@@ -76,6 +77,17 @@ const schema = z.object({
 
 const parsed = schema.safeParse(process.env);
 
+const AI_DEFAULT_URLS:Record<string,string>={
+  ollama:"http://127.0.0.1:11434/v1",
+  "openai-compatible":"http://127.0.0.1:11434/v1",
+  groq:"https://api.groq.com/openai/v1",
+  openrouter:"https://openrouter.ai/api/v1",
+  "lm-studio":"http://127.0.0.1:1234/v1",
+  "llama.cpp":"http://127.0.0.1:8080/v1",
+  gemini:"https://generativelanguage.googleapis.com/v1beta/openai",
+  "custom-http":"http://127.0.0.1:8080/v1"
+};
+
 if (!parsed.success) {
   console.error("Invalid Jarvis configuration:");
   console.error(parsed.error.flatten().fieldErrors);
@@ -88,11 +100,12 @@ export const config = {
   assistantName: parsed.data.JARVIS_NAME,
   ai: {
     provider: parsed.data.AI_PROVIDER,
-    baseUrl: parsed.data.AI_BASE_URL.replace(/\/$/, ""),
+    baseUrl: (parsed.data.AI_BASE_URL || AI_DEFAULT_URLS[parsed.data.AI_PROVIDER]).replace(/\/$/, ""),
     model: parsed.data.AI_MODEL,
     apiKey: parsed.data.AI_API_KEY,
     temperature: parsed.data.AI_TEMPERATURE,
-    timeoutMs: parsed.data.AI_TIMEOUT_MS
+    timeoutMs: parsed.data.AI_TIMEOUT_MS,
+    fallbacksJson: parsed.data.AI_FALLBACKS_JSON
   },
   dataDir: parsed.data.JARVIS_DATA_DIR,
   homeAssistant: {
