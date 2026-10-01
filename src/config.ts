@@ -15,6 +15,9 @@ const schema = z.object({
   AI_FALLBACKS_JSON: z.string().default("[]"),
 
   JARVIS_DATA_DIR: z.string().default("./data"),
+  JARVIS_LOG_LEVEL: z.enum(["trace","debug","info","warn","error","fatal"]).default("info"),
+  JARVIS_LOG_FILE: z.string().default("./data/logs/jarvis.log"),
+  JARVIS_LOG_MAX_BYTES: z.coerce.number().int().positive().default(5242880),
   JARVIS_TLS_CERT: z.string().default(""),
   JARVIS_TLS_KEY: z.string().default(""),
   JARVIS_LOCAL_ONLY: z.string().default("true"),
@@ -112,6 +115,11 @@ export const config = {
     fallbacksJson: parsed.data.AI_FALLBACKS_JSON
   },
   dataDir: parsed.data.JARVIS_DATA_DIR,
+  logging:{
+    level:parsed.data.JARVIS_LOG_LEVEL,
+    file:parsed.data.JARVIS_LOG_FILE,
+    maxBytes:parsed.data.JARVIS_LOG_MAX_BYTES
+  },
   tls:{
     cert:parsed.data.JARVIS_TLS_CERT,
     key:parsed.data.JARVIS_TLS_KEY
