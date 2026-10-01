@@ -99,7 +99,13 @@ export class DeviceRegistry {
     return {id,token};
   }
 
-  updateDevice(id:string,fields:{name?:string;room?:string;icon?:string;metadata?:Record<string,unknown>}){
+  updateDevice(id:string,fields:{
+    name?:string;
+    room?:string;
+    icon?:string;
+    permissionProfile?:{allowedCommands?:string[];deniedCommands?:string[]};
+    metadata?:Record<string,unknown>
+  }){
     const row=this.database.db.prepare(
       "SELECT name,metadata_json FROM devices WHERE id=?"
     ).get(id) as {name:string;metadata_json:string}|undefined;
@@ -107,6 +113,7 @@ export class DeviceRegistry {
     const metadata={...JSON.parse(row.metadata_json),...(fields.metadata ?? {})};
     if(fields.room!==undefined) metadata.room=fields.room;
     if(fields.icon!==undefined) metadata.icon=fields.icon;
+    if(fields.permissionProfile!==undefined) metadata.permissionProfile=fields.permissionProfile;
     return this.database.db.prepare(
       "UPDATE devices SET name=?,metadata_json=? WHERE id=?"
     ).run(fields.name ?? row.name,JSON.stringify(metadata),id).changes>0;
@@ -117,8 +124,14 @@ export class DeviceRegistry {
   }
 
   enqueueCommand(deviceId:string,command:string,args:Record<string,unknown>={}){
-    const device=this.database.db.prepare("SELECT id,revoked FROM devices WHERE id=?").get(deviceId) as {id:string;revoked:number}|undefined;
+    const device=this.database.db.prepare("SELECT id,revoked,metadata_json FROM devices WHERE id=?").get(deviceId) as {id:string;revoked:number;metadata_json:string}|undefined;
     if(!device || device.revoked) throw new Error("Device not found or revoked");
+    const metadata=JSON.parse(device.metadata_json || "{}") as any;
+    const profile=metadata.permissionProfile as {allowedCommands?:string[];deniedCommands?:string[]}|undefined;
+    if(profile?.deniedCommands?.includes(command)) throw new Error(`Device permission denied: ${command}`);
+    if(profile?.allowedCommands?.length && !profile.allowedCommands.includes(command)){
+      throw new Error(`Device command not allowed by profile: ${command}`);
+    }
     const id=randomUUID();
     const at=now();
     this.database.db.prepare(
