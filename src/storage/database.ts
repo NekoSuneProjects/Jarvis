@@ -176,6 +176,12 @@ export class JarvisDatabase {
         action TEXT NOT NULL,
         detail_json TEXT NOT NULL DEFAULT '{}'
       );
+
+      CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value_json TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
     `);
   }
 
