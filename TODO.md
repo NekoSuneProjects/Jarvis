@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 864 / 1215
-- **Remaining:** 351
-- **Progress:** **71.11%**
+- **Completed:** 872 / 1215
+- **Remaining:** 343
+- **Progress:** **71.77%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -165,19 +165,19 @@ Implemented in the repository so far:
 - [x] Add tool calls
 - [x] Add vision
 - [x] Add embeddings
-- [ ] Add provider presets
+- [x] Add provider presets
 - [x] Add connection test
 
 ## Future AI Providers
 
 - [ ] Anthropic-compatible provider
-- [ ] Gemini provider
-- [ ] Groq provider
-- [ ] OpenRouter provider
-- [ ] Local llama.cpp provider
-- [ ] LM Studio provider
-- [ ] Custom HTTP AI provider
-- [ ] Multi-provider fallback routing
+- [x] Gemini provider
+- [x] Groq provider
+- [x] OpenRouter provider
+- [x] Local llama.cpp provider
+- [x] LM Studio provider
+- [x] Custom HTTP AI provider
+- [x] Multi-provider fallback routing
 
 ---
 
