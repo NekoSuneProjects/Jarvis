@@ -12,6 +12,8 @@ export class IntegrationManager {
   private readonly integrations = new Map<string, JarvisIntegration>();
   private readonly logs:IntegrationLog[]=[];
   private readonly pollers=new Map<string,NodeJS.Timeout>();
+  private reconnectAttempts=0;
+  private reconnectSuccesses=0;
 
   constructor(private readonly events?:EventBus) {}
 
@@ -68,10 +70,20 @@ export class IntegrationManager {
   }
 
   async reconnect(id:string):Promise<void>{
+    this.reconnectAttempts++;
     const integration=this.integrations.get(id);
     if(!integration) throw new Error(`Unknown integration: ${id}`);
     try{await integration.disconnect();}catch{}
     await this.connectOne(id);
+    this.reconnectSuccesses++;
+  }
+
+  reconnectMetrics(){
+    return {
+      attempts:this.reconnectAttempts,
+      successes:this.reconnectSuccesses,
+      failures:this.reconnectAttempts-this.reconnectSuccesses
+    };
   }
 
   async connectEnabled(): Promise<void> {
