@@ -109,6 +109,20 @@ export function createMapsPlugin(store:AssistantStore):JarvisPlugin{
         }
       },
       {
+        name:"maps.android_navigation",
+        description:"Create an Android Google Maps navigation intent URI for a destination.",
+        capability:"utility.read",
+        async execute(input){
+          const value=z.object({
+            latitude:z.number(),
+            longitude:z.number(),
+            mode:z.enum(["d","w","b"]).default("d")
+          }).parse(input);
+          const uri=`google.navigation:q=${value.latitude},${value.longitude}&mode=${value.mode}`;
+          return {uri,platform:"android"};
+        }
+      },
+      {
         name:"maps.open_external",
         description:"Create an external OpenStreetMap route URL.",
         capability:"utility.read",
