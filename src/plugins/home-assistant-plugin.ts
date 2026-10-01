@@ -17,6 +17,78 @@ export function createHomeAssistantPlugin(homeAssistant:HomeAssistantIntegration
         async execute(){return homeAssistant.states();}
       },
       {
+        name:"home_assistant.devices",
+        description:"Group Home Assistant entities into device-oriented views.",
+        capability:"smart-home.read",
+        async execute(){return homeAssistant.devices();}
+      },
+      {
+        name:"home_assistant.areas",
+        description:"Group Home Assistant entities into room/area views.",
+        capability:"smart-home.read",
+        async execute(){return homeAssistant.areas();}
+      },
+      {
+        name:"home_assistant.presence",
+        description:"Read Home Assistant person and device_tracker presence.",
+        capability:"smart-home.read",
+        async execute(){return homeAssistant.presence();}
+      },
+      {
+        name:"home_assistant.alarms",
+        description:"Read Home Assistant alarm control panel states.",
+        capability:"smart-home.read",
+        async execute(){return homeAssistant.alarms();}
+      },
+      {
+        name:"home_assistant.alarm",
+        description:"Control a Home Assistant alarm panel.",
+        capability:"smart-home.control",
+        async execute(input){
+          const value=z.object({
+            entityId:z.string().min(1),
+            action:z.enum(["arm_away","arm_home","arm_night","disarm"]),
+            code:z.string().optional()
+          }).parse(input);
+          const service={
+            arm_away:"alarm_arm_away",
+            arm_home:"alarm_arm_home",
+            arm_night:"alarm_arm_night",
+            disarm:"alarm_disarm"
+          }[value.action];
+          return homeAssistant.callService("alarm_control_panel",service,{
+            entity_id:value.entityId,
+            ...(value.code?{code:value.code}:{})
+          });
+        }
+      },
+      {
+        name:"home_assistant.media_players",
+        description:"Read Home Assistant media_player states.",
+        capability:"smart-home.read",
+        async execute(){return homeAssistant.mediaPlayers();}
+      },
+      {
+        name:"home_assistant.media",
+        description:"Control a Home Assistant media player.",
+        capability:"smart-home.control",
+        async execute(input){
+          const value=z.object({
+            entityId:z.string().min(1),
+            action:z.enum(["play","pause","stop","next","previous","volume"]),
+            volume:z.number().min(0).max(1).optional()
+          }).parse(input);
+          const service={
+            play:"media_play",pause:"media_pause",stop:"media_stop",
+            next:"media_next_track",previous:"media_previous_track",volume:"volume_set"
+          }[value.action];
+          return homeAssistant.callService("media_player",service,{
+            entity_id:value.entityId,
+            ...(value.action==="volume"?{volume_level:value.volume??0.5}:{})
+          });
+        }
+      },
+      {
         name:"home_assistant.state",
         description:"Read one Home Assistant entity state.",
         capability:"smart-home.read",
