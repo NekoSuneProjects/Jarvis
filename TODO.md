@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 855 / 1215
-- **Remaining:** 360
-- **Progress:** **70.37%**
+- **Completed:** 864 / 1215
+- **Remaining:** 351
+- **Progress:** **71.11%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -107,7 +107,7 @@ Implemented in the repository so far:
 - [x] Create plugin manifest format
 - [x] Add integration enable/disable toggle
 - [x] Add per-integration permissions
-- [ ] Add per-device permissions
+- [x] Add per-device permissions
 - [x] Add OAuth token storage foundation
 - [x] Add API key storage foundation
 - [x] Add encrypted secrets storage
@@ -314,7 +314,7 @@ Implemented in the repository so far:
 - [x] Delete event
 - [x] RSVP to event
 - [x] Find free time
-- [ ] Read upcoming schedule
+- [x] Read upcoming schedule
 - [x] Reminder integration
 - [x] Timezone support
 - [x] Recurring event support
@@ -338,7 +338,7 @@ Implemented in the repository so far:
 - [x] Create Google Docs
 - [x] Create Sheets
 - [x] Create Slides
-- [ ] Edit Docs
+- [x] Edit Docs
 - [x] Edit Sheets
 - [x] Edit Slides
 - [x] Read comments
@@ -1003,13 +1003,13 @@ Implemented in the repository so far:
 - [x] Heartbeat
 - [x] Device online/offline state foundation
 - [x] Remote commands
-- [ ] Remote screenshots
+- [x] Remote screenshots
 - [x] Remote system stats
-- [ ] Remote notifications
-- [ ] Remote file transfer
+- [x] Remote notifications
+- [x] Remote file transfer
 - [x] Remote app launching
-- [ ] Remote power actions
-- [ ] Per-device permissions
+- [x] Remote power actions
+- [x] Per-device permissions
 - [x] Device revoke
 - [x] Audit log
 
@@ -1406,7 +1406,7 @@ Implemented in the repository so far:
 - [ ] Emergency disable
 - [ ] Local-only mode
 - [ ] LAN-only remote control
-- [ ] Permission profiles
+- [x] Permission profiles
 
 ---
 
