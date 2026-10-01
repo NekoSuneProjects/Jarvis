@@ -40,7 +40,12 @@ async function register(){
       name,
       platform:process.platform,
       arch:process.arch,
-      capabilities:["system.stats","heartbeat","system.info","process.list","app.open","url.open"],
+      capabilities:[
+        "system.stats","heartbeat","system.info","process.list","app.open","url.open",
+        "screenshot.capture","notification.send","file.read","file.write",
+        "power.lock","power.sleep","power.restart","power.shutdown",
+        "audio.play","audio.volume","tts.speak"
+      ],
       metadata:{release:os.release()}
     })
   });
@@ -87,6 +92,70 @@ function openUrl(url){
   else openDetached("xdg-open",[url]);
 }
 
+async function screenshotCapture(){
+  const target=path.join(stateDir,`screenshot-${Date.now()}.png`);
+  await fs.mkdir(stateDir,{recursive:true});
+  if(process.platform==="win32"){
+    const script=`Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; $b=[System.Windows.Forms.Screen]::PrimaryScreen.Bounds; $bmp=New-Object System.Drawing.Bitmap $b.Width,$b.Height; $g=[System.Drawing.Graphics]::FromImage($bmp); $g.CopyFromScreen($b.Location,[System.Drawing.Point]::Empty,$b.Size); $bmp.Save('${target.replace(/'/g,"''")}'); $g.Dispose(); $bmp.Dispose()`;
+    await execFileAsync("powershell.exe",["-NoProfile","-Command",script],{windowsHide:true});
+  }else if(process.platform==="darwin"){
+    await execFileAsync("screencapture",["-x",target]);
+  }else{
+    try{await execFileAsync("grim",[target]);}
+    catch{await execFileAsync("import",["-window","root",target]);}
+  }
+  const bytes=await fs.readFile(target);
+  await fs.rm(target,{force:true});
+  return {mimeType:"image/png",base64:bytes.toString("base64")};
+}
+
+async function nativeNotify(title,body){
+  if(process.platform==="win32"){
+    const escaped=(v)=>String(v).replace(/'/g,"''");
+    const script=`Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('${escaped(body)}','${escaped(title)}') | Out-Null`;
+    await execFileAsync("powershell.exe",["-NoProfile","-Command",script],{windowsHide:true});
+  }else if(process.platform==="darwin"){
+    await execFileAsync("osascript",["-e",`display notification ${JSON.stringify(body)} with title ${JSON.stringify(title)}`]);
+  }else{
+    await execFileAsync("notify-send",[title,body]);
+  }
+  return {ok:true};
+}
+
+async function powerAction(action){
+  if(process.platform==="win32"){
+    if(action==="lock") return execFileAsync("rundll32.exe",["user32.dll,LockWorkStation"]);
+    if(action==="sleep") return execFileAsync("powershell.exe",["-NoProfile","-Command","Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.Application]::SetSuspendState('Suspend',$false,$false)"]);
+    return execFileAsync("shutdown.exe",[action==="restart"?"/r":"/s","/t","0"]);
+  }
+  if(process.platform==="darwin"){
+    const script=action==="lock"?'tell application "System Events" to keystroke "q" using {control down, command down}':action==="sleep"?'tell application "System Events" to sleep':action==="restart"?'tell application "System Events" to restart':'tell application "System Events" to shut down';
+    return execFileAsync("osascript",["-e",script]);
+  }
+  return execFileAsync("systemctl",[action==="lock"?"lock-session":action==="sleep"?"suspend":action==="restart"?"reboot":"poweroff"]);
+}
+
+async function speak(text){
+  if(process.platform==="win32"){
+    const escaped=String(text).replace(/'/g,"''");
+    return execFileAsync("powershell.exe",["-NoProfile","-Command",`Add-Type -AssemblyName System.Speech; $s=New-Object System.Speech.Synthesis.SpeechSynthesizer; $s.Speak('${escaped}')`]);
+  }
+  if(process.platform==="darwin") return execFileAsync("say",[String(text)]);
+  try{return await execFileAsync("spd-say",[String(text)]);}
+  catch{return execFileAsync("espeak",[String(text)]);}
+}
+
+async function setVolume(percent){
+  const p=Math.max(0,Math.min(100,Number(percent)));
+  if(process.platform==="win32"){
+    const script=`$w=New-Object -ComObject WScript.Shell; 1..${Math.ceil(50)} | % {$w.SendKeys([char]174)}; 1..${Math.round(p/2)} | % {$w.SendKeys([char]175)}`;
+    return execFileAsync("powershell.exe",["-NoProfile","-Command",script]);
+  }
+  if(process.platform==="darwin") return execFileAsync("osascript",["-e",`set volume output volume ${Math.round(p)}`]);
+  try{return await execFileAsync("wpctl",["set-volume","@DEFAULT_AUDIO_SINK@",`${p}%`]);}
+  catch{return execFileAsync("pactl",["set-sink-volume","@DEFAULT_SINK@",`${p}%`]);}
+}
+
 async function executeCommand(job){
   switch(job.command){
     case "system.info":
@@ -110,6 +179,33 @@ async function executeCommand(job){
       openUrl(url);
       return {ok:true};
     }
+    case "screenshot.capture":
+      return screenshotCapture();
+    case "notification.send":
+      return nativeNotify(String(job.args?.title??"Jarvis"),String(job.args?.body??""));
+    case "file.read":{
+      const file=path.resolve(String(job.args?.path??""));
+      const bytes=await fs.readFile(file);
+      return {path:file,base64:bytes.toString("base64")};
+    }
+    case "file.write":{
+      const file=path.resolve(String(job.args?.path??""));
+      await fs.mkdir(path.dirname(file),{recursive:true});
+      await fs.writeFile(file,Buffer.from(String(job.args?.base64??""),"base64"));
+      return {ok:true,path:file};
+    }
+    case "power.lock": await powerAction("lock"); return {ok:true};
+    case "power.sleep": await powerAction("sleep"); return {ok:true};
+    case "power.restart": await powerAction("restart"); return {ok:true};
+    case "power.shutdown": await powerAction("shutdown"); return {ok:true};
+    case "audio.play":{
+      const url=String(job.args?.url??"");
+      if(!url) throw new Error("audio.play requires args.url");
+      openUrl(url);
+      return {ok:true,url};
+    }
+    case "audio.volume": await setVolume(job.args?.percent??50); return {ok:true};
+    case "tts.speak": await speak(String(job.args?.text??"")); return {ok:true};
     default:
       throw new Error(`Unsupported remote command: ${job.command}`);
   }
