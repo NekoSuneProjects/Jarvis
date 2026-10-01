@@ -65,7 +65,7 @@ export class HomeAssistantIntegration implements JarvisIntegration {
     const grouped=new Map<string,{device:string;entities:any[]}>();
     for(const state of states){
       const device=state.attributes?.device_class ?? state.entity_id?.split(".")[0] ?? "unknown";
-      const item=grouped.get(device) ?? {device,entities:[]};
+      const item=grouped.get(device) ?? {device,entities:[] as any[]};
       item.entities.push(state);
       grouped.set(device,item);
     }
