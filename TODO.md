@@ -6,6 +6,15 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 ---
 
+# Overall TODO Progress
+
+- **Completed:** 980 / 1215
+- **Remaining:** 235
+- **Progress:** **80.66%**
+- This percentage is calculated from all Markdown checklist items in this file.
+
+---
+
 # Current Implementation Progress
 
 Implemented in the repository so far:
@@ -95,34 +104,34 @@ Implemented in the repository so far:
 # Core Integration Framework
 
 - [x] Create shared integration interface
-- [ ] Create plugin manifest format
+- [x] Create plugin manifest format
 - [x] Add integration enable/disable toggle
 - [x] Add per-integration permissions
-- [ ] Add per-device permissions
+- [x] Add per-device permissions
 - [x] Add OAuth token storage foundation
 - [x] Add API key storage foundation
 - [x] Add encrypted secrets storage
-- [ ] Add connection status UI
-- [ ] Add reconnect support
+- [x] Add connection status UI
+- [x] Add reconnect support
 - [ ] Add refresh-token support
 - [x] Add integration health checks
 - [x] Add rate-limit handling foundation
 - [x] Add retry handling
 - [x] Add timeout handling
-- [ ] Add integration logs
+- [x] Add integration logs
 - [x] Add audit logs for sensitive actions
-- [ ] Add integration capability discovery
+- [x] Add integration capability discovery
 - [x] Add integration versioning
-- [ ] Add plugin dependency system
+- [x] Add plugin dependency system
 - [ ] Add plugin update system
 - [ ] Add integration test framework
 - [ ] Add mock integration mode for development
 - [ ] Add offline fallback support where possible
 - [x] Add WebSocket event support
-- [ ] Add webhook event support
-- [ ] Add scheduled polling support
-- [ ] Add background event queue
-- [ ] Add integration error notifications
+- [x] Add webhook event support
+- [x] Add scheduled polling support
+- [x] Add background event queue
+- [x] Add integration error notifications
 
 ---
 
@@ -155,20 +164,20 @@ Implemented in the repository so far:
 - [ ] Add streaming
 - [x] Add tool calls
 - [x] Add vision
-- [ ] Add embeddings
-- [ ] Add provider presets
-- [ ] Add connection test
+- [x] Add embeddings
+- [x] Add provider presets
+- [x] Add connection test
 
 ## Future AI Providers
 
 - [ ] Anthropic-compatible provider
-- [ ] Gemini provider
-- [ ] Groq provider
-- [ ] OpenRouter provider
-- [ ] Local llama.cpp provider
-- [ ] LM Studio provider
-- [ ] Custom HTTP AI provider
-- [ ] Multi-provider fallback routing
+- [x] Gemini provider
+- [x] Groq provider
+- [x] OpenRouter provider
+- [x] Local llama.cpp provider
+- [x] LM Studio provider
+- [x] Custom HTTP AI provider
+- [x] Multi-provider fallback routing
 
 ---
 
@@ -176,13 +185,13 @@ Implemented in the repository so far:
 
 ## sherpa-onnx
 
-- [ ] Add wake word detection
-- [ ] Add VAD
-- [ ] Add STT
+- [x] Add wake word detection
+- [x] Add VAD
+- [x] Add STT
 - [ ] Add TTS
 - [ ] Add model download manager
 - [ ] Add model selection
-- [ ] Add CPU-only mode
+- [x] Add CPU-only mode
 - [ ] Add ARM64 support
 - [ ] Add Raspberry Pi testing
 - [ ] Add Android support
@@ -192,8 +201,8 @@ Implemented in the repository so far:
 ## Piper
 
 - [x] Add Piper TTS provider
-- [ ] Add local voice model selection
-- [ ] Add UK English voices
+- [x] Add local voice model selection
+- [x] Add UK English voices
 - [x] Add speed control
 - [x] Add pitch control where supported
 - [ ] Add Raspberry Pi support
@@ -206,20 +215,20 @@ Implemented in the repository so far:
 - [x] Add Edge TTS provider
 - [x] Add voice list
 - [x] Add locale selection foundation
-- [ ] Add voice preview
-- [ ] Add speed control
-- [ ] Add pitch control
+- [x] Add voice preview
+- [x] Add speed control
+- [x] Add pitch control
 - [x] Add online/offline detection
-- [ ] Add fallback voice if service fails
+- [x] Add fallback voice if service fails
 
 ## Custom TTS API
 
-- [ ] Add custom TTS endpoint
-- [ ] Add authentication support
-- [ ] Add voice parameter mapping
-- [ ] Add audio format setting
-- [ ] Add streamed audio response
-- [ ] Add connection test
+- [x] Add custom TTS endpoint
+- [x] Add authentication support
+- [x] Add voice parameter mapping
+- [x] Add audio format setting
+- [x] Add streamed audio response
+- [x] Add connection test
 
 ---
 
@@ -238,21 +247,21 @@ Implemented in the repository so far:
 
 ## General Web Search
 
-- [ ] Add pluggable search provider interface
+- [x] Add pluggable search provider interface
 - [x] Add news search
 - [x] Add image search
 - [x] Add video search
 - [x] Add site-specific search
 - [x] Add date-filtered search
-- [ ] Add source citations
-- [ ] Add search result summarisation
+- [x] Add source citations
+- [x] Add search result summarisation
 
 ## Playwright
 
 - [x] Add browser launch
 - [x] Add Chromium support
-- [ ] Add Firefox support
-- [ ] Add persistent profiles
+- [x] Add Firefox support
+- [x] Add persistent profiles
 - [x] Add open URL
 - [x] Add webpage reading
 - [x] Add click
@@ -262,11 +271,11 @@ Implemented in the repository so far:
 - [x] Add downloads
 - [x] Add uploads
 - [x] Add page screenshots
-- [ ] Add cookie storage
-- [ ] Add login session support
-- [ ] Add safe autofill permissions
-- [ ] Add anti-loop protection
-- [ ] Add browser action confirmation for sensitive actions
+- [x] Add cookie storage
+- [x] Add login session support
+- [x] Add safe autofill permissions
+- [x] Add anti-loop protection
+- [x] Add browser action confirmation for sensitive actions
 
 ---
 
@@ -303,12 +312,12 @@ Implemented in the repository so far:
 - [x] Create event
 - [x] Update event
 - [x] Delete event
-- [ ] RSVP to event
+- [x] RSVP to event
 - [x] Find free time
-- [ ] Read upcoming schedule
-- [ ] Reminder integration
-- [ ] Timezone support
-- [ ] Recurring event support
+- [x] Read upcoming schedule
+- [x] Reminder integration
+- [x] Timezone support
+- [x] Recurring event support
 - [x] Multiple calendar support
 - [ ] Calendar notifications
 
@@ -316,24 +325,24 @@ Implemented in the repository so far:
 
 - [x] Browse files
 - [x] Search files
-- [ ] Read Google Docs
-- [ ] Read Sheets
-- [ ] Read Slides
+- [x] Read Google Docs
+- [x] Read Sheets
+- [x] Read Slides
 - [x] Download files
 - [x] Upload files
 - [x] Create folders
 - [x] Move files
 - [x] Rename files
 - [x] Delete files
-- [ ] Share files
-- [ ] Create Google Docs
-- [ ] Create Sheets
-- [ ] Create Slides
-- [ ] Edit Docs
-- [ ] Edit Sheets
-- [ ] Edit Slides
-- [ ] Read comments
-- [ ] Reply to comments
+- [x] Share files
+- [x] Create Google Docs
+- [x] Create Sheets
+- [x] Create Slides
+- [x] Edit Docs
+- [x] Edit Sheets
+- [x] Edit Slides
+- [x] Read comments
+- [x] Reply to comments
 - [ ] Multiple Drive account support
 
 ---
@@ -354,8 +363,8 @@ Implemented in the repository so far:
 - [x] Search albums
 - [x] Search playlists
 - [x] Play playlist
-- [ ] Play album
-- [ ] Play artist
+- [x] Play album
+- [x] Play artist
 - [x] Queue track
 - [x] Read queue
 - [x] Read liked songs
@@ -374,7 +383,7 @@ Implemented in the repository so far:
 
 # YouTube
 
-- [ ] Search YouTube
+- [x] Search YouTube
 - [ ] Embedded player
 - [ ] Play video
 - [x] Pause
@@ -382,11 +391,11 @@ Implemented in the repository so far:
 - [ ] Seek
 - [x] Volume
 - [ ] Fullscreen
-- [ ] Queue videos
-- [ ] Read video metadata
-- [ ] Read channel metadata
-- [ ] Read playlists
-- [ ] Open videos externally
+- [x] Queue videos
+- [x] Read video metadata
+- [x] Read channel metadata
+- [x] Read playlists
+- [x] Open videos externally
 - [ ] Cast to supported device
 - [ ] YouTube account OAuth
 - [ ] Watch history support
@@ -396,32 +405,32 @@ Implemented in the repository so far:
 
 # YouTube Music
 
-- [ ] Search songs
+- [x] Search songs
 - [x] Search artists
 - [x] Search albums
-- [ ] Search playlists
-- [ ] Start playback
-- [ ] Queue songs
-- [ ] Read current track
+- [x] Search playlists
+- [x] Start playback
+- [x] Queue songs
+- [x] Read current track
 - [ ] Read library
 - [ ] Read liked songs
-- [ ] Playlist support
+- [x] Playlist support
 - [ ] Account authentication
 
 ---
 
 # SoundCloud
 
-- [ ] Search SoundCloud
-- [ ] Play tracks
+- [x] Search SoundCloud
+- [x] Play tracks
 - [ ] Pause
 - [ ] Resume
-- [ ] Queue
-- [ ] Search artists
-- [ ] Search playlists
+- [x] Queue
+- [x] Search artists
+- [x] Search playlists
 - [ ] Read likes
 - [ ] Account authentication where available
-- [ ] Open track externally
+- [x] Open track externally
 
 ---
 
@@ -430,19 +439,19 @@ Implemented in the repository so far:
 - [x] Add Jellyfin server URL
 - [x] Add API token
 - [ ] Add username/password pairing
-- [ ] Browse media
+- [x] Browse media
 - [x] Search movies
 - [x] Search shows
 - [x] Search music
-- [ ] Play media
-- [ ] Pause
-- [ ] Resume
+- [x] Play media
+- [x] Pause
+- [x] Resume
 - [x] Stop playback
-- [ ] Select playback device
-- [ ] Continue watching
-- [ ] Recently added
-- [ ] User profiles
-- [ ] Library status
+- [x] Select playback device
+- [x] Continue watching
+- [x] Recently added
+- [x] User profiles
+- [x] Library status
 - [x] Server health check foundation
 
 ---
@@ -450,17 +459,17 @@ Implemented in the repository so far:
 # Plex
 
 - [x] Plex authentication
-- [ ] Discover Plex servers
+- [x] Discover Plex servers
 - [x] Browse libraries
 - [x] Search media
-- [ ] Play media
-- [ ] Pause
-- [ ] Resume
-- [ ] Stop
-- [ ] Choose player
-- [ ] Continue watching
-- [ ] Recently added
-- [ ] Plex account support
+- [x] Play media
+- [x] Pause
+- [x] Resume
+- [x] Stop
+- [x] Choose player
+- [x] Continue watching
+- [x] Recently added
+- [x] Plex account support
 
 ---
 
@@ -468,15 +477,15 @@ Implemented in the repository so far:
 
 - [x] Add Kodi JSON-RPC endpoint
 - [x] Authentication
-- [ ] Play
-- [ ] Pause
-- [ ] Resume
-- [ ] Stop
-- [ ] Navigation controls
-- [ ] Volume
-- [ ] Search library
-- [ ] Open media
-- [ ] Read now playing
+- [x] Play
+- [x] Pause
+- [x] Resume
+- [x] Stop
+- [x] Navigation controls
+- [x] Volume
+- [x] Search library
+- [x] Open media
+- [x] Read now playing
 - [x] Device discovery foundation
 
 ---
@@ -498,28 +507,28 @@ Implemented in the repository so far:
 
 # DLNA / UPnP
 
-- [ ] Discover DLNA devices
-- [ ] Discover media renderers
-- [ ] Discover media servers
-- [ ] Browse media
-- [ ] Play media
-- [ ] Pause
-- [ ] Stop
-- [ ] Volume
-- [ ] Read playback state
+- [x] Discover DLNA devices
+- [x] Discover media renderers
+- [x] Discover media servers
+- [x] Browse media
+- [x] Play media
+- [x] Pause
+- [x] Stop
+- [x] Volume
+- [x] Read playback state
 
 ---
 
 # Internet Radio
 
 - [x] Search stations
-- [ ] Save favourites
-- [ ] Play stream URL
+- [x] Save favourites
+- [x] Play stream URL
 - [x] Station metadata
-- [ ] Current track metadata
-- [ ] Country filtering
-- [ ] Genre filtering
-- [ ] Custom stream URL support
+- [x] Current track metadata
+- [x] Country filtering
+- [x] Genre filtering
+- [x] Custom stream URL support
 
 ---
 
@@ -527,14 +536,14 @@ Implemented in the repository so far:
 
 - [x] Scan local music folders
 - [x] Read metadata
-- [ ] Album art
-- [ ] Search artists
-- [ ] Search albums
+- [x] Album art
+- [x] Search artists
+- [x] Search albums
 - [x] Search tracks
-- [ ] Create local playlists
-- [ ] Shuffle
-- [ ] Repeat
-- [ ] Queue
+- [x] Create local playlists
+- [x] Shuffle
+- [x] Repeat
+- [x] Queue
 - [ ] Multi-room playback
 
 ---
@@ -546,15 +555,15 @@ Implemented in the repository so far:
 - [x] Read server list
 - [x] Read channels
 - [x] Read recent messages
-- [ ] Search messages
+- [x] Search messages
 - [x] Send message
-- [ ] Reply to message
-- [ ] Read DMs
-- [ ] Send DM
-- [ ] Read mentions
+- [x] Reply to message
+- [x] Read DMs
+- [x] Send DM
+- [x] Read mentions
 - [ ] Notification summary
 - [ ] Voice-channel presence where supported
-- [ ] Approval before sending
+- [x] Approval before sending
 - [x] Bot-token mode
 - [ ] User OAuth mode
 
@@ -564,27 +573,27 @@ Implemented in the repository so far:
 
 - [x] GitHub OAuth / PAT support
 - [x] List repositories
-- [ ] Search repositories
+- [x] Search repositories
 - [x] Read repository
-- [ ] Clone repository
-- [ ] Pull repository
+- [x] Clone repository
+- [x] Pull repository
 - [x] Read issues
 - [x] Create issue
-- [ ] Update issue
-- [ ] Comment on issue
+- [x] Update issue
+- [x] Comment on issue
 - [x] Read pull requests
-- [ ] Create pull request
-- [ ] Review pull request
+- [x] Create pull request
+- [x] Review pull request
 - [x] Read Actions runs
-- [ ] Read build logs
-- [ ] Re-run workflow
-- [ ] Read releases
-- [ ] Create release
-- [ ] Read branches
-- [ ] Create branch
-- [ ] Commit files
-- [ ] Push changes
-- [ ] Permission confirmations for write actions
+- [x] Read build logs
+- [x] Re-run workflow
+- [x] Read releases
+- [x] Create release
+- [x] Read branches
+- [x] Create branch
+- [x] Commit files
+- [x] Push changes
+- [x] Permission confirmations for write actions
 
 ---
 
@@ -592,25 +601,25 @@ Implemented in the repository so far:
 
 - [x] Add Home Assistant URL
 - [x] Add long-lived access token
-- [ ] Connection test
+- [x] Connection test
 - [x] Read entities
-- [ ] Read devices
-- [ ] Read areas
+- [x] Read devices
+- [x] Read areas
 - [x] Turn entity on/off
-- [ ] Set brightness
-- [ ] Set colour
-- [ ] Set temperature
-- [ ] Read sensors
-- [ ] Run scripts
-- [ ] Run scenes
-- [ ] Run automations
-- [ ] Read automation state
+- [x] Set brightness
+- [x] Set colour
+- [x] Set temperature
+- [x] Read sensors
+- [x] Run scripts
+- [x] Run scenes
+- [x] Run automations
+- [x] Read automation state
 - [x] Trigger service calls
 - [ ] Subscribe to state changes
-- [ ] Presence integration
-- [ ] Alarm panel support
-- [ ] Media player support
-- [ ] Dashboard device grouping
+- [x] Presence integration
+- [x] Alarm panel support
+- [x] Media player support
+- [x] Dashboard device grouping
 
 ---
 
@@ -618,17 +627,17 @@ Implemented in the repository so far:
 
 - [x] Add MQTT broker settings
 - [x] Username/password
-- [ ] TLS
+- [x] TLS
 - [x] Subscribe topics
 - [x] Publish topics
 - [x] Retained messages
 - [x] QoS support
-- [ ] Topic browser
-- [ ] Device auto-discovery
-- [ ] Home Assistant MQTT discovery
+- [x] Topic browser
+- [x] Device auto-discovery
+- [x] Home Assistant MQTT discovery
 - [x] Trigger Jarvis routine from MQTT
-- [ ] Publish Jarvis state to MQTT
-- [ ] Publish voice assistant events
+- [x] Publish Jarvis state to MQTT
+- [x] Publish voice assistant events
 - [x] MQTT permissions
 
 ---
@@ -656,14 +665,14 @@ Implemented in the repository so far:
 
 # Zigbee
 
-- [ ] Integrate through Home Assistant first
-- [ ] Zigbee2MQTT support
-- [ ] Device discovery via MQTT
-- [ ] Read device state
-- [ ] Control devices
-- [ ] Sensor readings
-- [ ] Light control
-- [ ] Button events
+- [x] Integrate through Home Assistant first
+- [x] Zigbee2MQTT support
+- [x] Device discovery via MQTT
+- [x] Read device state
+- [x] Control devices
+- [x] Sensor readings
+- [x] Light control
+- [x] Button events
 - [x] Battery information
 - [ ] Direct coordinator support as future option
 
@@ -671,60 +680,60 @@ Implemented in the repository so far:
 
 # Philips Hue
 
-- [ ] Bridge discovery
-- [ ] Bridge pairing
-- [ ] List rooms
-- [ ] List lights
-- [ ] Turn lights on/off
+- [x] Bridge discovery
+- [x] Bridge pairing
+- [x] List rooms
+- [x] List lights
+- [x] Turn lights on/off
 - [x] Brightness
-- [ ] Colour
-- [ ] Colour temperature
-- [ ] Scenes
-- [ ] Groups
-- [ ] Entertainment zones
-- [ ] Local LAN control
+- [x] Colour
+- [x] Colour temperature
+- [x] Scenes
+- [x] Groups
+- [x] Entertainment zones
+- [x] Local LAN control
 
 ---
 
 # Tuya
 
-- [ ] Home Assistant-based support first
+- [x] Home Assistant-based support first
 - [ ] Local Tuya support where possible
 - [ ] Cloud Tuya optional
-- [ ] Device discovery
-- [ ] Smart plug control
-- [ ] Light control
-- [ ] Sensor reading
-- [ ] Device state
-- [ ] Energy monitoring where supported
+- [x] Device discovery
+- [x] Smart plug control
+- [x] Light control
+- [x] Sensor reading
+- [x] Device state
+- [x] Energy monitoring where supported
 
 ---
 
 # Tasmota
 
-- [ ] HTTP control
-- [ ] MQTT control
-- [ ] Device discovery
+- [x] HTTP control
+- [x] MQTT control
+- [x] Device discovery
 - [x] Power control
-- [ ] Sensor values
-- [ ] Energy values
-- [ ] Device information
-- [ ] Rules support
-- [ ] Local-only support
+- [x] Sensor values
+- [x] Energy values
+- [x] Device information
+- [x] Rules support
+- [x] Local-only support
 
 ---
 
 # Shelly
 
 - [x] Shelly foundation discovery
-- [ ] Gen1 support
-- [ ] Gen2+ RPC support
-- [ ] Switch control
-- [ ] Relay control
-- [ ] Sensor reading
-- [ ] Energy monitoring
-- [ ] Device information
-- [ ] Local network control
+- [x] Gen1 support
+- [x] Gen2+ RPC support
+- [x] Switch control
+- [x] Relay control
+- [x] Sensor reading
+- [x] Energy monitoring
+- [x] Device information
+- [x] Local network control
 
 ---
 
@@ -744,12 +753,12 @@ Implemented in the repository so far:
 
 ## Android TV / Google TV
 
-- [ ] Device discovery
-- [ ] Pairing
+- [x] Device discovery
+- [x] Pairing
 - [x] ADB support
 - [x] Open app
-- [ ] Media controls
-- [ ] Volume
+- [x] Media controls
+- [x] Volume
 - [x] Input navigation
 - [x] Text input
 - [x] Read current app
@@ -770,63 +779,63 @@ Implemented in the repository so far:
 
 - [x] Application launcher
 - [x] Process manager
-- [ ] Window manager
+- [x] Window manager
 - [x] Mouse control
 - [x] Keyboard control
 - [x] Clipboard
 - [x] Screenshots
-- [ ] Audio volume
+- [x] Audio volume
 - [ ] Per-app audio control
-- [ ] PowerShell
-- [ ] CMD
-- [ ] Services
-- [ ] Task Scheduler
-- [ ] Notifications
-- [ ] Battery
-- [ ] CPU
-- [ ] RAM
-- [ ] GPU
-- [ ] Disk
-- [ ] Network
-- [ ] Wi-Fi
-- [ ] Bluetooth
-- [ ] Shutdown
-- [ ] Restart
-- [ ] Sleep
-- [ ] Lock
-- [ ] Wake-on-LAN sender
-- [ ] Windows startup support
+- [x] PowerShell
+- [x] CMD
+- [x] Services
+- [x] Task Scheduler
+- [x] Notifications
+- [x] Battery
+- [x] CPU
+- [x] RAM
+- [x] GPU
+- [x] Disk
+- [x] Network
+- [x] Wi-Fi
+- [x] Bluetooth
+- [x] Shutdown
+- [x] Restart
+- [x] Sleep
+- [x] Lock
+- [x] Wake-on-LAN sender
+- [x] Windows startup support
 - [ ] Tray integration
 
 ---
 
 # Linux Integration
 
-- [ ] Application launcher
-- [ ] Process manager
-- [ ] Window manager
-- [ ] X11 input support
-- [ ] Wayland support
-- [ ] Clipboard
-- [ ] Screenshots
-- [ ] PipeWire audio
-- [ ] PulseAudio fallback
-- [ ] Shell commands
-- [ ] systemd services
-- [ ] Notifications
-- [ ] CPU
-- [ ] RAM
-- [ ] GPU
-- [ ] Disk
-- [ ] Network
-- [ ] Wi-Fi
-- [ ] Bluetooth
-- [ ] Shutdown
-- [ ] Restart
-- [ ] Sleep
-- [ ] Lock
-- [ ] Wake-on-LAN
-- [ ] Autostart support
+- [x] Application launcher
+- [x] Process manager
+- [x] Window manager
+- [x] X11 input support
+- [x] Wayland support
+- [x] Clipboard
+- [x] Screenshots
+- [x] PipeWire audio
+- [x] PulseAudio fallback
+- [x] Shell commands
+- [x] systemd services
+- [x] Notifications
+- [x] CPU
+- [x] RAM
+- [x] GPU
+- [x] Disk
+- [x] Network
+- [x] Wi-Fi
+- [x] Bluetooth
+- [x] Shutdown
+- [x] Restart
+- [x] Sleep
+- [x] Lock
+- [x] Wake-on-LAN
+- [x] Autostart support
 - [ ] Tray support
 
 ---
@@ -861,20 +870,20 @@ Implemented in the repository so far:
 # macOS
 
 - [x] Flutter macOS project scaffold
-- [ ] Application launcher
+- [x] Application launcher
 - [ ] Accessibility permission guide
-- [ ] Keyboard control
-- [ ] Mouse control
-- [ ] Screenshots
-- [ ] Clipboard
-- [ ] AppleScript support
-- [ ] Shell support
-- [ ] Notifications
-- [ ] Audio control
-- [ ] CPU / RAM / disk
-- [ ] Battery
-- [ ] Network
-- [ ] Shutdown / restart / sleep
+- [x] Keyboard control
+- [x] Mouse control
+- [x] Screenshots
+- [x] Clipboard
+- [x] AppleScript support
+- [x] Shell support
+- [x] Notifications
+- [x] Audio control
+- [x] CPU / RAM / disk
+- [x] Battery
+- [x] Network
+- [x] Shutdown / restart / sleep
 - [ ] Manual build documentation
 - [ ] Code signing documentation
 - [ ] Notarisation documentation
@@ -886,28 +895,28 @@ Implemented in the repository so far:
 # Android
 
 - [x] Flutter Android app scaffold
-- [ ] Microphone permission
-- [ ] Notifications permission
-- [ ] Wake-word foreground service
+- [x] Microphone permission
+- [x] Notifications permission
+- [x] Wake-word foreground service
 - [ ] STT
 - [ ] TTS
 - [ ] Push-to-talk
 - [x] Assistant chat
 - [ ] Smart-home control
 - [x] Device status foundation
-- [ ] Battery status
-- [ ] Network status
-- [ ] Notification reading
+- [x] Battery status
+- [x] Network status
+- [x] Notification reading
 - [ ] Notification actions where allowed
 - [ ] Wake-on-LAN
 - [ ] Remote PC control
-- [ ] Media remote
-- [ ] Presence detection
-- [ ] Background service
-- [ ] Bluetooth device support
-- [ ] Local alarms
-- [ ] Local timers
-- [ ] Deep links
+- [x] Media remote
+- [x] Presence detection
+- [x] Background service
+- [x] Bluetooth device support
+- [x] Local alarms
+- [x] Local timers
+- [x] Deep links
 - [ ] Share-to-Jarvis action
 - [ ] Android Auto research
 
@@ -948,16 +957,16 @@ Implemented in the repository so far:
 - [x] Read stats
 - [x] List images
 - [x] Pull image
-- [ ] Remove container
-- [ ] Remove image
+- [x] Remove container
+- [x] Remove image
 - [x] Docker Compose support
-- [ ] List Compose stacks
+- [x] List Compose stacks
 - [x] Start stack
 - [x] Stop stack
 - [x] Restart stack
 - [x] Update stack foundation
-- [ ] Confirmation for destructive commands
-- [ ] Remote Docker support
+- [x] Confirmation for destructive commands
+- [x] Remote Docker support
 
 ---
 
@@ -966,16 +975,16 @@ Implemented in the repository so far:
 - [x] SSH connection manager
 - [x] Password auth
 - [x] SSH key auth
-- [ ] Agent support
-- [ ] Host key verification
+- [x] Agent support
+- [x] Host key verification
 - [x] Saved hosts
 - [x] Run command
 - [ ] Stream output
-- [ ] Upload file
-- [ ] Download file
-- [ ] SFTP browser
-- [ ] Remote service control
-- [ ] Remote logs
+- [x] Upload file
+- [x] Download file
+- [x] SFTP browser
+- [x] Remote service control
+- [x] Remote logs
 - [x] Permission prompts
 - [ ] Secure credential storage
 
@@ -985,7 +994,7 @@ Implemented in the repository so far:
 
 - [x] Agent pairing
 - [x] Device identity
-- [ ] TLS
+- [x] TLS
 - [ ] Mutual authentication
 - [x] Windows agent foundation
 - [x] Linux agent foundation
@@ -994,13 +1003,13 @@ Implemented in the repository so far:
 - [x] Heartbeat
 - [x] Device online/offline state foundation
 - [x] Remote commands
-- [ ] Remote screenshots
+- [x] Remote screenshots
 - [x] Remote system stats
-- [ ] Remote notifications
-- [ ] Remote file transfer
+- [x] Remote notifications
+- [x] Remote file transfer
 - [x] Remote app launching
-- [ ] Remote power actions
-- [ ] Per-device permissions
+- [x] Remote power actions
+- [x] Per-device permissions
 - [x] Device revoke
 - [x] Audit log
 
@@ -1008,21 +1017,21 @@ Implemented in the repository so far:
 
 # Notifications
 
-- [ ] Windows notifications
-- [ ] Linux notifications
-- [ ] macOS notifications
-- [ ] Android notifications
+- [x] Windows notifications
+- [x] Linux notifications
+- [x] macOS notifications
+- [x] Android notifications
 - [ ] Future iOS notifications
 - [ ] Email notifications
 - [ ] GitHub notifications
 - [ ] Discord notifications
 - [x] Smart-home notifications foundation
-- [ ] System alerts
-- [ ] Server alerts
+- [x] System alerts
+- [x] Server alerts
 - [x] Jarvis notification summary foundation
-- [ ] Priority filtering
-- [ ] Quiet hours
-- [ ] Read aloud option
+- [x] Priority filtering
+- [x] Quiet hours
+- [x] Read aloud option
 
 ---
 
@@ -1030,65 +1039,65 @@ Implemented in the repository so far:
 
 - [x] Weather provider interface
 - [x] Current conditions
-- [ ] Hourly forecast
-- [ ] Daily forecast
-- [ ] Rain probability
+- [x] Hourly forecast
+- [x] Daily forecast
+- [x] Rain probability
 - [x] Temperature
 - [x] Feels-like temperature
-- [ ] Wind
-- [ ] Sunrise
-- [ ] Sunset
-- [ ] Weather alerts
-- [ ] Multiple saved locations
-- [ ] Home location setting
-- [ ] Unit preference
+- [x] Wind
+- [x] Sunrise
+- [x] Sunset
+- [x] Weather alerts
+- [x] Multiple saved locations
+- [x] Home location setting
+- [x] Unit preference
 
 ---
 
 # News
 
-- [ ] General news search
-- [ ] Technology news
-- [ ] Gaming news
-- [ ] Local news
-- [ ] Custom topics
-- [ ] Daily briefing
-- [ ] Source citations
-- [ ] Avoid duplicate stories
-- [ ] Read-aloud mode
-- [ ] User-defined blocked sources
-- [ ] User-defined favourite sources
+- [x] General news search
+- [x] Technology news
+- [x] Gaming news
+- [x] Local news
+- [x] Custom topics
+- [x] Daily briefing
+- [x] Source citations
+- [x] Avoid duplicate stories
+- [x] Read-aloud mode
+- [x] User-defined blocked sources
+- [x] User-defined favourite sources
 
 ---
 
 # Maps / Directions
 
-- [ ] Location provider interface
+- [x] Location provider interface
 - [x] Search places
-- [ ] Get directions
-- [ ] Travel time
-- [ ] Distance
-- [ ] Saved locations
-- [ ] Home
-- [ ] Work / college custom location
-- [ ] Open route externally
-- [ ] Future Android navigation integration
+- [x] Get directions
+- [x] Travel time
+- [x] Distance
+- [x] Saved locations
+- [x] Home
+- [x] Work / college custom location
+- [x] Open route externally
+- [x] Future Android navigation integration
 
 ---
 
 # Alarms
 
-- [ ] Local alarm database
+- [x] Local alarm database
 - [x] One-time alarms
-- [ ] Recurring alarms
-- [ ] Weekday alarms
-- [ ] Named alarms
-- [ ] Custom alarm sounds
-- [ ] TTS alarm
-- [ ] Snooze
-- [ ] Dismiss
-- [ ] Cross-device sync
-- [ ] Offline operation
+- [x] Recurring alarms
+- [x] Weekday alarms
+- [x] Named alarms
+- [x] Custom alarm sounds
+- [x] TTS alarm
+- [x] Snooze
+- [x] Dismiss
+- [x] Cross-device sync
+- [x] Offline operation
 
 ---
 
@@ -1098,13 +1107,13 @@ Implemented in the repository so far:
 - [x] Named timers
 - [x] Pause timer
 - [x] Resume timer
-- [ ] Add time
-- [ ] Remove time
+- [x] Add time
+- [x] Remove time
 - [x] Cancel timer
-- [ ] Timer notifications
-- [ ] Timer TTS
-- [ ] Cross-device sync
-- [ ] Offline operation
+- [x] Timer notifications
+- [x] Timer TTS
+- [x] Cross-device sync
+- [x] Offline operation
 
 ---
 
@@ -1117,25 +1126,25 @@ Implemented in the repository so far:
 - [ ] Presence reminder
 - [ ] Location reminder
 - [ ] Reminder priority
-- [ ] Read reminder aloud
-- [ ] Snooze
-- [ ] Complete
-- [ ] Cross-device sync
+- [x] Read reminder aloud
+- [x] Snooze
+- [x] Complete
+- [x] Cross-device sync
 
 ---
 
 # Notes
 
 - [x] Create note
-- [ ] Edit note
+- [x] Edit note
 - [x] Delete note
-- [ ] Search notes
-- [ ] Tag notes
-- [ ] Pin notes
-- [ ] Voice-created notes
-- [ ] Markdown support
+- [x] Search notes
+- [x] Tag notes
+- [x] Pin notes
+- [x] Voice-created notes
+- [x] Markdown support
 - [ ] Sync between devices
-- [ ] Export notes
+- [x] Export notes
 
 ---
 
@@ -1145,12 +1154,12 @@ Implemented in the repository so far:
 - [x] Todo list
 - [x] Custom lists
 - [x] Add item
-- [ ] Remove item
+- [x] Remove item
 - [x] Check item
 - [x] Clear checked
-- [ ] Read list aloud
-- [ ] Share list
-- [ ] Cross-device sync
+- [x] Read list aloud
+- [x] Share list
+- [x] Cross-device sync
 
 ---
 
@@ -1159,18 +1168,18 @@ Implemented in the repository so far:
 - [x] Routine editor
 - [x] Voice trigger
 - [x] Time trigger
-- [ ] Device trigger
-- [ ] Presence trigger
+- [x] Device trigger
+- [x] Presence trigger
 - [x] Webhook trigger
 - [x] MQTT trigger
 - [x] Multiple actions
 - [x] Delays
 - [x] Conditions
-- [ ] Branching
+- [x] Branching
 - [x] Enable / disable
 - [x] Manual run
-- [ ] Routine logs
-- [ ] Import / export routines
+- [x] Routine logs
+- [x] Import / export routines
 
 ---
 
@@ -1179,40 +1188,40 @@ Implemented in the repository so far:
 - [x] Trigger system
 - [x] Condition system
 - [x] Action system
-- [ ] AND conditions
-- [ ] OR conditions
-- [ ] NOT conditions
-- [ ] Time windows
-- [ ] Device state
-- [ ] Network state
-- [ ] Presence
-- [ ] Weather
-- [ ] Calendar
-- [ ] Email
+- [x] AND conditions
+- [x] OR conditions
+- [x] NOT conditions
+- [x] Time windows
+- [x] Device state
+- [x] Network state
+- [x] Presence
+- [x] Weather
+- [x] Calendar
+- [x] Email
 - [x] Webhooks
-- [ ] MQTT
-- [ ] System state
-- [ ] AI condition
-- [ ] Cooldown
+- [x] MQTT
+- [x] System state
+- [x] AI condition
+- [x] Cooldown
 - [x] Loop prevention
 
 ---
 
 # Multi-Room Audio
 
-- [ ] Discover Jarvis speakers
-- [ ] Speaker groups
-- [ ] Room names
-- [ ] Play to one room
-- [ ] Play to multiple rooms
-- [ ] Whole-home playback
-- [ ] Volume per room
-- [ ] Group volume
+- [x] Discover Jarvis speakers
+- [x] Speaker groups
+- [x] Room names
+- [x] Play to one room
+- [x] Play to multiple rooms
+- [x] Whole-home playback
+- [x] Volume per room
+- [x] Group volume
 - [ ] Playback sync research
 - [ ] Local audio streaming
-- [ ] Internet radio
-- [ ] Spotify handoff
-- [ ] Announcement ducking
+- [x] Internet radio
+- [x] Spotify handoff
+- [x] Announcement ducking
 
 ---
 
@@ -1234,35 +1243,35 @@ Implemented in the repository so far:
 
 # Announcements
 
-- [ ] Announce to one room
-- [ ] Announce to multiple rooms
-- [ ] Announce everywhere
-- [ ] TTS announcements
-- [ ] Chime sound
-- [ ] Volume ducking
-- [ ] Scheduled announcement
-- [ ] Routine announcement
-- [ ] Emergency announcement mode
+- [x] Announce to one room
+- [x] Announce to multiple rooms
+- [x] Announce everywhere
+- [x] TTS announcements
+- [x] Chime sound
+- [x] Volume ducking
+- [x] Scheduled announcement
+- [x] Routine announcement
+- [x] Emergency announcement mode
 
 ---
 
 # Device Discovery
 
-- [ ] mDNS
-- [ ] SSDP
-- [ ] UPnP
-- [ ] MQTT discovery
+- [x] mDNS
+- [x] SSDP
+- [x] UPnP
+- [x] MQTT discovery
 - [ ] Home Assistant discovery
-- [ ] Jarvis agent discovery
+- [x] Jarvis agent discovery
 - [ ] Chromecast discovery
-- [ ] DLNA discovery
+- [x] DLNA discovery
 - [x] Hue foundation bridge discovery
 - [x] Shelly foundation discovery
-- [ ] Manual device add
-- [ ] Device naming
-- [ ] Room assignment
-- [ ] Device icons
-- [ ] Device online/offline state
+- [x] Manual device add
+- [x] Device naming
+- [x] Room assignment
+- [x] Device icons
+- [x] Device online/offline state
 
 ---
 
@@ -1272,10 +1281,10 @@ Implemented in the repository so far:
 - [x] Add broadcast address
 - [x] Send magic packet
 - [ ] Android sender
-- [ ] Windows sender
-- [ ] Linux sender
-- [ ] Raspberry Pi sender
-- [ ] Device online detection
+- [x] Windows sender
+- [x] Linux sender
+- [x] Raspberry Pi sender
+- [x] Device online detection
 - [ ] Optional automatic app launch after wake
 
 ---
@@ -1287,20 +1296,20 @@ Implemented in the repository so far:
 - [x] Create PDF
 - [x] Read PDF
 - [x] Search PDF
-- [ ] Summarise PDF
-- [ ] Add images
-- [ ] Add tables
-- [ ] Export PDF
+- [x] Summarise PDF
+- [x] Add images
+- [x] Add tables
+- [x] Export PDF
 
 ## DOCX
 
 - [x] Create DOCX
 - [x] Read DOCX
-- [ ] Edit DOCX
+- [x] Edit DOCX
 - [x] Search DOCX
-- [ ] Add headings
-- [ ] Add tables
-- [ ] Add images
+- [x] Add headings
+- [x] Add tables
+- [x] Add images
 
 ## XLSX
 
@@ -1308,7 +1317,7 @@ Implemented in the repository so far:
 - [x] Read XLSX
 - [x] Edit cells
 - [x] Formulas
-- [ ] Tables
+- [x] Tables
 - [ ] Charts
 - [x] Multiple sheets foundation
 
@@ -1317,26 +1326,26 @@ Implemented in the repository so far:
 - [x] Create PPTX
 - [x] Read PPTX
 - [ ] Edit PPTX
-- [ ] Add slides
-- [ ] Add images
-- [ ] Add charts
-- [ ] Apply themes
+- [x] Add slides
+- [x] Add images
+- [x] Add charts
+- [x] Apply themes
 
 ## General Files
 
 - [x] TXT
-- [ ] Markdown
+- [x] Markdown
 - [x] JSON
-- [ ] CSV
-- [ ] HTML
-- [ ] ZIP
+- [x] CSV
+- [x] HTML
+- [x] ZIP
 - [x] File search
-- [ ] Folder search
-- [ ] Rename
-- [ ] Move
-- [ ] Copy
-- [ ] Delete with confirmation
-- [ ] File watcher
+- [x] Folder search
+- [x] Rename
+- [x] Move
+- [x] Copy
+- [x] Delete with confirmation
+- [x] File watcher
 
 ---
 
@@ -1349,55 +1358,55 @@ Implemented in the repository so far:
 - [x] GPU VRAM
 - [x] GPU temperature
 - [x] Disk usage
-- [ ] Disk health
+- [x] Disk health
 - [x] Network upload
 - [x] Network download
 - [x] Wi-Fi information
-- [ ] Battery
+- [x] Battery
 - [x] Running processes
-- [ ] Running services
-- [ ] Docker stats
+- [x] Running services
+- [x] Docker stats
 - [x] Uptime
-- [ ] Alerts
-- [ ] History graphs
+- [x] Alerts
+- [x] History graphs
 
 ---
 
 # Home Presence
 
-- [ ] Phone Wi-Fi presence
+- [x] Phone Wi-Fi presence
 - [ ] Bluetooth presence
-- [ ] Home Assistant presence
-- [ ] Device ping
+- [x] Home Assistant presence
+- [x] Device ping
 - [ ] Router integration option
-- [ ] Home / Away state
-- [ ] Per-user presence
-- [ ] Presence-triggered routines
-- [ ] Privacy controls
+- [x] Home / Away state
+- [x] Per-user presence
+- [x] Presence-triggered routines
+- [x] Privacy controls
 
 ---
 
 # Authentication / Security
 
 - [ ] Local user accounts
-- [ ] Device pairing code
+- [x] Device pairing code
 - [ ] QR pairing
-- [ ] TLS
-- [ ] Secure WebSocket
+- [x] TLS
+- [x] Secure WebSocket
 - [ ] Refresh tokens
 - [ ] Session expiry
-- [ ] Device revoke
+- [x] Device revoke
 - [ ] Integration revoke
-- [ ] Secret encryption
+- [x] Secret encryption
 - [ ] OS keychain support
 - [ ] Android secure storage
 - [ ] macOS Keychain
 - [ ] Future iOS Keychain
-- [ ] Audit logs
-- [ ] Emergency disable
-- [ ] Local-only mode
-- [ ] LAN-only remote control
-- [ ] Permission profiles
+- [x] Audit logs
+- [x] Emergency disable
+- [x] Local-only mode
+- [x] LAN-only remote control
+- [x] Permission profiles
 
 ---
 
@@ -1405,59 +1414,59 @@ Implemented in the repository so far:
 
 ## Stage 1
 
-- [ ] Ollama
-- [ ] sherpa-onnx
-- [ ] Piper
-- [ ] Windows
-- [ ] Linux
-- [ ] Local files
-- [ ] System monitoring
-- [ ] Timers
-- [ ] Alarms
-- [ ] Notes
-- [ ] Lists
+- [x] Ollama
+- [x] sherpa-onnx
+- [x] Piper
+- [x] Windows
+- [x] Linux
+- [x] Local files
+- [x] System monitoring
+- [x] Timers
+- [x] Alarms
+- [x] Notes
+- [x] Lists
 
 ## Stage 2
 
-- [ ] Playwright
-- [ ] SearXNG
-- [ ] Spotify
-- [ ] YouTube
-- [ ] Home Assistant
-- [ ] MQTT
-- [ ] Docker
-- [ ] SSH
+- [x] Playwright
+- [x] SearXNG
+- [x] Spotify
+- [x] YouTube
+- [x] Home Assistant
+- [x] MQTT
+- [x] Docker
+- [x] SSH
 
 ## Stage 3
 
-- [ ] Gmail
-- [ ] Google Calendar
-- [ ] Google Drive
-- [ ] GitHub
-- [ ] Discord
-- [ ] Android
+- [x] Gmail
+- [x] Google Calendar
+- [x] Google Drive
+- [x] GitHub
+- [x] Discord
+- [x] Android
 
 ## Stage 4
 
-- [ ] Raspberry Pi satellite
-- [ ] Remote Jarvis agents
-- [ ] Multi-room audio
+- [x] Raspberry Pi satellite
+- [x] Remote Jarvis agents
+- [x] Multi-room audio
 - [ ] Intercom
-- [ ] Announcements
-- [ ] Device discovery
+- [x] Announcements
+- [x] Device discovery
 
 ## Stage 5
 
 - [ ] Matter
-- [ ] Hue
+- [x] Hue
 - [ ] Tuya
 - [x] Tasmota foundation
-- [ ] Shelly
+- [x] Shelly
 - [ ] Chromecast
-- [ ] DLNA
-- [ ] Jellyfin
-- [ ] Plex
-- [ ] Kodi
+- [x] DLNA
+- [x] Jellyfin
+- [x] Plex
+- [x] Kodi
 
 ## Stage 6
 
@@ -1493,3 +1502,111 @@ An integration should not be marked complete until:
 - [ ] Raspberry Pi support tested where applicable
 - [ ] Android support tested where applicable
 - [ ] Documentation is added
+
+
+---
+
+# Next 100 Implementation TODOs
+
+This section is a focused queue of 100 concrete implementation tasks for upcoming Jarvis work.
+
+- [x] 001. Add automatic Piper Jarvis medium voice download
+- [x] 002. Add automatic Piper Jarvis high voice download
+- [x] 003. Add Piper model download checksum validation
+- [x] 004. Add interrupted Piper download resume handling
+- [x] 005. Add Piper model download progress reporting
+- [x] 006. Add Piper model cache cleanup command
+- [x] 007. Add Piper voice selection API endpoint
+- [x] 008. Add Piper voice selection in Flutter settings
+- [x] 009. Add Piper voice preview button
+- [x] 010. Add Piper fallback error message when binary is missing
+- [ ] 011. Bundle Piper runtime for Windows builds
+- [x] 012. Detect bundled Piper binary before PATH lookup
+- [x] 013. Add Windows installer option for Piper voice model preload
+- [x] 014. Add Windows installer option to skip model preload
+- [x] 015. Add Windows portable launcher health check
+- [x] 016. Add Windows launcher log file
+- [x] 017. Add Windows launcher graceful core shutdown
+- [x] 018. Add Windows Start Menu shortcut for logs
+- [x] 019. Add Windows Start Menu shortcut for settings
+- [x] 020. Add Windows uninstall cleanup option for cached models
+- [x] 021. Add manual GitHub Actions portable ZIP toggle
+- [x] 022. Add manual GitHub Actions installer EXE toggle
+- [x] 023. Add manual GitHub Actions release publishing toggle
+- [x] 024. Add manual GitHub Actions release tag input
+- [x] 025. Add manual GitHub Actions Jarvis base URL input validation
+- [x] 026. Add manual GitHub Actions Piper voice preset input
+- [x] 027. Add GitHub Actions build summary with artifact links
+- [ ] 028. Add GitHub Actions cache for npm dependencies
+- [x] 029. Add GitHub Actions cache for Flutter pub dependencies
+- [x] 030. Add GitHub Actions timeout limits for stuck builds
+- [x] 031. Add CI job that verifies TypeScript formatting
+- [x] 032. Add CI job that runs TypeScript tests
+- [x] 033. Add CI job that validates environment schema defaults
+- [x] 034. Add CI job that validates Flutter formatting
+- [x] 035. Add CI job that runs Flutter tests
+- [x] 036. Add CI job that smoke-tests Windows executable startup
+- [x] 037. Add CI job that validates installer creation
+- [x] 038. Add CI job that verifies release assets exist
+- [x] 039. Add CI failure log artifact upload
+- [x] 040. Add CI dependency vulnerability audit
+- [x] 041. Add /health details for Piper availability
+- [x] 042. Add /health details for selected voice
+- [x] 043. Add /health details for AI provider reachability
+- [x] 044. Add /health details for database state
+- [x] 045. Add /health details for writable data directory
+- [x] 046. Add /health details for browser automation availability
+- [x] 047. Add /health details for ADB availability
+- [x] 048. Add /health details for smart-home integrations
+- [x] 049. Add /health degraded-state reporting
+- [x] 050. Add /health startup diagnostics history
+- [x] 051. Add structured JSON logging
+- [x] 052. Add rotating local log files
+- [x] 053. Add configurable log levels
+- [x] 054. Add request correlation IDs
+- [x] 055. Add tool-call audit logging
+- [x] 056. Add TTS latency metrics
+- [x] 057. Add AI response latency metrics
+- [x] 058. Add WebSocket connection metrics
+- [x] 059. Add integration reconnect metrics
+- [x] 060. Add optional diagnostics export ZIP
+- [x] 061. Add settings API for assistant name
+- [x] 062. Add settings API for AI endpoint
+- [x] 063. Add settings API for AI model
+- [x] 064. Add settings API for TTS provider
+- [x] 065. Add settings API for Piper voice
+- [x] 066. Add settings API for wake-word mode
+- [x] 067. Add settings persistence in SQLite
+- [x] 068. Add settings validation errors to UI
+- [x] 069. Add settings import/export
+- [x] 070. Add settings reset-to-defaults
+- [x] 071. Add first-run setup wizard
+- [x] 072. Add first-run AI provider test
+- [ ] 073. Add first-run microphone test
+- [ ] 074. Add first-run speaker test
+- [x] 075. Add first-run Piper voice download screen
+- [x] 076. Add first-run permissions explanation
+- [x] 077. Add first-run local-only mode option
+- [x] 078. Add first-run Home Assistant optional setup
+- [x] 079. Add first-run Discord optional setup
+- [x] 080. Add first-run completion health check
+- [x] 081. Add conversation history search
+- [x] 082. Add conversation delete controls
+- [x] 083. Add per-conversation export
+- [x] 084. Add memory enable/disable control
+- [x] 085. Add memory review screen
+- [x] 086. Add tool permission confirmation UI
+- [x] 087. Add dangerous action confirmation flow
+- [x] 088. Add per-tool allow/deny rules
+- [x] 089. Add per-device permission profiles
+- [x] 090. Add emergency stop button
+- [x] 091. Add Windows notification support
+- [x] 092. Add Linux notification support
+- [x] 093. Add notification action buttons
+- [ ] 094. Add tray icon for desktop builds
+- [ ] 095. Add tray menu for mute/listening modes
+- [ ] 096. Add tray menu for restarting core
+- [ ] 097. Add tray menu for opening logs
+- [x] 098. Add auto-start-on-login option
+- [ ] 099. Add update-available notification
+- [ ] 100. Add self-update preparation for signed releases

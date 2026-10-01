@@ -6,14 +6,22 @@ const schema = z.object({
   JARVIS_PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   JARVIS_NAME: z.string().min(1).default("Neko"),
 
-  AI_PROVIDER: z.enum(["ollama", "openai-compatible"]).default("ollama"),
-  AI_BASE_URL: z.string().url().default("http://127.0.0.1:11434/v1"),
+  AI_PROVIDER: z.enum(["ollama","openai-compatible","groq","openrouter","lm-studio","llama.cpp","gemini","custom-http"]).default("ollama"),
+  AI_BASE_URL: z.string().default(""),
   AI_MODEL: z.string().min(1).default("qwen2.5:3b"),
   AI_API_KEY: z.string().default(""),
   AI_TEMPERATURE: z.coerce.number().min(0).max(2).default(0.7),
   AI_TIMEOUT_MS: z.coerce.number().int().positive().default(60000),
+  AI_FALLBACKS_JSON: z.string().default("[]"),
 
   JARVIS_DATA_DIR: z.string().default("./data"),
+  JARVIS_LOG_LEVEL: z.enum(["trace","debug","info","warn","error","fatal"]).default("info"),
+  JARVIS_LOG_FILE: z.string().default("./data/logs/jarvis.log"),
+  JARVIS_LOG_MAX_BYTES: z.coerce.number().int().positive().default(5242880),
+  JARVIS_TLS_CERT: z.string().default(""),
+  JARVIS_TLS_KEY: z.string().default(""),
+  JARVIS_LOCAL_ONLY: z.string().default("true"),
+  JARVIS_LAN_ONLY: z.string().default("true"),
 
   HOME_ASSISTANT_URL: z.string().default(""),
   HOME_ASSISTANT_TOKEN: z.string().default(""),
@@ -27,11 +35,14 @@ const schema = z.object({
   JARVIS_FILES_ROOT: z.string().default("./workspace"),
 
   PIPER_BIN: z.string().default("piper"),
-  PIPER_MODEL: z.string().default(""),
+  PIPER_VOICE: z.enum(["en_GB-jarvis-medium", "en_GB-jarvis-high"]).default("en_GB-jarvis-medium"),
 
   BROWSER_EXECUTABLE_PATH: z.string().default(""),
   BROWSER_CHANNEL: z.string().default("chrome"),
   BROWSER_HEADLESS: z.string().default("false"),
+  BROWSER_ENGINE: z.enum(["chromium","firefox"]).default("chromium"),
+  BROWSER_PROFILE_DIR: z.string().default("./data/browser-profile"),
+  BROWSER_MAX_ACTIONS_PER_MINUTE: z.coerce.number().int().min(5).max(1000).default(120),
 
   GOOGLE_ACCESS_TOKEN: z.string().default(""),
   DISCORD_BOT_TOKEN: z.string().default(""),
@@ -56,6 +67,11 @@ const schema = z.object({
   EDGE_TTS_RATE: z.string().default("+0%"),
   EDGE_TTS_PITCH: z.string().default("+0Hz"),
 
+  CUSTOM_TTS_URL: z.string().default(""),
+  CUSTOM_TTS_API_KEY: z.string().default(""),
+  CUSTOM_TTS_FORMAT: z.string().default("wav"),
+  CUSTOM_TTS_VOICE_MAP_JSON: z.string().default("{}"),
+
   JARVIS_API_TOKEN: z.string().default(""),
   JARVIS_SECRET_KEY: z.string().default(""),
   ADB_BIN: z.string().default("adb"),
@@ -68,6 +84,17 @@ const schema = z.object({
 
 const parsed = schema.safeParse(process.env);
 
+const AI_DEFAULT_URLS:Record<string,string>={
+  ollama:"http://127.0.0.1:11434/v1",
+  "openai-compatible":"http://127.0.0.1:11434/v1",
+  groq:"https://api.groq.com/openai/v1",
+  openrouter:"https://openrouter.ai/api/v1",
+  "lm-studio":"http://127.0.0.1:1234/v1",
+  "llama.cpp":"http://127.0.0.1:8080/v1",
+  gemini:"https://generativelanguage.googleapis.com/v1beta/openai",
+  "custom-http":"http://127.0.0.1:8080/v1"
+};
+
 if (!parsed.success) {
   console.error("Invalid Jarvis configuration:");
   console.error(parsed.error.flatten().fieldErrors);
@@ -75,18 +102,30 @@ if (!parsed.success) {
 }
 
 export const config = {
-  host: parsed.data.JARVIS_HOST,
+  host: parsed.data.JARVIS_LOCAL_ONLY.toLowerCase()!=="false" ? "127.0.0.1" : parsed.data.JARVIS_HOST,
   port: parsed.data.JARVIS_PORT,
   assistantName: parsed.data.JARVIS_NAME,
   ai: {
     provider: parsed.data.AI_PROVIDER,
-    baseUrl: parsed.data.AI_BASE_URL.replace(/\/$/, ""),
+    baseUrl: (parsed.data.AI_BASE_URL || AI_DEFAULT_URLS[parsed.data.AI_PROVIDER]).replace(/\/$/, ""),
     model: parsed.data.AI_MODEL,
     apiKey: parsed.data.AI_API_KEY,
     temperature: parsed.data.AI_TEMPERATURE,
-    timeoutMs: parsed.data.AI_TIMEOUT_MS
+    timeoutMs: parsed.data.AI_TIMEOUT_MS,
+    fallbacksJson: parsed.data.AI_FALLBACKS_JSON
   },
   dataDir: parsed.data.JARVIS_DATA_DIR,
+  logging:{
+    level:parsed.data.JARVIS_LOG_LEVEL,
+    file:parsed.data.JARVIS_LOG_FILE,
+    maxBytes:parsed.data.JARVIS_LOG_MAX_BYTES
+  },
+  tls:{
+    cert:parsed.data.JARVIS_TLS_CERT,
+    key:parsed.data.JARVIS_TLS_KEY
+  },
+  localOnly:parsed.data.JARVIS_LOCAL_ONLY.toLowerCase()!=="false",
+  lanOnly:parsed.data.JARVIS_LAN_ONLY.toLowerCase()!=="false",
   homeAssistant: {
     url: parsed.data.HOME_ASSISTANT_URL,
     token: parsed.data.HOME_ASSISTANT_TOKEN
@@ -101,12 +140,15 @@ export const config = {
   filesRoot: parsed.data.JARVIS_FILES_ROOT,
   piper: {
     bin: parsed.data.PIPER_BIN,
-    model: parsed.data.PIPER_MODEL
+    voice: parsed.data.PIPER_VOICE
   },
   browser: {
     executablePath: parsed.data.BROWSER_EXECUTABLE_PATH,
     channel: parsed.data.BROWSER_CHANNEL,
-    headless: parsed.data.BROWSER_HEADLESS.toLowerCase() === "true"
+    headless: parsed.data.BROWSER_HEADLESS.toLowerCase() === "true",
+    engine:parsed.data.BROWSER_ENGINE,
+    profileDir:parsed.data.BROWSER_PROFILE_DIR,
+    maxActionsPerMinute:parsed.data.BROWSER_MAX_ACTIONS_PER_MINUTE
   },
   googleAccessToken: parsed.data.GOOGLE_ACCESS_TOKEN,
   discordBotToken: parsed.data.DISCORD_BOT_TOKEN,
@@ -133,6 +175,12 @@ export const config = {
     voice: parsed.data.EDGE_TTS_VOICE,
     rate: parsed.data.EDGE_TTS_RATE,
     pitch: parsed.data.EDGE_TTS_PITCH
+  },
+  customTts:{
+    url:parsed.data.CUSTOM_TTS_URL,
+    apiKey:parsed.data.CUSTOM_TTS_API_KEY,
+    format:parsed.data.CUSTOM_TTS_FORMAT,
+    voiceMapJson:parsed.data.CUSTOM_TTS_VOICE_MAP_JSON
   },
   apiToken: parsed.data.JARVIS_API_TOKEN,
   secretKey: parsed.data.JARVIS_SECRET_KEY,

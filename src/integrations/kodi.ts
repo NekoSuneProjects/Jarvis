@@ -33,4 +33,23 @@ export class KodiIntegration {
   playPause(playerid:number,play?:boolean){return this.call("Player.PlayPause",{playerid,play:play??"toggle"});}
   stop(playerid:number){return this.call("Player.Stop",{playerid});}
   volume(volume:number){return this.call("Application.SetVolume",{volume:Math.round(Math.max(0,Math.min(100,volume)))});}
+  input(action:"up"|"down"|"left"|"right"|"select"|"back"|"home"|"info"|"contextmenu"){
+    const methods={
+      up:"Input.Up",down:"Input.Down",left:"Input.Left",right:"Input.Right",
+      select:"Input.Select",back:"Input.Back",home:"Input.Home",info:"Input.Info",
+      contextmenu:"Input.ContextMenu"
+    } as const;
+    return this.call(methods[action]);
+  }
+  search(query:string,limit=50){
+    const filter={operator:"contains",field:"title",value:query};
+    return Promise.all([
+      this.call("VideoLibrary.GetMovies",{filter,limits:{start:0,end:limit},properties:["title","year","file","thumbnail"]}),
+      this.call("VideoLibrary.GetEpisodes",{filter,limits:{start:0,end:limit},properties:["title","showtitle","season","episode","file","thumbnail"]}),
+      this.call("AudioLibrary.GetSongs",{filter,limits:{start:0,end:limit},properties:["title","artist","album","file","thumbnail"]})
+    ]).then(([movies,episodes,songs])=>({movies,episodes,songs}));
+  }
+  open(item:{file?:string;movieid?:number;episodeid?:number;songid?:number}){
+    return this.call("Player.Open",{item});
+  }
 }

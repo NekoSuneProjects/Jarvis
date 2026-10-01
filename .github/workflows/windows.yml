@@ -1,0 +1,347 @@
+name: Windows Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: Flutter build type
+        required: true
+        default: release
+        type: choice
+        options:
+          - release
+          - debug
+      jarvis_base_url:
+        description: Core URL compiled into the Flutter client
+        required: true
+        default: http://127.0.0.1:3000
+        type: string
+      build_portable:
+        description: Build and upload portable ZIP
+        required: true
+        default: true
+        type: boolean
+      build_installer:
+        description: Build and upload Windows Setup EXE
+        required: true
+        default: true
+        type: boolean
+      publish_release:
+        description: Publish outputs to GitHub Releases
+        required: true
+        default: false
+        type: boolean
+      release_tag:
+        description: Release tag for manual publishing (example v0.1.0)
+        required: false
+        default: ""
+        type: string
+      piper_voice:
+        description: Piper Jarvis voice preset
+        required: true
+        default: en_GB-jarvis-medium
+        type: choice
+        options:
+          - en_GB-jarvis-medium
+          - en_GB-jarvis-high
+      preload_piper_model:
+        description: Preload selected Piper voice model into the package
+        required: true
+        default: false
+        type: boolean
+      cleanup_models_on_uninstall:
+        description: Offer cached Piper model cleanup on uninstall
+        required: true
+        default: true
+        type: boolean
+permissions:
+  contents: write
+
+concurrency:
+  group: windows-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-windows:
+    name: Windows app + installer
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: pwsh
+
+    timeout-minutes: 45
+
+    env:
+      JARVIS_BASE_URL: ${{ github.event.inputs.jarvis_base_url || 'http://127.0.0.1:3000' }}
+      BUILD_TYPE: ${{ github.event.inputs.build_type || 'release' }}
+      PIPER_VOICE: ${{ github.event.inputs.piper_voice || 'en_GB-jarvis-medium' }}
+      PIPER_PRELOAD: ${{ github.event.inputs.preload_piper_model || 'false' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Validate manual build inputs
+        run: |
+          try {
+            $uri = [System.Uri]$env:JARVIS_BASE_URL
+          } catch {
+            throw "jarvis_base_url must be a valid absolute URL."
+          }
+          if (-not $uri.IsAbsoluteUri) {
+            throw "jarvis_base_url must be an absolute URL."
+          }
+          if ($env:PIPER_VOICE -notin @("en_GB-jarvis-medium","en_GB-jarvis-high")) {
+            throw "Unsupported Piper voice preset."
+          }
+
+      - name: Install core dependencies
+        run: npm install
+
+      - name: Typecheck core
+        run: npm run typecheck
+
+      - name: Build core
+        run: npm run build
+
+      - name: Keep production core dependencies only
+        run: npm prune --omit=dev
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Generate Windows runner files
+        working-directory: apps/jarvis_ui
+        run: |
+          if (-not (Test-Path "windows")) {
+            flutter create --platforms=windows --project-name nekosune_jarvis_ui .
+          }
+
+      - name: Install Flutter dependencies
+        working-directory: apps/jarvis_ui
+        run: flutter pub get
+
+      - name: Analyze Flutter app
+        working-directory: apps/jarvis_ui
+        run: flutter analyze
+
+      - name: Build Flutter Windows app
+        working-directory: apps/jarvis_ui
+        run: |
+          if ($env:BUILD_TYPE -eq "debug") {
+            flutter build windows --debug --dart-define=JARVIS_BASE_URL=$env:JARVIS_BASE_URL
+          } else {
+            flutter build windows --release --dart-define=JARVIS_BASE_URL=$env:JARVIS_BASE_URL
+          }
+
+      - name: Prepare standalone Windows package
+        if: github.event_name != 'workflow_dispatch' || inputs.build_portable || inputs.build_installer
+        run: |
+          $configuration = if ($env:BUILD_TYPE -eq "debug") { "Debug" } else { "Release" }
+          $uiBuild = Join-Path "apps/jarvis_ui/build/windows/x64/runner" $configuration
+          if (-not (Test-Path $uiBuild)) {
+            throw "Flutter Windows output was not found at $uiBuild"
+          }
+
+          New-Item -ItemType Directory -Force -Path "package/ui" | Out-Null
+          New-Item -ItemType Directory -Force -Path "package/core" | Out-Null
+          New-Item -ItemType Directory -Force -Path "package/runtime" | Out-Null
+          New-Item -ItemType Directory -Force -Path "package/logs" | Out-Null
+
+          Copy-Item "$uiBuild/*" "package/ui/" -Recurse -Force
+          Copy-Item "dist" "package/core/dist" -Recurse -Force
+          Copy-Item "node_modules" "package/core/node_modules" -Recurse -Force
+          Copy-Item "package.json" "package/core/package.json" -Force
+          if (Test-Path ".env.example") {
+            Copy-Item ".env.example" "package/core/.env.example" -Force
+          }
+
+          $nodeExe = (Get-Command node.exe).Source
+          Copy-Item $nodeExe "package/runtime/node.exe" -Force
+
+          if ($env:PIPER_PRELOAD -eq "true") {
+            $voiceDir = "package/core/data/models/piper/$env:PIPER_VOICE"
+            New-Item -ItemType Directory -Force -Path $voiceDir | Out-Null
+            if ($env:PIPER_VOICE -eq "en_GB-jarvis-high") {
+              $modelUrl = "https://huggingface.co/jgkawell/jarvis/resolve/main/en/en_GB/jarvis/high/jarvis-high.onnx"
+              $jsonUrl = "$modelUrl.json"
+            } else {
+              $modelUrl = "https://huggingface.co/jgkawell/jarvis/resolve/main/en/en_GB/jarvis/medium/jarvis-medium.onnx"
+              $jsonUrl = "$modelUrl.json"
+            }
+            Invoke-WebRequest $modelUrl -OutFile "$voiceDir/$env:PIPER_VOICE.onnx"
+            Invoke-WebRequest $jsonUrl -OutFile "$voiceDir/$env:PIPER_VOICE.onnx.json"
+          }
+
+          @'
+          @echo off
+          setlocal
+          set "JARVIS_ROOT=%~dp0"
+          if not exist "%JARVIS_ROOT%core\.env" (
+            if exist "%JARVIS_ROOT%core\.env.example" copy /Y "%JARVIS_ROOT%core\.env.example" "%JARVIS_ROOT%core\.env" >nul
+          )
+          if not exist "%JARVIS_ROOT%logs" mkdir "%JARVIS_ROOT%logs"
+          start "NekoSune Jarvis Core" /min /D "%JARVIS_ROOT%core" cmd /c ""%JARVIS_ROOT%runtime\node.exe" "dist\index.js" >> "%JARVIS_ROOT%logs\core.log" 2>&1"
+          powershell -NoProfile -Command "$ok=$false; 1..20 | %% { try { $r=Invoke-WebRequest -UseBasicParsing -TimeoutSec 1 http://127.0.0.1:3000/health; if($r.StatusCode -eq 200){$ok=$true;break} } catch {}; Start-Sleep -Milliseconds 500 }; if(-not $ok){exit 1}"
+          if errorlevel 1 (
+            echo Jarvis Core health check failed. See logs\core.log
+            exit /b 1
+          )
+          start "" "%JARVIS_ROOT%ui\nekosune_jarvis_ui.exe"
+          endlocal
+          '@ | Set-Content -Path "package/Start NekoSune Jarvis.cmd" -Encoding ascii
+
+          @'
+          @echo off
+          powershell -NoProfile -Command "try { Invoke-WebRequest -UseBasicParsing -Method POST -TimeoutSec 3 http://127.0.0.1:3000/api/v1/system/shutdown | Out-Null } catch {}"
+          timeout /t 2 /nobreak >nul
+          taskkill /FI "WINDOWTITLE eq NekoSune Jarvis Core" /T /F >nul 2>&1
+          exit /b 0
+          '@ | Set-Content -Path "package/Stop NekoSune Jarvis.cmd" -Encoding ascii
+
+          if ("${{ github.event_name }}" -ne "workflow_dispatch" -or "${{ inputs.build_portable }}" -eq "true") {
+            Compress-Archive -Path "package/*" -DestinationPath "NekoSune-Jarvis-Windows-${{ github.run_number }}.zip" -Force
+          }
+
+      - name: Smoke-test Windows executable startup
+        run: |
+          $configuration = if ($env:BUILD_TYPE -eq "debug") { "Debug" } else { "Release" }
+          $exe = Join-Path "apps/jarvis_ui/build/windows/x64/runner/$configuration" "nekosune_jarvis_ui.exe"
+          if (-not (Test-Path $exe)) { throw "Windows executable missing: $exe" }
+          $process = Start-Process $exe -PassThru
+          Start-Sleep -Seconds 3
+          if ($process.HasExited -and $process.ExitCode -ne 0) {
+            throw "Windows executable exited with code $($process.ExitCode)"
+          }
+          if (-not $process.HasExited) { Stop-Process -Id $process.Id -Force }
+
+      - name: Install Inno Setup
+        if: github.event_name != 'workflow_dispatch' || inputs.build_installer
+        run: choco install innosetup --no-progress -y
+
+      - name: Build Windows Setup EXE
+        if: github.event_name != 'workflow_dispatch' || inputs.build_installer
+        run: |
+          $versionLine = Select-String -Path "apps/jarvis_ui/pubspec.yaml" -Pattern '^version:\s*([^+\s]+)'
+          $appVersion = if ($versionLine) { $versionLine.Matches[0].Groups[1].Value } else { "0.1.0" }
+
+          @"
+          [Setup]
+          AppId={{7D2765E4-3D71-4D8D-8D61-9D652A47D71A}
+          AppName=NekoSune Jarvis
+          AppVersion=$appVersion
+          AppPublisher=NekoSuneProjects
+          DefaultDirName={autopf}\NekoSune Jarvis
+          DefaultGroupName=NekoSune Jarvis
+          DisableProgramGroupPage=yes
+          OutputDir=installer
+          OutputBaseFilename=NekoSune-Jarvis-Setup
+          Compression=lzma2
+          SolidCompression=yes
+          WizardStyle=modern
+          ArchitecturesAllowed=x64compatible
+          ArchitecturesInstallIn64BitMode=x64compatible
+          UninstallDisplayIcon={app}\ui\nekosune_jarvis_ui.exe
+
+          [Files]
+          Source: "package\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+          [Icons]
+          Name: "{autoprograms}\NekoSune Jarvis"; Filename: "{app}\Start NekoSune Jarvis.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\ui\nekosune_jarvis_ui.exe"
+          Name: "{autodesktop}\NekoSune Jarvis"; Filename: "{app}\Start NekoSune Jarvis.cmd"; WorkingDir: "{app}"; IconFilename: "{app}\ui\nekosune_jarvis_ui.exe"; Tasks: desktopicon
+          Name: "{autoprograms}\NekoSune Jarvis Logs"; Filename: "explorer.exe"; Parameters: """{app}\logs"""
+          Name: "{autoprograms}\NekoSune Jarvis Settings"; Filename: "notepad.exe"; Parameters: """{app}\core\.env"""
+
+          [Tasks]
+          Name: "desktopicon"; Description: "Create a desktop shortcut"; GroupDescription: "Additional icons:"
+          Name: "cleanupmodels"; Description: "Remove cached Piper voice models during uninstall"; GroupDescription: "Uninstall cleanup:"; Flags: unchecked
+
+          [UninstallDelete]
+          Type: filesandordirs; Name: "{app}\core\data\models"; Tasks: cleanupmodels
+
+          [Run]
+          Filename: "{app}\Start NekoSune Jarvis.cmd"; Description: "Launch NekoSune Jarvis"; Flags: nowait postinstall skipifsilent
+          "@ | Set-Content -Path "jarvis.iss" -Encoding utf8
+
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            $iscc = "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          }
+          & $iscc "jarvis.iss"
+          if (-not (Test-Path "installer/NekoSune-Jarvis-Setup.exe")) {
+            throw "Inno Setup did not create installer/NekoSune-Jarvis-Setup.exe"
+          }
+
+      - name: Validate requested build outputs
+        run: |
+          if ("${{ inputs.build_portable }}" -eq "true" -and -not (Test-Path "NekoSune-Jarvis-Windows-${{ github.run_number }}.zip")) {
+            throw "Requested portable ZIP is missing"
+          }
+          if ("${{ inputs.build_installer }}" -eq "true" -and -not (Test-Path "installer/NekoSune-Jarvis-Setup.exe")) {
+            throw "Requested installer EXE is missing"
+          }
+
+      - name: Write build summary
+        run: |
+          @"
+          ## NekoSune Jarvis Windows Build
+          - Build type: $env:BUILD_TYPE
+          - Base URL: $env:JARVIS_BASE_URL
+          - Piper voice: $env:PIPER_VOICE
+          - Piper model preloaded: $env:PIPER_PRELOAD
+          - Portable ZIP requested: ${{ inputs.build_portable }}
+          - Installer requested: ${{ inputs.build_installer }}
+          - Release requested: ${{ inputs.publish_release }}
+          "@ | Add-Content $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload portable Windows build
+        if: github.event_name != 'workflow_dispatch' || inputs.build_portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: NekoSune-Jarvis-Windows-Portable
+          path: NekoSune-Jarvis-Windows-${{ github.run_number }}.zip
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Windows Setup
+        if: github.event_name != 'workflow_dispatch' || inputs.build_installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: NekoSune-Jarvis-Windows-Setup
+          path: installer/NekoSune-Jarvis-Setup.exe
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Validate manual release settings
+        if: github.event_name == 'workflow_dispatch' && inputs.publish_release
+        run: |
+          if ([string]::IsNullOrWhiteSpace("${{ inputs.release_tag }}")) {
+            throw "release_tag is required when Publish outputs to GitHub Releases is enabled."
+          }
+          if (-not "${{ inputs.release_tag }}".StartsWith("v")) {
+            throw "release_tag must start with v, for example v0.1.0."
+          }
+
+      - name: Publish GitHub Release
+        if: inputs.publish_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          name: NekoSune Jarvis ${{ inputs.release_tag }}
+          generate_release_notes: true
+          fail_on_unmatched_files: false
+          files: |
+            installer/NekoSune-Jarvis-Setup.exe
+            NekoSune-Jarvis-Windows-${{ github.run_number }}.zip

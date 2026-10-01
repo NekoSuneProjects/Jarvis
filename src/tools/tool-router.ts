@@ -67,7 +67,7 @@ export class ToolRouter {
       throw new Error(`Plugin disabled: ${registered.pluginId}`);
     }
 
-    this.permissions.assertAllowed(registered.tool.capability);
+    this.permissions.assertToolAllowed(name,registered.tool.capability);
     return registered.tool.execute(input);
   }
 }

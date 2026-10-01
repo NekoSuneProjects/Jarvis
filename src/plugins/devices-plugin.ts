@@ -17,6 +17,40 @@ export function createDevicesPlugin(devices:DeviceRegistry):JarvisPlugin{
         async execute(){return devices.list();}
       },
       {
+        name:"devices.add",
+        description:"Manually add a Jarvis-managed device record.",
+        capability:"devices.manage",
+        async execute(input){
+          const value=z.object({
+            name:z.string().min(1),
+            platform:z.string().default("manual"),
+            arch:z.string().default("unknown"),
+            capabilities:z.array(z.string()).default([]),
+            metadata:z.record(z.unknown()).default({})
+          }).parse(input);
+          return devices.addManual(value);
+        }
+      },
+      {
+        name:"devices.update",
+        description:"Rename a device or update room/icon metadata.",
+        capability:"devices.manage",
+        async execute(input){
+          const value=z.object({
+            deviceId:z.string().min(1),
+            name:z.string().min(1).optional(),
+            room:z.string().optional(),
+            icon:z.string().optional(),
+            permissionProfile:z.object({
+              allowedCommands:z.array(z.string()).optional(),
+              deniedCommands:z.array(z.string()).optional()
+            }).optional(),
+            metadata:z.record(z.unknown()).optional()
+          }).parse(input);
+          return {ok:devices.updateDevice(value.deviceId,value)};
+        }
+      },
+      {
         name:"devices.command",
         description:"Queue an allowlisted command on a paired Jarvis agent.",
         capability:"devices.manage",
@@ -26,7 +60,12 @@ export function createDevicesPlugin(devices:DeviceRegistry):JarvisPlugin{
             deviceId:{type:"string"},
             command:{
               type:"string",
-              enum:["system.info","process.list","app.open","url.open"]
+              enum:[
+                "system.info","process.list","app.open","url.open",
+                "screenshot.capture","notification.send","file.read","file.write",
+                "power.lock","power.sleep","power.restart","power.shutdown",
+                "audio.play","audio.volume","tts.speak"
+              ]
             },
             args:{type:"object"}
           },
@@ -36,7 +75,12 @@ export function createDevicesPlugin(devices:DeviceRegistry):JarvisPlugin{
         async execute(input){
           const value=z.object({
             deviceId:z.string().min(1),
-            command:z.enum(["system.info","process.list","app.open","url.open"]),
+            command:z.enum([
+              "system.info","process.list","app.open","url.open",
+              "screenshot.capture","notification.send","file.read","file.write",
+              "power.lock","power.sleep","power.restart","power.shutdown",
+              "audio.play","audio.volume","tts.speak"
+            ]),
             args:z.record(z.unknown()).default({})
           }).parse(input);
           return devices.enqueueCommand(value.deviceId,value.command,value.args);

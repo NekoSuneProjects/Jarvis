@@ -2,6 +2,8 @@ import fs from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import websocket from "@fastify/websocket";
 import Fastify from "fastify";
+import { z } from "zod";
+import JSZip from "jszip";
 import { config } from "./config.js";
 import { BrowserAutomation } from "./browser/automation.js";
 import type { AiProvider, ChatMessage } from "./ai/types.js";
@@ -20,8 +22,9 @@ import { createAssistantPlugin } from "./plugins/assistant-plugin.js";
 import { androidPlugin } from "./plugins/android-plugin.js";
 import { createBrowserPlugin } from "./plugins/browser-plugin.js";
 import { createDiscordPlugin } from "./plugins/discord-plugin.js";
+import { createDlnaPlugin } from "./plugins/dlna-plugin.js";
 import { createDiscoveryPlugin } from "./plugins/discovery-plugin.js";
-import { documentsPlugin } from "./plugins/documents-plugin.js";
+import { createDocumentsPlugin } from "./plugins/documents-plugin.js";
 import { createDevicesPlugin } from "./plugins/devices-plugin.js";
 import { computerPlugin } from "./plugins/computer-plugin.js";
 import { desktopInputPlugin } from "./plugins/desktop-input-plugin.js";
@@ -31,66 +34,123 @@ import { createGithubPlugin } from "./plugins/github-plugin.js";
 import { createGooglePlugin } from "./plugins/google-plugin.js";
 import { createHomeAssistantPlugin } from "./plugins/home-assistant-plugin.js";
 import { createMemoryPlugin } from "./plugins/memory-plugin.js";
+import { createMapsPlugin } from "./plugins/maps-plugin.js";
+import { createMultiRoomPlugin } from "./plugins/multi-room-plugin.js";
 import { createNotificationsPlugin } from "./plugins/notifications-plugin.js";
 import { createNativeNotificationPlugin } from "./plugins/native-notification-plugin.js";
 import { createMqttPlugin } from "./plugins/mqtt-plugin.js";
-import { monitoringPlugin } from "./plugins/monitoring-plugin.js";
+import { createMonitoringPlugin } from "./plugins/monitoring-plugin.js";
 import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createLanSmartHomePlugin } from "./plugins/lan-smart-home-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { powerPlugin } from "./plugins/power-plugin.js";
+import { platformAdminPlugin } from "./plugins/platform-admin-plugin.js";
+import { createPresencePlugin } from "./plugins/presence-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
+import { createStreamingMediaPlugin } from "./plugins/streaming-media-plugin.js";
 import { shellPlugin } from "./plugins/shell-plugin.js";
 import { createSshPlugin } from "./plugins/ssh-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
 import { utilitiesPlugin } from "./plugins/utilities-plugin.js";
 import { createYoutubePlugin } from "./plugins/youtube-plugin.js";
+import { createZigbeePlugin } from "./plugins/zigbee-plugin.js";
+import { createTuyaPlugin } from "./plugins/tuya-plugin.js";
 import { wolPlugin } from "./plugins/wol-plugin.js";
 import { windowPlugin } from "./plugins/window-plugin.js";
 import { PiperTtsProvider } from "./voice/piper.js";
 import { EdgeTtsProvider } from "./voice/edge-tts.js";
+import { CustomTtsProvider } from "./voice/custom-tts.js";
 import { PluginRegistry } from "./plugins/plugin-registry.js";
 import { systemPlugin } from "./plugins/system-plugin.js";
 import { JarvisDatabase } from "./storage/database.js";
 import { SecretVault } from "./security/secret-vault.js";
 import { ToolRouter } from "./tools/tool-router.js";
 import { workspacePath } from "./utils/workspace-path.js";
+import { RotatingJsonLog } from "./utils/rotating-log.js";
+import { runProcess } from "./utils/process.js";
 
 export async function createServer(ai: AiProvider) {
-  const app = Fastify({ logger: true });
+  const tlsEnabled=Boolean(config.tls.cert && config.tls.key);
+  const tls=tlsEnabled
+    ? {cert:await fs.readFile(config.tls.cert),key:await fs.readFile(config.tls.key)}
+    : undefined;
+  const app = Fastify({ logger: {level:config.logging.level}, ...(tls?{https:tls}:{}) });
+  const fileLog=new RotatingJsonLog(config.logging.file,config.logging.maxBytes);
   await app.register(websocket);
 
+  app.addHook("onResponse", async (request, reply) => {
+    fileLog.write({
+      level:"info",
+      type:"http",
+      method:request.method,
+      url:request.url,
+      statusCode:reply.statusCode,
+      requestId:request.id
+    });
+  });
+
+  app.addHook("onError", async (request, _reply, error) => {
+    fileLog.write({
+      level:"error",
+      type:"http-error",
+      method:request.method,
+      url:request.url,
+      requestId:request.id,
+      error:error.message
+    });
+  });
+
   const database = new JarvisDatabase();
-  const store = new AssistantStore(database);
-  const secrets = new SecretVault(database, config.dataDir, config.secretKey);
   const events = new EventBus();
+  const store = new AssistantStore(database,events);
+  const secrets = new SecretVault(database, config.dataDir, config.secretKey);
   const devices = new DeviceRegistry(database);
   const discovery = new DiscoveryService();
   const scheduler = new Scheduler(store, events);
   const permissions = new PermissionManager();
   const plugins = new PluginRegistry(database);
   const tools = new ToolRouter(permissions, plugins);
-  const integrations = new IntegrationManager();
+  const integrations = new IntegrationManager(events);
   const routines = new RoutineEngine(store, tools, events);
   const agent = new JarvisAgent(ai, tools, events, store);
+  const metrics={
+    websocketConnections:0,
+    tts:{count:0,totalMs:0,lastMs:0},
+    ai:{count:0,totalMs:0,lastMs:0},
+    get integrationReconnect(){return integrations.reconnectMetrics();}
+  };
+  const startupDiagnostics=[{
+    at:new Date().toISOString(),
+    node:process.version,
+    platform:process.platform,
+    arch:process.arch,
+    dataDir:config.dataDir,
+    aiProvider:ai.id
+  }];
 
   const browser = new BrowserAutomation();
   const assistantPlugin = createAssistantPlugin(store);
   const browserPlugin = createBrowserPlugin(browser);
   const devicesPlugin = createDevicesPlugin(devices);
   const discoveryPlugin = createDiscoveryPlugin(discovery);
+  const documentsPlugin = createDocumentsPlugin(ai);
   const discordPlugin = createDiscordPlugin();
+  const dlnaPlugin = createDlnaPlugin(discovery);
   const githubPlugin = createGithubPlugin();
   const googlePlugin = createGooglePlugin();
   const memoryPlugin = createMemoryPlugin(store);
+  const mapsPlugin = createMapsPlugin(store);
+  const monitoringPlugin = createMonitoringPlugin(store,events);
+  const multiRoomPlugin = createMultiRoomPlugin(store,devices);
   const mediaServersPlugin = createMediaServersPlugin();
-  const lanSmartHomePlugin = createLanSmartHomePlugin();
+  const lanSmartHomePlugin = createLanSmartHomePlugin(discovery);
   const notificationsPlugin = createNotificationsPlugin(store, events);
   const nativeNotificationPlugin = createNativeNotificationPlugin(store, events);
-  const searchPlugin = createSearchPlugin();
-  const weatherPlugin = createWeatherPlugin();
+  const searchPlugin = createSearchPlugin(ai,store,events);
+  const weatherPlugin = createWeatherPlugin(store);
   const youtubePlugin = createYoutubePlugin();
   const spotifyPlugin = createSpotifyPlugin();
+  const streamingMediaPlugin = createStreamingMediaPlugin(browser);
   const sshPlugin = createSshPlugin();
   const builtInPlugins = [
     systemPlugin,
@@ -102,17 +162,21 @@ export async function createServer(ai: AiProvider) {
     devicesPlugin,
     discoveryPlugin,
     discordPlugin,
+    dlnaPlugin,
     documentsPlugin,
     filesPlugin,
     githubPlugin,
     googlePlugin,
     memoryPlugin,
+    mapsPlugin,
+    multiRoomPlugin,
     mediaServersPlugin,
     lanSmartHomePlugin,
     monitoringPlugin,
     nativeNotificationPlugin,
     notificationsPlugin,
     powerPlugin,
+    platformAdminPlugin,
     dockerPlugin,
     wolPlugin,
     searchPlugin,
@@ -122,6 +186,7 @@ export async function createServer(ai: AiProvider) {
     youtubePlugin,
     utilitiesPlugin,
     spotifyPlugin,
+    streamingMediaPlugin,
     sshPlugin
   ];
 
@@ -131,9 +196,35 @@ export async function createServer(ai: AiProvider) {
   }
 
   const piper = new PiperTtsProvider();
+  const savedPiperVoice=store.getSetting<"en_GB-jarvis-medium"|"en_GB-jarvis-high">("piperVoice");
+  if(savedPiperVoice) piper.setVoice(savedPiperVoice);
   const edgeTts = new EdgeTtsProvider();
+  const customTts = new CustomTtsProvider();
+
+  app.addHook("onSend", async (request,reply,payload)=>{
+    reply.header("x-request-id",request.id);
+    return payload;
+  });
+
+  const isPrivateAddress=(address:string)=>{
+    const value=address.replace(/^::ffff:/,"");
+    return value==="127.0.0.1" || value==="::1" ||
+      /^10\./.test(value) ||
+      /^192\.168\./.test(value) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(value) ||
+      /^169\.254\./.test(value) ||
+      /^fe80:/i.test(value) ||
+      /^fc|^fd/i.test(value);
+  };
 
   app.addHook("onRequest", async (request, reply) => {
+    const emergencyDisabled=store.getSetting<boolean>("system.emergencyDisabled",false)===true;
+    if(emergencyDisabled && request.url!=="/health" && !request.url.startsWith("/api/v1/system/emergency-stop")){
+      return reply.code(503).send({ok:false,error:"Jarvis emergency disable is active"});
+    }
+    if(config.lanOnly && !isPrivateAddress(request.ip)){
+      return reply.code(403).send({ok:false,error:"Jarvis LAN-only mode rejected a non-private client"});
+    }
     if (!config.apiToken) return;
     if (request.url === "/health") return;
 
@@ -175,11 +266,20 @@ export async function createServer(ai: AiProvider) {
   integrations.register(mqtt);
 
   const homeAssistantPlugin = createHomeAssistantPlugin(homeAssistant);
+  const presencePlugin = createPresencePlugin(store,events,homeAssistant);
   const mqttPlugin = createMqttPlugin(mqtt);
+  const zigbeePlugin = createZigbeePlugin(mqtt,homeAssistant);
+  const tuyaPlugin = createTuyaPlugin(homeAssistant);
   plugins.register(homeAssistantPlugin);
+  plugins.register(presencePlugin);
   plugins.register(mqttPlugin);
+  plugins.register(zigbeePlugin);
+  plugins.register(tuyaPlugin);
   tools.registerMany(homeAssistantPlugin.tools, homeAssistantPlugin.id);
+  tools.registerMany(presencePlugin.tools, presencePlugin.id);
   tools.registerMany(mqttPlugin.tools, mqttPlugin.id);
+  tools.registerMany(zigbeePlugin.tools, zigbeePlugin.id);
+  tools.registerMany(tuyaPlugin.tools, tuyaPlugin.id);
 
   discovery.advertise(config.port);
   scheduler.start();
@@ -197,35 +297,289 @@ export async function createServer(ai: AiProvider) {
 
   app.get("/health", async () => {
     const aiHealth = await ai.health();
+    const piperAvailable = await piper.available();
+    const browserHealth = await browser.available();
+    let adbHealth:{ok:boolean;detail?:string}={ok:false};
+    try{
+      const adb=await runProcess(config.adbBin,["version"],{timeoutMs:5000});
+      adbHealth={ok:adb.code===0,detail:(adb.stdout||adb.stderr).trim().slice(0,500)};
+    }catch(error){
+      adbHealth={ok:false,detail:error instanceof Error?error.message:String(error)};
+    }
+
+    let databaseOk=true;
+    let databaseDetail="ok";
+    try{
+      database.db.prepare("SELECT 1 AS ok").get();
+    }catch(error){
+      databaseOk=false;
+      databaseDetail=error instanceof Error?error.message:String(error);
+    }
+
+    let dataDirectoryWritable=true;
+    let dataDirectoryDetail="ok";
+    try{
+      await fs.mkdir(config.dataDir,{recursive:true});
+      const probe=`${config.dataDir}/.jarvis-health-${randomUUID()}`;
+      await fs.writeFile(probe,"ok","utf8");
+      await fs.unlink(probe);
+    }catch(error){
+      dataDirectoryWritable=false;
+      dataDirectoryDetail=error instanceof Error?error.message:String(error);
+    }
+
+    const integrationHealth = await Promise.all(
+      integrations.list().map(async (item)=>({
+        id:item.id,
+        state:item.state,
+        capabilities:item.capabilities,
+        health:await item.health()
+      }))
+    );
+    const smartHome=integrationHealth.filter((item)=>
+      item.capabilities.some((capability)=>capability.startsWith("smart-home"))
+    );
+    const degraded =
+      !aiHealth.ok ||
+      !piperAvailable ||
+      !databaseOk ||
+      !dataDirectoryWritable ||
+      integrationHealth.some((item)=>item.health.ok===false);
 
     return {
-      ok: true,
+      ok: !degraded,
+      degraded,
       service: "nekosune-jarvis",
       assistant: config.assistantName,
       ai: {
         provider: ai.id,
+        reachable: aiHealth.ok,
         ...aiHealth
       },
-      integrations: integrations.list().map((item) => ({
-        id: item.id,
-        state: item.state
-      }))
+      piper: {
+        available: piperAvailable,
+        selectedVoice: config.piper.voice
+      },
+      database: {
+        ok: databaseOk,
+        detail: databaseDetail
+      },
+      dataDirectory: {
+        path: config.dataDir,
+        writable: dataDirectoryWritable,
+        detail: dataDirectoryDetail
+      },
+      browserAutomation:browserHealth,
+      adb:adbHealth,
+      startupDiagnostics,
+      metrics,
+      smartHome,
+      integrations: integrationHealth
     };
   });
 
   app.get("/api/v1/events", { websocket: true }, (socket) => {
+    metrics.websocketConnections++;
     const unsubscribe = events.subscribe((event) => {
       if (socket.readyState === socket.OPEN) {
         socket.send(JSON.stringify(event));
       }
     });
 
-    socket.on("close", unsubscribe);
+    socket.on("close", ()=>{
+      metrics.websocketConnections=Math.max(0,metrics.websocketConnections-1);
+      unsubscribe();
+    });
+  });
+
+  app.get<{ Querystring:{limit?:string;type?:string} }>("/api/v1/events/recent", async (request) => ({
+    events:events.recent(
+      Math.max(1,Math.min(2000,Number(request.query.limit ?? 100))),
+      request.query.type
+    )
+  }));
+
+  app.post<{Body:{enabled:boolean}}>("/api/v1/system/emergency-stop", async (request) => {
+    store.setSetting("system.emergencyDisabled",request.body.enabled);
+    store.audit("api","system.emergency_stop",{enabled:request.body.enabled});
+    events.publish("system.emergency_stop",{enabled:request.body.enabled});
+    return {ok:true,enabled:request.body.enabled};
+  });
+
+  app.post("/api/v1/system/shutdown", async () => {
+    store.audit("api","system.graceful_shutdown",{});
+    setImmediate(()=>void app.close());
+    return {ok:true};
+  });
+
+  app.get<{ Querystring:{ path:string } }>("/api/v1/media/local", async (request,reply) => {
+    try{
+      const file=workspacePath(request.query.path);
+      const bytes=await fs.readFile(file);
+      const lower=file.toLowerCase();
+      const type=lower.endsWith(".mp3")?"audio/mpeg":
+        lower.endsWith(".wav")?"audio/wav":
+        lower.endsWith(".ogg")?"audio/ogg":
+        lower.endsWith(".flac")?"audio/flac":
+        lower.endsWith(".m4a")?"audio/mp4":
+        lower.endsWith(".mp4")?"video/mp4":
+        "application/octet-stream";
+      reply.header("content-type",type);
+      reply.header("cache-control","private, max-age=60");
+      return reply.send(bytes);
+    }catch(error){
+      return reply.code(404).send({error:error instanceof Error?error.message:"Media file not found"});
+    }
+  });
+
+  app.get("/api/v1/metrics", async () => ({
+    websocketConnections:metrics.websocketConnections,
+    tts:{
+      ...metrics.tts,
+      averageMs:metrics.tts.count?metrics.tts.totalMs/metrics.tts.count:0
+    },
+    ai:{
+      ...metrics.ai,
+      averageMs:metrics.ai.count?metrics.ai.totalMs/metrics.ai.count:0
+    }
+  }));
+
+  app.get("/api/v1/diagnostics/export", async (_request,reply) => {
+    const zip=new JSZip();
+    zip.file("health.json",JSON.stringify({
+      startupDiagnostics,
+      metrics,
+      settings:store.listSettings(),
+      integrations:await Promise.all(integrations.list().map(async(item)=>({
+        id:item.id,
+        state:item.state,
+        health:await item.health()
+      })))
+    },null,2));
+    zip.file("audit.json",JSON.stringify(store.listAudit(1000),null,2));
+    const buffer=await zip.generateAsync({type:"nodebuffer"});
+    reply.header("content-type","application/zip");
+    reply.header("content-disposition",'attachment; filename="jarvis-diagnostics.zip"');
+    return reply.send(buffer);
+  });
+
+  const settingSchema=z.object({
+    assistantName:z.string().min(1).max(100).optional(),
+    aiEndpoint:z.string().url().optional(),
+    aiModel:z.string().min(1).max(200).optional(),
+    ttsProvider:z.enum(["piper","edge"]).optional(),
+    piperVoice:z.enum(["en_GB-jarvis-medium","en_GB-jarvis-high"]).optional(),
+    wakeWordMode:z.enum(["always","push-to-talk","disabled"]).optional(),
+    memoryEnabled:z.boolean().optional(),
+    localOnly:z.boolean().optional(),
+    homeAssistantUrl:z.string().optional(),
+    homeAssistantToken:z.string().optional(),
+    discordBotToken:z.string().optional(),
+    firstRunComplete:z.boolean().optional()
+  }).strict();
+
+  app.get("/api/v1/settings", async () => ({
+    defaults:{
+      assistantName:config.assistantName,
+      aiEndpoint:config.ai.baseUrl,
+      aiModel:config.ai.model,
+      ttsProvider:"piper",
+      piperVoice:config.piper.voice,
+      wakeWordMode:"always",
+      memoryEnabled:true,
+      localOnly:false,
+      homeAssistantUrl:config.homeAssistant.url,
+      homeAssistantToken:"",
+      discordBotToken:"",
+      firstRunComplete:false
+    },
+    settings:store.listSettings()
+  }));
+
+  app.patch<{ Body: unknown }>("/api/v1/settings", async (request, reply) => {
+    const parsed=settingSchema.safeParse(request.body ?? {});
+    if(!parsed.success){
+      return reply.code(400).send({
+        ok:false,
+        error:"Invalid settings",
+        details:parsed.error.flatten().fieldErrors
+      });
+    }
+    const entries=Object.entries(parsed.data).map(([key,value])=>({key,value}));
+    store.importSettings(entries);
+    if(parsed.data.piperVoice) piper.setVoice(parsed.data.piperVoice);
+    store.audit("api","settings.update",{keys:entries.map((entry)=>entry.key)});
+    events.publish("settings.updated",{keys:entries.map((entry)=>entry.key)});
+    return {ok:true,settings:store.listSettings()};
+  });
+
+  app.post<{ Body: { settings?: Array<{ key:string; value:unknown }> } }>(
+    "/api/v1/settings/import",
+    async (request, reply) => {
+      const entries=request.body?.settings ?? [];
+      const object=Object.fromEntries(entries.map((entry)=>[entry.key,entry.value]));
+      const parsed=settingSchema.partial().safeParse(object);
+      if(!parsed.success){
+        return reply.code(400).send({
+          ok:false,
+          error:"Invalid settings import",
+          details:parsed.error.flatten().fieldErrors
+        });
+      }
+      const imported=Object.entries(parsed.data).map(([key,value])=>({key,value}));
+      store.importSettings(imported);
+      store.audit("api","settings.import",{keys:imported.map((entry)=>entry.key)});
+      events.publish("settings.updated",{keys:imported.map((entry)=>entry.key)});
+      return {ok:true,settings:store.listSettings()};
+    }
+  );
+
+  app.get("/api/v1/settings/export", async () => ({
+    settings:store.listSettings()
+  }));
+
+  app.delete("/api/v1/settings", async () => {
+    store.resetSettings();
+    store.audit("api","settings.reset",{});
+    events.publish("settings.updated",{reset:true});
+    return {ok:true};
   });
 
   app.get("/api/v1/permissions", async () => ({
-    permissions: permissions.list()
+    permissions: permissions.list(),
+    toolRules: permissions.listToolRules(),
+    emergencyStop: permissions.emergencyStop
   }));
+
+  app.patch<{ Params:{ tool:string }; Body:{ decision:"allow"|"ask"|"deny" } }>(
+    "/api/v1/permissions/tools/:tool",
+    async (request)=>{
+      permissions.setTool(request.params.tool,request.body.decision);
+      store.audit("api","permission.tool.update",{tool:request.params.tool,decision:request.body.decision});
+      events.publish("permission.tool.updated",{tool:request.params.tool,decision:request.body.decision});
+      return {ok:true};
+    }
+  );
+
+  app.post<{ Params:{ tool:string } }>(
+    "/api/v1/permissions/tools/:tool/approve-once",
+    async (request)=>{
+      permissions.approveOnce(request.params.tool);
+      store.audit("api","permission.tool.approve_once",{tool:request.params.tool});
+      return {ok:true};
+    }
+  );
+
+  app.post<{ Body:{ enabled:boolean } }>(
+    "/api/v1/emergency-stop",
+    async (request)=>{
+      permissions.setEmergencyStop(request.body.enabled);
+      store.setSetting("emergencyStop",request.body.enabled);
+      store.audit("api","emergency-stop",{enabled:request.body.enabled});
+      events.publish("emergency-stop",{enabled:request.body.enabled});
+      return {ok:true,enabled:request.body.enabled};
+    }
+  );
 
   app.get("/api/v1/secrets", async () => {
     permissions.assertAllowed("secrets.manage");
@@ -353,6 +707,28 @@ export async function createServer(ai: AiProvider) {
     )
   }));
 
+  app.post<{ Params:{id:string} }>("/api/v1/integrations/:id/reconnect", async (request, reply) => {
+    try{
+      await integrations.reconnect(request.params.id);
+      return {ok:true,id:request.params.id};
+    }catch(error){
+      return reply.code(400).send({
+        ok:false,
+        error:error instanceof Error?error.message:"Reconnect failed"
+      });
+    }
+  });
+
+  app.get<{ Params:{id:string}; Querystring:{limit?:string} }>(
+    "/api/v1/integrations/:id/logs",
+    async (request)=>({
+      logs:integrations.listLogs(
+        request.params.id,
+        Math.max(1,Math.min(1000,Number(request.query.limit ?? 200)))
+      )
+    })
+  );
+
   app.get("/api/v1/tools", async () => ({
     tools: tools.list()
   }));
@@ -416,6 +792,8 @@ export async function createServer(ai: AiProvider) {
   });
 
   app.get("/api/v1/voice", async () => ({
+    selectedPiperVoice:piper.voiceId,
+    piperVoices:PiperTtsProvider.voices,
     providers: [
       {
         id: piper.id,
@@ -426,9 +804,57 @@ export async function createServer(ai: AiProvider) {
         id: edgeTts.id,
         available: await edgeTts.available(),
         offline: false
+      },
+      {
+        id: customTts.id,
+        available: await customTts.available(),
+        offline: false
       }
     ]
   }));
+
+  app.put<{ Body:{ voice:"en_GB-jarvis-medium"|"en_GB-jarvis-high" } }>(
+    "/api/v1/voice/piper/voice",
+    async (request)=>{
+      piper.setVoice(request.body.voice);
+      store.setSetting("piperVoice",request.body.voice);
+      events.publish("voice.piper.changed",{voice:request.body.voice});
+      return {ok:true,voice:piper.voiceId};
+    }
+  );
+
+  app.post<{ Body:{ text?:string; voice?:"en_GB-jarvis-medium"|"en_GB-jarvis-high" } }>(
+    "/api/v1/voice/piper/preview",
+    async (request)=>{
+      if(request.body.voice) piper.setVoice(request.body.voice);
+      const outputPath=`${config.dataDir}/tts/piper-preview-${Date.now()}.wav`;
+      const result=await piper.synthesize({
+        text:request.body.text ?? "Jarvis voice preview.",
+        outputPath
+      });
+      return {ok:true,voice:piper.voiceId,...result};
+    }
+  );
+
+  app.delete<{ Querystring:{ voice?:"en_GB-jarvis-medium"|"en_GB-jarvis-high" } }>(
+    "/api/v1/voice/piper/cache",
+    async (request)=>piper.cleanupCache(request.query.voice)
+  );
+
+  app.post<{Body:{voice?:string;text?:string}}>("/api/v1/voice/edge/preview", async (request, reply) => {
+    try{
+      const result=await edgeTts.preview(
+        request.body?.voice ?? config.edgeTts.voice,
+        request.body?.text ?? "Jarvis Edge TTS voice preview."
+      );
+      return {ok:true,voice:request.body?.voice ?? config.edgeTts.voice,...result};
+    }catch(error){
+      return reply.code(503).send({
+        ok:false,
+        error:error instanceof Error?error.message:"Edge TTS preview failed"
+      });
+    }
+  });
 
   app.get("/api/v1/voice/edge/voices", async (_request, reply) => {
     try {
@@ -444,7 +870,7 @@ export async function createServer(ai: AiProvider) {
   app.post<{
     Body: {
       text: string;
-      provider?: "piper" | "edge";
+      provider?: "piper" | "edge" | "custom";
       outputPath?: string;
       voice?: string;
       rate?: string;
@@ -452,6 +878,7 @@ export async function createServer(ai: AiProvider) {
       volume?: string;
     };
   }>("/api/v1/voice/tts", async (request, reply) => {
+    const started=Date.now();
     try {
       const provider = request.body.provider ?? (
         await piper.available() ? "piper" : "edge"
@@ -461,7 +888,7 @@ export async function createServer(ai: AiProvider) {
           ? `${config.dataDir}/tts/output.mp3`
           : `${config.dataDir}/tts/output.wav`
       );
-      const selected = provider === "edge" ? edgeTts : piper;
+      const selected = provider === "edge" ? edgeTts : provider === "custom" ? customTts : piper;
       const result = await selected.synthesize({
         text: request.body.text,
         outputPath,
@@ -470,11 +897,16 @@ export async function createServer(ai: AiProvider) {
         pitch: request.body.pitch,
         volume: request.body.volume
       });
+      const elapsed=Date.now()-started;
+      metrics.tts.count++;
+      metrics.tts.totalMs+=elapsed;
+      metrics.tts.lastMs=elapsed;
       events.publish("voice.tts.completed", {
         provider,
+        latencyMs:elapsed,
         ...result
       });
-      return { ok: true, provider, ...result };
+      return { ok: true, provider, latencyMs:elapsed, ...result };
     } catch (error) {
       return reply.code(503).send({
         ok: false,
@@ -650,12 +1082,29 @@ export async function createServer(ai: AiProvider) {
     }
   );
 
-  app.get("/api/v1/conversations", async () => ({
-    conversations: store.listConversations()
+  app.get<{ Querystring: { q?: string; limit?: string } }>("/api/v1/conversations", async (request) => ({
+    conversations: request.query.q
+      ? store.searchConversations(
+          request.query.q,
+          Math.max(1,Math.min(500,Number(request.query.limit ?? 50)))
+        )
+      : store.listConversations(
+          Math.max(1,Math.min(500,Number(request.query.limit ?? 50)))
+        )
   }));
 
   app.get<{ Params: { id: string } }>("/api/v1/conversations/:id/messages", async (request) => ({
     messages: store.conversationMessages(request.params.id, 100)
+  }));
+
+  app.get<{ Params: { id: string } }>("/api/v1/conversations/:id/export", async (request, reply) => {
+    const exported=store.exportConversation(request.params.id);
+    if(!exported) return reply.code(404).send({error:"Conversation not found"});
+    return exported;
+  });
+
+  app.delete<{ Params: { id: string } }>("/api/v1/conversations/:id", async (request) => ({
+    ok: store.deleteConversation(request.params.id)
   }));
 
   app.get<{ Querystring: { category?: string } }>("/api/v1/memories", async (request) => {
@@ -764,6 +1213,13 @@ export async function createServer(ai: AiProvider) {
   );
 
   app.get("/api/v1/routines", async () => ({ routines: store.listRoutines() }));
+  app.get("/api/v1/routines/export", async () => ({ routines: store.exportRoutines() }));
+  app.post<{ Body: { routines: Array<{ name:string; enabled?:boolean; trigger:unknown; actions:unknown[]; conditions?:unknown[] }> } }>(
+    "/api/v1/routines/import",
+    async (request) => ({
+      routines: store.importRoutines(request.body.routines ?? [])
+    })
+  );
   app.post<{ Body: { name: string; trigger?: unknown; actions: unknown[]; conditions?: unknown[] } }>(
     "/api/v1/routines",
     async (request) => ({
@@ -921,14 +1377,20 @@ export async function createServer(ai: AiProvider) {
   app.post<{ Body: { message?: string; messages?: ChatMessage[]; conversationId?: string } }>(
     "/api/v1/chat",
     async (request, reply) => {
+      const started=Date.now();
       permissions.assertAllowed("assistant.chat");
 
       const supplied = request.body?.messages;
 
       if (supplied && supplied.length > 0) {
         const response = await agent.chat(supplied);
+        const elapsed=Date.now()-started;
+        metrics.ai.count++;
+        metrics.ai.totalMs+=elapsed;
+        metrics.ai.lastMs=elapsed;
         return {
           ...response,
+          latencyMs:elapsed,
           conversationId: request.body.conversationId ?? null
         };
       }
@@ -957,8 +1419,13 @@ export async function createServer(ai: AiProvider) {
 
       store.appendConversationMessage(conversationId, "assistant", response.content);
 
+      const elapsed=Date.now()-started;
+      metrics.ai.count++;
+      metrics.ai.totalMs+=elapsed;
+      metrics.ai.lastMs=elapsed;
       return {
         ...response,
+        latencyMs:elapsed,
         conversationId
       };
     }

@@ -41,6 +41,32 @@ class JarvisClient {
     return _json(response);
   }
 
+  Future<Map<String,dynamic>> settings() async {
+    final response=await http.get(_uri('/api/v1/settings'),headers:_headers);
+    return _json(response);
+  }
+
+  Future<Map<String,dynamic>> updateSettings(Map<String,dynamic> values) async {
+    final response=await http.patch(
+      _uri('/api/v1/settings'),
+      headers:_jsonHeaders,
+      body:jsonEncode(values),
+    );
+    return _json(response);
+  }
+
+  Future<Map<String,dynamic>> piperPreview({String? voice,String? text}) async {
+    final response=await http.post(
+      _uri('/api/v1/voice/piper/preview'),
+      headers:_jsonHeaders,
+      body:jsonEncode({
+        if(voice!=null)'voice':voice,
+        if(text!=null)'text':text,
+      }),
+    );
+    return _json(response);
+  }
+
   Future<List<dynamic>> integrations() async {
     final response = await http.get(_uri('/api/v1/integrations'), headers: _headers);
     return (_json(response)['integrations'] as List<dynamic>? ?? []);
@@ -72,6 +98,38 @@ class JarvisClient {
   Future<List<dynamic>> devices() async {
     final response = await http.get(_uri('/api/v1/devices'), headers: _headers);
     return (_json(response)['devices'] as List<dynamic>? ?? []);
+  }
+
+  Future<List<dynamic>> memories() async {
+    final response=await http.get(_uri('/api/v1/memories'),headers:_headers);
+    return (_json(response)['memories'] as List<dynamic>? ?? []);
+  }
+
+  Future<void> forgetMemory(int id) async {
+    final response=await http.delete(_uri('/api/v1/memories/$id'),headers:_headers);
+    _json(response);
+  }
+
+  Future<List<dynamic>> permissions() async {
+    final response=await http.get(_uri('/api/v1/permissions'),headers:_headers);
+    return (_json(response)['permissions'] as List<dynamic>? ?? []);
+  }
+
+  Future<void> setPermission(String capability,String decision) async {
+    final response=await http.patch(
+      _uri('/api/v1/permissions/${Uri.encodeComponent(capability)}'),
+      headers:_jsonHeaders,
+      body:jsonEncode({'decision':decision}),
+    );
+    _json(response);
+  }
+
+  Future<void> reconnectIntegration(String id) async {
+    final response=await http.post(
+      _uri('/api/v1/integrations/${Uri.encodeComponent(id)}/reconnect'),
+      headers:_jsonHeaders,
+    );
+    _json(response);
   }
 
   Future<JarvisReply> chat(String message) async {
@@ -117,9 +175,17 @@ class JarvisClient {
 
   Map<String, dynamic> _json(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(
-        'Jarvis HTTP ${response.statusCode}: ${response.body}',
-      );
+      try {
+        final decoded=jsonDecode(response.body);
+        if(decoded is Map<String,dynamic>){
+          final error=decoded['error']?.toString() ?? 'Request failed';
+          final details=decoded['details'];
+          throw Exception(details==null ? error : '$error: $details');
+        }
+      } catch (e) {
+        if(e is Exception) rethrow;
+      }
+      throw Exception('Jarvis HTTP ${response.statusCode}: ${response.body}');
     }
     return jsonDecode(response.body) as Map<String, dynamic>;
   }

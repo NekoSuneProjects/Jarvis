@@ -5,7 +5,8 @@ import type { ToolRouter } from "../tools/tool-router.js";
 export type RoutineAction =
   | { type:"tool"; tool:string; input?:unknown }
   | { type:"delay"; ms:number }
-  | { type:"event"; event:string; payload?:unknown };
+  | { type:"event"; event:string; payload?:unknown }
+  | { type:"branch"; condition:RoutineCondition; then:RoutineAction[]; else?:RoutineAction[] };
 
 type RoutineRow = {
   id:number;
@@ -17,10 +18,19 @@ type RoutineRow = {
 };
 
 type RoutineCondition = {
+  source?:"device"|"network"|"weather"|"calendar"|"email"|"system"|"ai";
+  tool?:string;
+  input?:unknown;
   path?:string;
   equals?:unknown;
   notEquals?:unknown;
   contains?:string;
+  exists?:boolean;
+  after?:string;
+  before?:string;
+  all?:RoutineCondition[];
+  any?:RoutineCondition[];
+  not?:RoutineCondition;
 };
 
 export class RoutineEngine {
@@ -28,6 +38,7 @@ export class RoutineEngine {
   private interval?:NodeJS.Timeout;
   private readonly running=new Set<number>();
   private readonly lastTimeRun=new Map<number,string>();
+  private readonly lastCompletedAt=new Map<number,number>();
 
   constructor(
     private readonly store:AssistantStore,
@@ -60,15 +71,54 @@ export class RoutineEngine {
     return path.split(".").reduce((current:any,key)=>current?.[key],value);
   }
 
-  private conditionsPass(row:RoutineRow,context:unknown):boolean{
+  private async conditionPass(condition:RoutineCondition,context:unknown):Promise<boolean>{
+    if(condition.all){
+      const values=await Promise.all(condition.all.map((item)=>this.conditionPass(item,context)));
+      if(!values.every(Boolean)) return false;
+    }
+    if(condition.any){
+      const values=await Promise.all(condition.any.map((item)=>this.conditionPass(item,context)));
+      if(!values.some(Boolean)) return false;
+    }
+    if(condition.not && await this.conditionPass(condition.not,context)) return false;
+
+    let resolvedContext=context;
+    if(condition.tool){
+      resolvedContext=await this.tools.execute(condition.tool,condition.input ?? {});
+    }else if(condition.source){
+      const sourceTools:Record<string,string>={
+        device:"devices.list",
+        network:"system.monitor.network",
+        weather:"weather.current",
+        calendar:"calendar.events",
+        email:"gmail.search",
+        system:"system.monitor.summary",
+        ai:"web.search.summarize"
+      };
+      const tool=sourceTools[condition.source];
+      resolvedContext=await this.tools.execute(tool,condition.input ?? {});
+    }
+
+    const value=this.getPath(resolvedContext,condition.path);
+    if("equals" in condition && value!==condition.equals) return false;
+    if("notEquals" in condition && value===condition.notEquals) return false;
+    if(condition.contains!==undefined && !String(value ?? "").includes(condition.contains)) return false;
+    if(condition.exists!==undefined && (value!==undefined && value!==null)!==condition.exists) return false;
+
+    if(condition.after || condition.before){
+      const hhmm=new Date().toTimeString().slice(0,5);
+      if(condition.after && hhmm<condition.after) return false;
+      if(condition.before && hhmm>condition.before) return false;
+    }
+    return true;
+  }
+
+  private async conditionsPass(row:RoutineRow,context:unknown):Promise<boolean>{
     const conditions=JSON.parse(row.conditions_json || "[]") as RoutineCondition[];
-    return conditions.every((condition)=>{
-      const value=this.getPath(context,condition.path);
-      if("equals" in condition && value!==condition.equals) return false;
-      if("notEquals" in condition && value===condition.notEquals) return false;
-      if(condition.contains!==undefined && !String(value ?? "").includes(condition.contains)) return false;
-      return true;
-    });
+    for(const condition of conditions){
+      if(!await this.conditionPass(condition,context)) return false;
+    }
+    return true;
   }
 
   private mqttMatch(pattern:string,topic:string):boolean{
@@ -95,6 +145,10 @@ export class RoutineEngine {
       }else if(trigger.type==="mqtt" && event.type==="mqtt.message"){
         const topic=String((event.payload as any)?.topic ?? "");
         matches=this.mqttMatch(String(trigger.topic ?? ""),topic);
+      }else if(trigger.type==="device" && event.type.startsWith("device.")){
+        matches=!trigger.event || trigger.event===event.type;
+      }else if(trigger.type==="presence" && event.type.startsWith("presence.")){
+        matches=!trigger.event || trigger.event===event.type;
       }else if(trigger.type==="voice" && event.type==="voice.transcript"){
         const text=String((event.payload as any)?.text ?? "").toLowerCase();
         const phrase=String(trigger.phrase ?? "").toLowerCase();
@@ -103,7 +157,10 @@ export class RoutineEngine {
         );
       }
 
-      if(matches && this.conditionsPass(row,event)){
+      const cooldownMs=Math.max(0,Number(trigger.cooldownMs ?? 0));
+      const lastCompleted=this.lastCompletedAt.get(row.id) ?? 0;
+      if(matches && cooldownMs>0 && Date.now()-lastCompleted<cooldownMs) continue;
+      if(matches && await this.conditionsPass(row,event)){
         void this.run(row.id,{event});
       }
     }
@@ -121,7 +178,7 @@ export class RoutineEngine {
       if(Array.isArray(trigger.days) && !trigger.days.includes(now.getDay())) continue;
       if(this.lastTimeRun.get(row.id)===dateKey) continue;
       this.lastTimeRun.set(row.id,dateKey);
-      if(this.conditionsPass(row,{time:now.toISOString()})){
+      if(await this.conditionsPass(row,{time:now.toISOString()})){
         void this.run(row.id,{time:now.toISOString()});
       }
     }
@@ -136,7 +193,7 @@ export class RoutineEngine {
 
     const results=[];
     for(const row of matches){
-      if(this.conditionsPass(row,{payload})){
+      if(await this.conditionsPass(row,{payload})){
         results.push(await this.run(row.id,{webhook:key,payload}));
       }
     }
@@ -148,7 +205,7 @@ export class RoutineEngine {
     if(!row) throw new Error("Routine not found");
     if(!row.enabled) throw new Error("Routine is disabled");
     if(this.running.has(id)) throw new Error("Routine is already running");
-    if(!this.conditionsPass(row,context)) {
+    if(!await this.conditionsPass(row,context)) {
       return {id:row.id,name:row.name,skipped:true,reason:"conditions"};
     }
 
@@ -159,20 +216,29 @@ export class RoutineEngine {
       const actions=JSON.parse(row.actions_json) as RoutineAction[];
       const results:unknown[]=[];
 
-      for(const action of actions){
+      const executeActions=async(items:RoutineAction[]):Promise<unknown[]>=>{
+        const output:unknown[]=[];
+        for(const action of items){
         if(action.type==="delay"){
           const ms=Math.max(0,Math.min(action.ms,60*60*1000));
           await new Promise((resolve)=>setTimeout(resolve,ms));
-          results.push({type:"delay",ms});
+          output.push({type:"delay",ms});
         }else if(action.type==="tool"){
-          results.push(await this.tools.execute(action.tool,action.input));
+          output.push(await this.tools.execute(action.tool,action.input));
         }else if(action.type==="event"){
           this.events.publish(action.event,action.payload ?? {});
-          results.push({type:"event",event:action.event});
+          output.push({type:"event",event:action.event});
+        }else if(action.type==="branch"){
+          const branch=await this.conditionPass(action.condition,context)?action.then:(action.else ?? []);
+          output.push({type:"branch",results:await executeActions(branch)});
         }
-      }
+        }
+        return output;
+      };
+      results.push(...await executeActions(actions));
 
       this.events.publish("routine.completed",{id:row.id,name:row.name});
+      this.lastCompletedAt.set(row.id,Date.now());
       this.store.audit("routine",`routine.run:${row.name}`,{id:row.id});
       return {id:row.id,name:row.name,results};
     }catch(error){

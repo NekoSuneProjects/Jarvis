@@ -24,6 +24,9 @@ export function createMemoryPlugin(store:AssistantStore):JarvisPlugin{
           additionalProperties:false
         },
         async execute(input){
+          if(store.getSetting<boolean>("memoryEnabled",true)===false){
+            throw new Error("Memory is disabled in settings");
+          }
           const value=z.object({
             query:z.string(),
             category:z.string().optional(),
@@ -47,6 +50,9 @@ export function createMemoryPlugin(store:AssistantStore):JarvisPlugin{
           additionalProperties:false
         },
         async execute(input){
+          if(store.getSetting<boolean>("memoryEnabled",true)===false){
+            throw new Error("Memory is disabled in settings");
+          }
           const value=z.object({
             category:z.string().min(1).default("general"),
             key:z.string().min(1),

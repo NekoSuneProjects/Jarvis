@@ -130,6 +130,20 @@ export function createGooglePlugin():JarvisPlugin{
         }
       },
       {
+        name:"calendar.rsvp",
+        description:"RSVP to a Google Calendar event for a specific attendee email.",
+        capability:"calendar.write",
+        async execute(input){
+          const value=z.object({
+            calendarId:z.string().default("primary"),
+            eventId:z.string().min(1),
+            email:z.string().email(),
+            responseStatus:z.enum(["accepted","declined","tentative","needsAction"])
+          }).parse(input);
+          return google.calendarRsvp(value.calendarId,value.eventId,value.email,value.responseStatus);
+        }
+      },
+      {
         name:"calendar.delete",
         description:"Delete a Google Calendar event.",
         capability:"calendar.write",
@@ -171,6 +185,100 @@ export function createGooglePlugin():JarvisPlugin{
         async execute(input){
           const value=z.object({id:z.string().min(1)}).parse(input);
           return google.driveFile(value.id);
+        }
+      },
+      {
+        name:"drive.google.export",
+        description:"Export a Google Doc, Sheet, or Slides file into the Jarvis workspace.",
+        capability:"drive.read",
+        async execute(input){
+          const value=z.object({
+            id:z.string().min(1),
+            path:z.string().min(1),
+            mimeType:z.string().min(1)
+          }).parse(input);
+          const target=workspacePath(value.path);
+          await fs.mkdir(path.dirname(target),{recursive:true});
+          const bytes=await google.driveExport(value.id,value.mimeType);
+          if(!(bytes instanceof ArrayBuffer)) throw new Error("Drive export returned non-binary content");
+          await fs.writeFile(target,Buffer.from(bytes));
+          return {ok:true,path:value.path};
+        }
+      },
+      {
+        name:"drive.google.create",
+        description:"Create a blank Google Doc, Sheet, or Slides file.",
+        capability:"drive.write",
+        async execute(input){
+          const value=z.object({
+            name:z.string().min(1),
+            type:z.enum(["doc","sheet","slides"]),
+            parentId:z.string().optional()
+          }).parse(input);
+          const mime={
+            doc:"application/vnd.google-apps.document",
+            sheet:"application/vnd.google-apps.spreadsheet",
+            slides:"application/vnd.google-apps.presentation"
+          }[value.type];
+          return google.driveCreateGoogleFile(value.name,mime,value.parentId);
+        }
+      },
+      {
+        name:"drive.share",
+        description:"Share a Google Drive file with another user.",
+        capability:"drive.write",
+        async execute(input){
+          const value=z.object({
+            id:z.string().min(1),
+            email:z.string().email(),
+            role:z.enum(["reader","commenter","writer"]).default("reader")
+          }).parse(input);
+          return google.driveShare(value.id,value.email,value.role);
+        }
+      },
+      {
+        name:"drive.comments",
+        description:"Read comments and replies on a Google Drive file.",
+        capability:"drive.read",
+        async execute(input){
+          const value=z.object({id:z.string().min(1)}).parse(input);
+          return google.driveComments(value.id);
+        }
+      },
+      {
+        name:"drive.comment.reply",
+        description:"Reply to a Google Drive comment.",
+        capability:"drive.write",
+        async execute(input){
+          const value=z.object({id:z.string().min(1),commentId:z.string().min(1),content:z.string().min(1)}).parse(input);
+          return google.driveReplyComment(value.id,value.commentId,value.content);
+        }
+      },
+      {
+        name:"google.docs.batch_update",
+        description:"Edit a Google Doc with Google Docs batchUpdate requests.",
+        capability:"drive.write",
+        async execute(input){
+          const value=z.object({documentId:z.string().min(1),requests:z.array(z.unknown()).min(1)}).parse(input);
+          return google.docsBatchUpdate(value.documentId,value.requests);
+        }
+      },
+      {
+        name:"google.sheets.batch_update",
+        description:"Edit a Google Sheet with Sheets batchUpdate requests.",
+        capability:"drive.write",
+        async execute(input){
+          const value=z.object({spreadsheetId:z.string().min(1),requests:z.array(z.unknown()).min(1)}).parse(input);
+          return google.sheetsBatchUpdate(value.spreadsheetId,value.requests);
+        }
+      },
+      {
+        name:"google.slides.batch_update",
+        description:"Edit a Google Slides presentation with Slides batchUpdate requests.",
+        capability:"drive.write",
+        async execute(input){
+          const value=z.object({presentationId:z.string().min(1),requests:z.array(z.unknown()).min(1)}).parse(input);
+          return google.slidesBatchUpdate(value.presentationId,value.requests);
         }
       },
       {

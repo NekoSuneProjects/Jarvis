@@ -32,4 +32,32 @@ export class DiscordIntegration {
       body:JSON.stringify({content})
     });
   }
+  reply(channelId:string,messageId:string,content:string){
+    return this.request(`/channels/${encodeURIComponent(channelId)}/messages`,{
+      method:"POST",
+      body:JSON.stringify({content,message_reference:{message_id:messageId}})
+    });
+  }
+  searchGuild(guildId:string,content:string,limit=25){
+    const params=new URLSearchParams({content,limit:String(Math.max(1,Math.min(25,limit)))});
+    return this.request(`/guilds/${encodeURIComponent(guildId)}/messages/search?${params}`);
+  }
+  async dmChannel(userId:string){
+    return this.request("/users/@me/channels",{
+      method:"POST",
+      body:JSON.stringify({recipient_id:userId})
+    }) as Promise<{id:string}>;
+  }
+  async sendDm(userId:string,content:string){
+    const channel=await this.dmChannel(userId);
+    return this.send(channel.id,content);
+  }
+  async readDm(userId:string,limit=25){
+    const channel=await this.dmChannel(userId);
+    return this.messages(channel.id,limit);
+  }
+  searchMentions(guildId:string,userId:string,limit=25){
+    const params=new URLSearchParams({mentions:userId,limit:String(Math.max(1,Math.min(25,limit)))});
+    return this.request(`/guilds/${encodeURIComponent(guildId)}/messages/search?${params}`);
+  }
 }

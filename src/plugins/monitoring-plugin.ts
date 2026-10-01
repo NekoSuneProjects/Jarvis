@@ -1,8 +1,11 @@
 import si from "systeminformation";
 import { z } from "zod";
 import type { JarvisPlugin } from "./plugin-registry.js";
+import type { AssistantStore } from "../assistant/store.js";
+import type { EventBus } from "../events/event-bus.js";
 
-export const monitoringPlugin:JarvisPlugin={
+export function createMonitoringPlugin(store:AssistantStore,events:EventBus):JarvisPlugin{
+return {
   id:"monitoring",
   name:"System Monitoring",
   version:"0.1.0",
@@ -128,6 +131,100 @@ export const monitoringPlugin:JarvisPlugin={
       }
     },
     {
+      name:"system.monitor.disk_health",
+      description:"Read physical disk health and SMART-related details when available.",
+      capability:"system.read",
+      async execute(){
+        const disks=await si.diskLayout();
+        return disks.map((disk)=>({
+          device:disk.device,
+          type:disk.type,
+          name:disk.name,
+          vendor:disk.vendor,
+          size:disk.size,
+          interfaceType:disk.interfaceType,
+          smartStatus:disk.smartStatus,
+          temperature:disk.temperature
+        }));
+      }
+    },
+    {
+      name:"system.monitor.services",
+      description:"List operating-system services and their running state.",
+      capability:"system.read",
+      async execute(input){
+        const value=z.object({name:z.string().default("*")}).parse(input ?? {});
+        return si.services(value.name);
+      }
+    },
+    {
+      name:"system.monitor.alerts",
+      description:"Evaluate system thresholds and optionally create system/server notifications.",
+      capability:"system.read",
+      async execute(input){
+        const value=z.object({
+          cpuPercent:z.number().min(1).max(100).default(90),
+          memoryPercent:z.number().min(1).max(100).default(90),
+          diskPercent:z.number().min(1).max(100).default(90),
+          temperatureC:z.number().default(85),
+          source:z.enum(["system","server"]).default("system"),
+          notify:z.boolean().default(true)
+        }).parse(input??{});
+        const [load,mem,disks,temp]=await Promise.all([
+          si.currentLoad(),si.mem(),si.fsSize(),si.cpuTemperature()
+        ]);
+        const alerts:Array<{kind:string;message:string;value:number}>= [];
+        const memPercent=mem.total?mem.used/mem.total*100:0;
+        if(load.currentLoad>=value.cpuPercent) alerts.push({kind:"cpu",message:`CPU load is ${load.currentLoad.toFixed(1)}%`,value:load.currentLoad});
+        if(memPercent>=value.memoryPercent) alerts.push({kind:"memory",message:`Memory usage is ${memPercent.toFixed(1)}%`,value:memPercent});
+        for(const disk of disks){
+          if(disk.use>=value.diskPercent) alerts.push({kind:"disk",message:`${disk.mount||disk.fs} disk usage is ${disk.use.toFixed(1)}%`,value:disk.use});
+        }
+        if((temp.main??0)>=value.temperatureC) alerts.push({kind:"temperature",message:`CPU temperature is ${temp.main}°C`,value:temp.main??0});
+        if(value.notify){
+          for(const alert of alerts){
+            const notification=store.createNotification(
+              value.source==="server"?"Server alert":"System alert",
+              alert.message,
+              alert.kind==="temperature"?"critical":"high",
+              value.source
+            );
+            events.publish("notification.created",notification);
+          }
+        }
+        return {alerts};
+      }
+    },
+    {
+      name:"system.monitor.history.record",
+      description:"Record a lightweight monitoring snapshot for graph/history views.",
+      capability:"system.read",
+      async execute(){
+        const [load,mem,disks]=await Promise.all([si.currentLoad(),si.mem(),si.fsSize()]);
+        const snapshot={
+          at:new Date().toISOString(),
+          cpuPercent:load.currentLoad,
+          memoryPercent:mem.total?mem.used/mem.total*100:0,
+          disks:disks.map((disk)=>({mount:disk.mount,fs:disk.fs,usePercent:disk.use}))
+        };
+        const history=store.getSetting<any[]>("monitoring.history",[]) ?? [];
+        history.push(snapshot);
+        if(history.length>2000) history.splice(0,history.length-2000);
+        store.setSetting("monitoring.history",history);
+        return snapshot;
+      }
+    },
+    {
+      name:"system.monitor.history",
+      description:"Read stored monitoring history for UI graphs.",
+      capability:"system.read",
+      async execute(input){
+        const value=z.object({limit:z.number().int().min(1).max(2000).default(500)}).parse(input??{});
+        const history=store.getSetting<any[]>("monitoring.history",[]) ?? [];
+        return history.slice(-value.limit);
+      }
+    },
+    {
       name:"system.monitor.wifi",
       description:"Read Wi-Fi interfaces/connections when supported by the operating system.",
       capability:"system.read",
@@ -141,3 +238,4 @@ export const monitoringPlugin:JarvisPlugin={
     }
   ]
 };
+}

@@ -46,14 +46,10 @@ export class EdgeTtsProvider implements TtsProvider {
     return voices;
   }
 
-  async synthesize(request:TtsRequest):Promise<{outputPath:string}>{
-    await fs.mkdir(path.dirname(path.resolve(request.outputPath)),{recursive:true});
-
-    const voice=request.voice ?? config.edgeTts.voice;
+  private async runSynthesis(request:TtsRequest,voice:string):Promise<{outputPath:string}>{
     const rate=request.rate ?? config.edgeTts.rate;
     const pitch=request.pitch ?? config.edgeTts.pitch;
     const volume=request.volume ?? "+0%";
-
     const result=await runProcess(config.edgeTts.bin,[
       "--text",request.text,
       "--voice",voice,
@@ -62,11 +58,24 @@ export class EdgeTtsProvider implements TtsProvider {
       `--volume=${volume}`,
       "--write-media",request.outputPath
     ],{timeoutMs:120000});
-
-    if(result.code!==0){
-      throw new Error(result.stderr || `Edge TTS exited with ${result.code}`);
-    }
-
+    if(result.code!==0) throw new Error(result.stderr || `Edge TTS exited with ${result.code}`);
     return {outputPath:request.outputPath};
+  }
+
+  async synthesize(request:TtsRequest):Promise<{outputPath:string}>{
+    await fs.mkdir(path.dirname(path.resolve(request.outputPath)),{recursive:true});
+    const voice=request.voice ?? config.edgeTts.voice;
+    try{
+      return await this.runSynthesis(request,voice);
+    }catch(error){
+      if(voice===config.edgeTts.voice) throw error;
+      console.warn(`[edge-tts] Voice ${voice} failed; falling back to ${config.edgeTts.voice}`);
+      return this.runSynthesis(request,config.edgeTts.voice);
+    }
+  }
+
+  async preview(voice:string,text="Jarvis Edge TTS voice preview."){
+    const outputPath=path.resolve(config.dataDir,"tts","edge-preview.mp3");
+    return this.synthesize({text,voice,outputPath});
   }
 }

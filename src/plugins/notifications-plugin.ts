@@ -4,6 +4,14 @@ import type { EventBus } from "../events/event-bus.js";
 import type { JarvisPlugin } from "./plugin-registry.js";
 
 export function createNotificationsPlugin(store:AssistantStore,events:EventBus):JarvisPlugin{
+  const inQuietHours=()=>{
+    const quiet=store.getSetting<{enabled:boolean;start:string;end:string}>("notifications.quietHours",{enabled:false,start:"22:00",end:"07:00"});
+    if(!quiet?.enabled) return false;
+    const hhmm=new Date().toTimeString().slice(0,5);
+    return quiet.start<=quiet.end
+      ? hhmm>=quiet.start && hhmm<quiet.end
+      : hhmm>=quiet.start || hhmm<quiet.end;
+  };
   return {
     id:"notifications",
     name:"Notifications",
@@ -35,8 +43,18 @@ export function createNotificationsPlugin(store:AssistantStore,events:EventBus):
           const notification=store.createNotification(
             value.title,value.body,value.priority,value.source
           );
-          events.publish("notification.created",notification);
-          return notification;
+          const suppressed=inQuietHours() && !["high","critical"].includes(value.priority);
+          if(!suppressed){
+            events.publish("notification.created",notification);
+            if(store.getSetting<boolean>("notifications.readAloud",false)){
+              events.publish("voice.tts.requested",{
+                text:[value.title,value.body].filter(Boolean).join(". "),
+                source:"notification",
+                notificationId:(notification as any).id
+              });
+            }
+          }
+          return {...(notification as any),suppressed};
         }
       },
       {
@@ -46,9 +64,34 @@ export function createNotificationsPlugin(store:AssistantStore,events:EventBus):
         async execute(input){
           const value=z.object({
             limit:z.number().int().min(1).max(500).default(100),
-            unreadOnly:z.boolean().default(false)
+            unreadOnly:z.boolean().default(false),
+            minPriority:z.enum(["low","normal","high","critical"]).default("low")
           }).parse(input ?? {});
-          return store.listNotifications(value.limit,value.unreadOnly);
+          return store.listNotifications(value.limit,value.unreadOnly,value.minPriority);
+        }
+      },
+      {
+        name:"notifications.read_aloud",
+        description:"Enable or disable reading Jarvis notifications aloud through the voice pipeline.",
+        capability:"assistant.local",
+        async execute(input){
+          const value=z.object({enabled:z.boolean()}).parse(input);
+          store.setSetting("notifications.readAloud",value.enabled);
+          return {ok:true,enabled:value.enabled};
+        }
+      },
+      {
+        name:"notifications.quiet_hours",
+        description:"Configure notification quiet hours; high/critical alerts still pass through.",
+        capability:"assistant.local",
+        async execute(input){
+          const value=z.object({
+            enabled:z.boolean(),
+            start:z.string().regex(/^\d{2}:\d{2}$/).default("22:00"),
+            end:z.string().regex(/^\d{2}:\d{2}$/).default("07:00")
+          }).parse(input);
+          store.setSetting("notifications.quietHours",value);
+          return {ok:true,...value};
         }
       }
     ]

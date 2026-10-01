@@ -17,6 +17,12 @@ export function createMediaServersPlugin():JarvisPlugin{
   );
   const radio=new RadioIntegration();
   const local=new LocalMusicIntegration(config.localMusicDir);
+  const localPlaylists=new Map<string,string[]>();
+  const localQueue:string[]=[];
+  let localShuffle=false;
+  let localRepeat:"off"|"one"|"all"="off";
+  const radioFavorites=new Map<string,unknown>();
+  let radioCurrent:{url:string;name?:string;metadata?:unknown}|null=null;
 
   return {
     id:"media-servers",
@@ -40,11 +46,127 @@ export function createMediaServersPlugin():JarvisPlugin{
         }
       },
       {
+        name:"jellyfin.browse",
+        description:"Browse Jellyfin media.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({limit:z.number().int().min(1).max(500).default(100)}).parse(input ?? {});
+          return jellyfin.browse(value.limit);
+        }
+      },
+      {
+        name:"jellyfin.latest",
+        description:"Read recently added Jellyfin media.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({limit:z.number().int().min(1).max(100).default(20)}).parse(input ?? {});
+          return jellyfin.latest(value.limit);
+        }
+      },
+      {
+        name:"jellyfin.resume",
+        description:"Read continue-watching items for a Jellyfin user.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({userId:z.string().min(1),limit:z.number().int().min(1).max(100).default(20)}).parse(input);
+          return jellyfin.resume(value.userId,value.limit);
+        }
+      },
+      {
+        name:"jellyfin.users",
+        description:"List Jellyfin user profiles.",
+        capability:"media.read",
+        async execute(){return jellyfin.users();}
+      },
+      {
+        name:"jellyfin.libraries",
+        description:"Read Jellyfin library status.",
+        capability:"media.read",
+        async execute(){return jellyfin.libraries();}
+      },
+      {
+        name:"jellyfin.play",
+        description:"Play one or more Jellyfin items on a selected active session/device.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({sessionId:z.string().min(1),itemIds:z.array(z.string().min(1)).min(1)}).parse(input);
+          return jellyfin.play(value.sessionId,value.itemIds);
+        }
+      },
+      {
+        name:"jellyfin.pause",
+        description:"Pause a Jellyfin playback session.",
+        capability:"media.control",
+        async execute(input){const value=z.object({sessionId:z.string().min(1)}).parse(input);return jellyfin.playbackCommand(value.sessionId,"Pause");}
+      },
+      {
+        name:"jellyfin.resume_playback",
+        description:"Resume a Jellyfin playback session.",
+        capability:"media.control",
+        async execute(input){const value=z.object({sessionId:z.string().min(1)}).parse(input);return jellyfin.playbackCommand(value.sessionId,"Unpause");}
+      },
+      {
+        name:"jellyfin.stop",
+        description:"Stop a Jellyfin playback session.",
+        capability:"media.control",
+        async execute(input){const value=z.object({sessionId:z.string().min(1)}).parse(input);return jellyfin.playbackCommand(value.sessionId,"Stop");}
+      },
+      {
         name:"jellyfin.sessions",
         description:"Read active Jellyfin sessions.",
         capability:"media.read",
         async execute(){return jellyfin.sessions();}
       },
+      {
+        name:"plex.discover",
+        description:"Discover Plex resources/servers for the configured account token.",
+        capability:"media.read",
+        async execute(){return plex.discoverServers();}
+      },
+      {
+        name:"plex.recent",
+        description:"Read recently added Plex media.",
+        capability:"media.read",
+        async execute(input){const value=z.object({limit:z.number().int().min(1).max(100).default(20)}).parse(input??{});return plex.recentlyAdded(value.limit);}
+      },
+      {
+        name:"plex.continue",
+        description:"Read Plex continue-watching hub.",
+        capability:"media.read",
+        async execute(){return plex.continueWatching();}
+      },
+      {
+        name:"plex.clients",
+        description:"List Plex player clients known to the server.",
+        capability:"media.read",
+        async execute(){return plex.clients();}
+      },
+      {
+        name:"plex.play",
+        description:"Start a Plex library item on a selected Plex Companion player.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({
+            playerUrl:z.string().url(),
+            key:z.string().min(1),
+            machineIdentifier:z.string().min(1),
+            serverAddress:z.string().min(1),
+            serverPort:z.number().int().min(1).max(65535).default(32400),
+            serverProtocol:z.enum(["http","https"]).default("http"),
+            clientIdentifier:z.string().optional()
+          }).parse(input);
+          return plex.playMedia(value.playerUrl,value);
+        }
+      },
+      ...(["play","pause","stop"] as const).map((action)=>({
+        name:`plex.${action}`,
+        description:`${action} a selected Plex Companion player.`,
+        capability:"media.control",
+        async execute(input:unknown){
+          const value=z.object({playerUrl:z.string().url(),clientIdentifier:z.string().optional()}).parse(input);
+          return plex.playerCommand(value.playerUrl,action,value.clientIdentifier);
+        }
+      })),
       {
         name:"plex.search",
         description:"Search Plex media.",
@@ -71,6 +193,38 @@ export function createMediaServersPlugin():JarvisPlugin{
         description:"Read active Plex sessions.",
         capability:"media.read",
         async execute(){return plex.sessions();}
+      },
+      {
+        name:"kodi.navigate",
+        description:"Send a Kodi navigation action.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({action:z.enum(["up","down","left","right","select","back","home","info","contextmenu"])}).parse(input);
+          return kodi.input(value.action);
+        }
+      },
+      {
+        name:"kodi.search",
+        description:"Search Kodi movie, episode and music libraries.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({query:z.string().min(1),limit:z.number().int().min(1).max(200).default(50)}).parse(input);
+          return kodi.search(value.query,value.limit);
+        }
+      },
+      {
+        name:"kodi.open",
+        description:"Open/play a Kodi file or library item.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({
+            file:z.string().optional(),
+            movieid:z.number().int().optional(),
+            episodeid:z.number().int().optional(),
+            songid:z.number().int().optional()
+          }).refine((v)=>Boolean(v.file||v.movieid!==undefined||v.episodeid!==undefined||v.songid!==undefined),"Provide a Kodi item").parse(input);
+          return kodi.open(value);
+        }
       },
       {
         name:"kodi.status",
@@ -111,6 +265,50 @@ export function createMediaServersPlugin():JarvisPlugin{
         }
       },
       {
+        name:"radio.country",
+        description:"Browse internet radio stations by country.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({country:z.string().min(1),limit:z.number().int().min(1).max(100).default(20)}).parse(input);
+          return radio.byCountry(value.country,value.limit);
+        }
+      },
+      {
+        name:"radio.genre",
+        description:"Browse internet radio stations by genre/tag.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({genre:z.string().min(1),limit:z.number().int().min(1).max(100).default(20)}).parse(input);
+          return radio.byTag(value.genre,value.limit);
+        }
+      },
+      {
+        name:"radio.play",
+        description:"Select an internet radio stream URL for playback by a client/device.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({url:z.string().url(),name:z.string().optional(),metadata:z.unknown().optional()}).parse(input);
+          radioCurrent={url:value.url,name:value.name,metadata:value.metadata};
+          return {ok:true,current:radioCurrent};
+        }
+      },
+      {
+        name:"radio.custom",
+        description:"Set a custom internet radio stream URL.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({url:z.string().url(),name:z.string().default("Custom Radio")}).parse(input);
+          radioCurrent={url:value.url,name:value.name};
+          return {ok:true,current:radioCurrent};
+        }
+      },
+      {
+        name:"radio.current",
+        description:"Read selected radio stream and metadata.",
+        capability:"media.read",
+        async execute(){return {current:radioCurrent};}
+      },
+      {
         name:"radio.search",
         description:"Search internet radio stations.",
         capability:"media.read",
@@ -118,6 +316,31 @@ export function createMediaServersPlugin():JarvisPlugin{
           const value=z.object({query:z.string().min(1),limit:z.number().int().min(1).max(100).default(20)}).parse(input);
           return radio.search(value.query,value.limit);
         }
+      },
+      {
+        name:"radio.favorite.add",
+        description:"Save an internet radio station as a runtime favourite.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({id:z.string().min(1),station:z.unknown()}).parse(input);
+          radioFavorites.set(value.id,value.station);
+          return {ok:true,id:value.id};
+        }
+      },
+      {
+        name:"radio.favorite.remove",
+        description:"Remove an internet radio favourite.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({id:z.string().min(1)}).parse(input);
+          return {ok:radioFavorites.delete(value.id)};
+        }
+      },
+      {
+        name:"radio.favorites",
+        description:"List saved runtime internet radio favourites.",
+        capability:"media.read",
+        async execute(){return [...radioFavorites.entries()].map(([id,station])=>({id,station}));}
       },
       {
         name:"radio.top",
@@ -136,6 +359,68 @@ export function createMediaServersPlugin():JarvisPlugin{
           const value=z.object({query:z.string().min(1),limit:z.number().int().min(1).max(100).default(50)}).parse(input);
           return local.search(value.query,value.limit);
         }
+      },
+      {
+        name:"music.local.artists",
+        description:"Search/list artists in the local music library.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({query:z.string().default(""),limit:z.number().int().min(1).max(500).default(100)}).parse(input??{});
+          return local.artists(value.query,value.limit);
+        }
+      },
+      {
+        name:"music.local.albums",
+        description:"Search/list albums in the local music library.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({query:z.string().default(""),limit:z.number().int().min(1).max(500).default(100)}).parse(input??{});
+          return local.albums(value.query,value.limit);
+        }
+      },
+      {
+        name:"music.local.playlist.create",
+        description:"Create or replace a local music playlist.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({name:z.string().min(1),tracks:z.array(z.string().min(1)).default([])}).parse(input);
+          localPlaylists.set(value.name,[...value.tracks]);
+          return {ok:true,name:value.name,tracks:value.tracks};
+        }
+      },
+      {
+        name:"music.local.playlists",
+        description:"List local music playlists.",
+        capability:"media.read",
+        async execute(){return [...localPlaylists.entries()].map(([name,tracks])=>({name,tracks}));}
+      },
+      {
+        name:"music.local.queue.add",
+        description:"Add one or more local music paths to the queue.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({tracks:z.array(z.string().min(1)).min(1)}).parse(input);
+          localQueue.push(...value.tracks);
+          return {queue:[...localQueue]};
+        }
+      },
+      {
+        name:"music.local.queue",
+        description:"Read the local music queue and shuffle/repeat state.",
+        capability:"media.read",
+        async execute(){return {queue:[...localQueue],shuffle:localShuffle,repeat:localRepeat};}
+      },
+      {
+        name:"music.local.shuffle",
+        description:"Enable or disable local music shuffle.",
+        capability:"media.control",
+        async execute(input){const value=z.object({enabled:z.boolean()}).parse(input);localShuffle=value.enabled;return {shuffle:localShuffle};}
+      },
+      {
+        name:"music.local.repeat",
+        description:"Set local music repeat mode.",
+        capability:"media.control",
+        async execute(input){const value=z.object({mode:z.enum(["off","one","all"])}).parse(input);localRepeat=value.mode;return {repeat:localRepeat};}
       },
       {
         name:"music.local.scan",

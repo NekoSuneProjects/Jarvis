@@ -17,6 +17,7 @@ jobs:
   typecheck:
     name: TypeScript build
     runs-on: [self-hosted, Linux, docker, buildx]
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -33,5 +34,61 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Build
-        run: npm run build
+      - name: TypeScript format check
+        run: npm run format:check
+
+      - name: Build and tests
+        run: npm run test:ci
+
+      - name: Dependency vulnerability audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Upload CI npm logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-ci-failure-logs-${{ github.run_number }}
+          path: |
+            ~/.npm/_logs
+          if-no-files-found: ignore
+          retention-days: 7
+
+  flutter:
+    name: Flutter checks
+    runs-on: [self-hosted, Linux, docker, buildx]
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        working-directory: apps/jarvis_ui
+        run: flutter pub get
+
+      - name: Flutter format check
+        working-directory: apps/jarvis_ui
+        run: dart format --output=none --set-exit-if-changed lib test || dart format --output=none --set-exit-if-changed lib
+
+      - name: Flutter analyze
+        working-directory: apps/jarvis_ui
+        run: flutter analyze
+
+      - name: Flutter tests
+        working-directory: apps/jarvis_ui
+        run: flutter test
+
+      - name: Upload Flutter failure logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-ci-failure-${{ github.run_number }}
+          path: |
+            apps/jarvis_ui/build
+          if-no-files-found: ignore
+          retention-days: 7

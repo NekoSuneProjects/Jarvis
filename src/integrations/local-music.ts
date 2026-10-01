@@ -10,6 +10,8 @@ export interface LocalTrack {
   artist?:string;
   album?:string;
   duration?:number;
+  artworkBase64?:string;
+  artworkMimeType?:string;
 }
 
 export class LocalMusicIntegration {
@@ -35,13 +37,16 @@ export class LocalMusicIntegration {
     const tracks:LocalTrack[]=[];
     for(const filename of paths){
       try{
-        const meta=await parseFile(filename,{duration:true,skipCovers:true});
+        const meta=await parseFile(filename);
+        const picture=meta.common.picture?.[0];
         tracks.push({
           path:filename,
           title:meta.common.title ?? path.basename(filename,path.extname(filename)),
           artist:meta.common.artist,
           album:meta.common.album,
-          duration:meta.format.duration
+          duration:meta.format.duration,
+          artworkBase64:picture?.data?.toString("base64"),
+          artworkMimeType:picture?.format
         });
       }catch{
         tracks.push({
@@ -61,5 +66,32 @@ export class LocalMusicIntegration {
       track.artist?.toLowerCase().includes(q) ||
       track.album?.toLowerCase().includes(q)
     ).slice(0,limit);
+  }
+
+  async artists(query="",limit=100){
+    const q=query.toLowerCase();
+    const tracks=await this.scan();
+    const counts=new Map<string,number>();
+    for(const track of tracks){
+      if(!track.artist) continue;
+      if(q && !track.artist.toLowerCase().includes(q)) continue;
+      counts.set(track.artist,(counts.get(track.artist)??0)+1);
+    }
+    return [...counts.entries()].map(([artist,tracks])=>({artist,tracks})).sort((a,b)=>a.artist.localeCompare(b.artist)).slice(0,limit);
+  }
+
+  async albums(query="",limit=100){
+    const q=query.toLowerCase();
+    const tracks=await this.scan();
+    const counts=new Map<string,{album:string;artist?:string;tracks:number}>();
+    for(const track of tracks){
+      if(!track.album) continue;
+      if(q && !track.album.toLowerCase().includes(q) && !track.artist?.toLowerCase().includes(q)) continue;
+      const key=`${track.artist ?? ""}\u0000${track.album}`;
+      const entry=counts.get(key) ?? {album:track.album,artist:track.artist,tracks:0};
+      entry.tracks++;
+      counts.set(key,entry);
+    }
+    return [...counts.values()].sort((a,b)=>a.album.localeCompare(b.album)).slice(0,limit);
   }
 }

@@ -26,6 +26,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<dynamic> reminders = [];
   List<dynamic> notifications = [];
   List<dynamic> devices = [];
+  List<dynamic> memories = [];
+  List<dynamic> permissions = [];
 
   JarvisState state = JarvisState.idle;
   StreamSubscription<dynamic>? eventSubscription;
@@ -48,6 +50,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         widget.client.reminders(),
         widget.client.notifications(),
         widget.client.devices(),
+        widget.client.memories(),
+        widget.client.permissions(),
       ]);
       if (!mounted) return;
       setState(() {
@@ -58,6 +62,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         reminders = results[4] as List<dynamic>;
         notifications = results[5] as List<dynamic>;
         devices = results[6] as List<dynamic>;
+        memories = results[7] as List<dynamic>;
+        permissions = results[8] as List<dynamic>;
         error = null;
       });
     } catch (e) {
@@ -72,6 +78,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         (raw) {
           final event = jsonDecode(raw.toString()) as Map<String, dynamic>;
           final type = event['type']?.toString() ?? '';
+          if (type == 'tool.failed') {
+            final payload = event['payload'];
+            if (payload is Map<String, dynamic>) {
+              final message = payload['error']?.toString() ?? '';
+              const prefix = 'Permission requires approval: ';
+              if (message.startsWith(prefix)) {
+                final capability = message.substring(prefix.length).trim();
+                if (capability.isNotEmpty) {
+                  Future.microtask(() => _confirmPermission(capability));
+                }
+              }
+            }
+          }
           if (type.startsWith('timer.') ||
               type.startsWith('alarm.') ||
               type.startsWith('reminder.') ||
@@ -275,6 +294,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Future<void> _reconnectIntegration(String id) async {
+    try {
+      await widget.client.reconnectIntegration(id);
+      await _refresh();
+    } catch (e) {
+      if (mounted) setState(() => error = 'Reconnect failed: $e');
+    }
+  }
+
+  Future<void> _forgetMemory(int id) async {
+    try {
+      await widget.client.forgetMemory(id);
+      await _refresh();
+    } catch (e) {
+      if (mounted) setState(() => error = 'Forget memory failed: $e');
+    }
+  }
+
+  Future<void> _confirmPermission(String capability) async {
+    if (!mounted) return;
+    final decision = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Jarvis permission request'),
+        content: Text('Allow capability "$capability" for future tool calls?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'deny'),
+            child: const Text('Deny'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'ask'),
+            child: const Text('Keep asking'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, 'allow'),
+            child: const Text('Allow'),
+          ),
+        ],
+      ),
+    );
+    if (decision != null) {
+      await _setPermission(capability, decision);
+    }
+  }
+
+  Future<void> _setPermission(String capability, String decision) async {
+    try {
+      await widget.client.setPermission(capability, decision);
+      await _refresh();
+    } catch (e) {
+      if (mounted) setState(() => error = 'Permission update failed: $e');
+    }
+  }
+
+  Future<void> _markNotification(int id, bool read) async {
+    try {
+      await widget.client.markNotificationRead(id, read);
+      await _refresh();
+    } catch (e) {
+      if (mounted) setState(() => error = 'Notification update failed: $e');
+    }
+  }
+
   Widget _statusPanel() {
     return _panel(
       title: 'INTEGRATIONS',
@@ -286,12 +369,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
               contentPadding: EdgeInsets.zero,
               title: Text(item['name']?.toString() ?? item['id'].toString()),
               subtitle: Text(item['state']?.toString() ?? 'unknown'),
-              trailing: Icon(
-                Icons.circle,
-                size: 10,
-                color: item['state'] == 'connected'
-                    ? const Color(0xFF57FF9A)
-                    : Colors.orangeAccent,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.circle,
+                    size: 10,
+                    color: item['state'] == 'connected'
+                        ? const Color(0xFF57FF9A)
+                        : Colors.orangeAccent,
+                  ),
+                  IconButton(
+                    tooltip: 'Reconnect',
+                    onPressed: () => _reconnectIntegration(item['id'].toString()),
+                    icon: const Icon(Icons.sync, size: 18),
+                  ),
+                ],
               ),
             ),
         ],
@@ -324,6 +417,84 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         );
 
+    Widget notificationSection() => Padding(
+          padding: const EdgeInsets.only(bottom: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('NOTIFICATIONS', style: TextStyle(letterSpacing: 1.5)),
+              const SizedBox(height: 6),
+              for (final value in notifications.take(5))
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(value['title']?.toString() ?? 'Notification'),
+                  subtitle: Text(value['body']?.toString() ?? ''),
+                  trailing: TextButton(
+                    onPressed: () => _markNotification(
+                      (value['id'] as num).toInt(),
+                      value['is_read'] != 1,
+                    ),
+                    child: Text(value['is_read'] == 1 ? 'UNREAD' : 'READ'),
+                  ),
+                ),
+            ],
+          ),
+        );
+
+    Widget memorySection() => Padding(
+          padding: const EdgeInsets.only(bottom: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('MEMORY REVIEW', style: TextStyle(letterSpacing: 1.5)),
+              const SizedBox(height: 6),
+              for (final value in memories.take(5))
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(value['key']?.toString() ?? 'Memory'),
+                  subtitle: Text(value['value']?.toString() ?? ''),
+                  trailing: IconButton(
+                    tooltip: 'Forget',
+                    onPressed: () => _forgetMemory((value['id'] as num).toInt()),
+                    icon: const Icon(Icons.delete_outline, size: 18),
+                  ),
+                ),
+            ],
+          ),
+        );
+
+    Widget permissionSection() => Padding(
+          padding: const EdgeInsets.only(bottom: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('TOOL PERMISSIONS', style: TextStyle(letterSpacing: 1.5)),
+              const SizedBox(height: 6),
+              for (final value in permissions.take(8))
+                Row(
+                  children: [
+                    Expanded(child: Text(value['capability']?.toString() ?? '')),
+                    DropdownButton<String>(
+                      value: value['decision']?.toString() ?? 'ask',
+                      items: const [
+                        DropdownMenuItem(value: 'allow', child: Text('Allow')),
+                        DropdownMenuItem(value: 'ask', child: Text('Ask')),
+                        DropdownMenuItem(value: 'deny', child: Text('Deny')),
+                      ],
+                      onChanged: (decision) {
+                        if (decision != null) {
+                          _setPermission(value['capability'].toString(), decision);
+                        }
+                      },
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        );
+
     return _panel(
       title: 'ASSISTANT',
       child: ListView(
@@ -332,7 +503,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           section('ALARMS', alarms),
           section('REMINDERS', reminders),
           section('DEVICES', devices),
-          section('NOTIFICATIONS', notifications),
+          notificationSection(),
+          memorySection(),
+          permissionSection(),
         ],
       ),
     );

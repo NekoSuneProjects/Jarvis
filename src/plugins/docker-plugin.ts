@@ -2,8 +2,9 @@ import { z } from "zod";
 import { runProcess } from "../utils/process.js";
 import type { JarvisPlugin } from "./plugin-registry.js";
 
-async function docker(args:string[],timeoutMs=30000){
-  const result=await runProcess("docker",args,{timeoutMs});
+async function docker(args:string[],timeoutMs=30000,host?:string){
+  const full=host?["-H",host,...args]:args;
+  const result=await runProcess("docker",full,{timeoutMs});
   if(result.code!==0) throw new Error(result.stderr.trim() || `docker exited with ${result.code}`);
   return result.stdout.trim();
 }
@@ -20,10 +21,11 @@ export const dockerPlugin:JarvisPlugin={
   tools:[
     {
       name:"docker.ps",
-      description:"List Docker containers.",
+      description:"List Docker containers, optionally from a remote Docker daemon.",
       capability:"docker.read",
-      async execute(){
-        return jsonLines(await docker(["ps","-a","--format","{{json .}}"]));
+      async execute(input){
+        const value=z.object({host:z.string().optional()}).parse(input ?? {});
+        return jsonLines(await docker(["ps","-a","--format","{{json .}}"],30000,value.host));
       }
     },
     {
@@ -67,6 +69,39 @@ export const dockerPlugin:JarvisPlugin={
       async execute(input){
         const value=z.object({image:z.string().min(1)}).parse(input);
         return {output:await docker(["pull",value.image],120000)};
+      }
+    },
+    {
+      name:"docker.container.remove",
+      description:"Remove a Docker container. Requires control permission.",
+      capability:"docker.control",
+      async execute(input){
+        const value=z.object({container:z.string().min(1),force:z.boolean().default(false),confirm:z.literal(true),host:z.string().optional()}).parse(input);
+        const args=["rm"];
+        if(value.force) args.push("-f");
+        args.push(value.container);
+        return {output:await docker(args,30000,value.host)};
+      }
+    },
+    {
+      name:"docker.image.remove",
+      description:"Remove a Docker image. Requires control permission.",
+      capability:"docker.control",
+      async execute(input){
+        const value=z.object({image:z.string().min(1),force:z.boolean().default(false),confirm:z.literal(true),host:z.string().optional()}).parse(input);
+        const args=["image","rm"];
+        if(value.force) args.push("-f");
+        args.push(value.image);
+        return {output:await docker(args,30000,value.host)};
+      }
+    },
+    {
+      name:"docker.compose.list",
+      description:"List Docker Compose projects known to the local Docker engine.",
+      capability:"docker.read",
+      async execute(){
+        const out=await docker(["compose","ls","--format","json"]);
+        try{return JSON.parse(out);}catch{return {raw:out};}
       }
     },
     ...(["start","stop","restart"] as const).map((action)=>({

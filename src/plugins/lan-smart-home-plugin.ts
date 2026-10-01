@@ -7,6 +7,7 @@ import {
   type NamedHttpDevice
 } from "../integrations/lan-smart-home.js";
 import type { JarvisPlugin } from "./plugin-registry.js";
+import type { DiscoveryService } from "../devices/discovery.js";
 
 function parseDevices(value:string):Record<string,NamedHttpDevice>{
   try{
@@ -17,7 +18,7 @@ function parseDevices(value:string):Record<string,NamedHttpDevice>{
   }
 }
 
-export function createLanSmartHomePlugin():JarvisPlugin{
+export function createLanSmartHomePlugin(discovery?:DiscoveryService):JarvisPlugin{
   const hue=new HueIntegration(config.hue.url,config.hue.username);
   const shelly=new ShellyIntegration(parseDevices(config.shellyDevicesJson));
   const tasmota=new TasmotaIntegration(parseDevices(config.tasmotaDevicesJson));
@@ -28,6 +29,40 @@ export function createLanSmartHomePlugin():JarvisPlugin{
     version:"0.1.0",
     description:"Direct local Hue, Shelly and Tasmota control without a cloud dependency.",
     tools:[
+      {
+        name:"hue.discover",
+        description:"Discover Philips Hue bridges on the local network using SSDP/UPnP hints.",
+        capability:"smart-home.read",
+        async execute(){
+          if(!discovery) return [];
+          const devices=await discovery.ssdpScan(2500,"ssdp:all");
+          return devices.filter((item:any)=>{
+            const text=JSON.stringify(item).toLowerCase();
+            return text.includes("philips hue") || text.includes("hue bridge") || text.includes("ipbridge");
+          });
+        }
+      },
+      {
+        name:"hue.pair",
+        description:"Pair with a Philips Hue bridge after the bridge link button is pressed.",
+        capability:"smart-home.control",
+        async execute(input){
+          const value=z.object({baseUrl:z.string().url(),deviceType:z.string().default("nekosune_jarvis#assistant")}).parse(input);
+          return HueIntegration.pair(value.baseUrl,value.deviceType);
+        }
+      },
+      {
+        name:"hue.scenes",
+        description:"List Philips Hue scenes.",
+        capability:"smart-home.read",
+        async execute(){return hue.scenes();}
+      },
+      {
+        name:"hue.entertainment",
+        description:"List Philips Hue entertainment zones.",
+        capability:"smart-home.read",
+        async execute(){return hue.entertainmentZones();}
+      },
       {
         name:"hue.lights",
         description:"List Philips Hue lights from the configured local bridge.",
@@ -69,6 +104,24 @@ export function createLanSmartHomePlugin():JarvisPlugin{
         description:"List configured Shelly devices.",
         capability:"smart-home.read",
         async execute(){return shelly.list();}
+      },
+      {
+        name:"shelly.gen1.status",
+        description:"Read status from a Shelly Gen1 device.",
+        capability:"smart-home.read",
+        async execute(input){
+          const value=z.object({device:z.string().min(1)}).parse(input);
+          return shelly.gen1Status(value.device);
+        }
+      },
+      {
+        name:"shelly.gen1.relay",
+        description:"Control a Shelly Gen1 relay channel.",
+        capability:"smart-home.control",
+        async execute(input){
+          const value=z.object({device:z.string().min(1),id:z.number().int().min(0).default(0),on:z.boolean()}).parse(input);
+          return shelly.gen1Relay(value.device,value.id,value.on);
+        }
       },
       {
         name:"shelly.status",

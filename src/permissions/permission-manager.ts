@@ -58,6 +58,9 @@ const DEFAULT_RULES: PermissionRule[] = [
 
 export class PermissionManager {
   private readonly rules = new Map<string, PermissionDecision>();
+  private readonly toolRules = new Map<string, PermissionDecision>();
+  private readonly oneTimeApprovals = new Set<string>();
+  private emergencyStopped=false;
 
   constructor(rules: PermissionRule[] = DEFAULT_RULES) {
     for (const rule of rules) {
@@ -78,6 +81,50 @@ export class PermissionManager {
       capability,
       decision
     }));
+  }
+
+  listToolRules(){
+    return [...this.toolRules.entries()].map(([tool,decision])=>({tool,decision}));
+  }
+
+  setTool(tool:string,decision:PermissionDecision){
+    this.toolRules.set(tool,decision);
+  }
+
+  approveOnce(tool:string){
+    this.oneTimeApprovals.add(tool);
+  }
+
+  setEmergencyStop(enabled:boolean){
+    this.emergencyStopped=enabled;
+  }
+
+  get emergencyStop(){
+    return this.emergencyStopped;
+  }
+
+  assertToolAllowed(tool:string,capability:string):void{
+    const safeDuringEmergency=
+      capability==="assistant.chat" ||
+      capability==="assistant.local" ||
+      capability.endsWith(".read") ||
+      capability==="weather.read" ||
+      capability==="web.search" ||
+      capability==="utility.read";
+    if(this.emergencyStopped && !safeDuringEmergency){
+      throw new Error(`Emergency stop active: ${tool}`);
+    }
+
+    if(this.oneTimeApprovals.delete(tool)) return;
+
+    const decision=this.toolRules.get(tool) ?? this.get(capability);
+    if(decision!=="allow"){
+      throw new Error(
+        decision==="deny"
+          ? `Permission denied: ${tool}`
+          : `Permission requires approval: ${tool}`
+      );
+    }
   }
 
   assertAllowed(capability: string): void {
