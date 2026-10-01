@@ -68,6 +68,21 @@ export class GithubIntegration {
   branches(owner:string,name:string){
     return this.request(`/repos/${owner}/${name}/branches?per_page=100`);
   }
+  async workflowLogs(owner:string,name:string,runId:number){
+    if(!this.token) throw new Error("GitHub token is not configured");
+    const response=await fetch(`https://api.github.com/repos/${owner}/${name}/actions/runs/${runId}/logs`,{
+      headers:{
+        authorization:`Bearer ${this.token}`,
+        accept:"application/vnd.github+json",
+        "x-github-api-version":"2022-11-28"
+      },
+      signal:AbortSignal.timeout(30000)
+    });
+    if(!response.ok) throw new Error(`GitHub logs HTTP ${response.status}: ${await response.text()}`);
+    const buffer=Buffer.from(await response.arrayBuffer());
+    return {format:"zip",base64:buffer.toString("base64"),bytes:buffer.length};
+  }
+
   async createBranch(owner:string,name:string,branch:string,from:string){
     const ref=await this.request(`/repos/${owner}/${name}/git/ref/heads/${encodeURIComponent(from)}`) as any;
     return this.request(`/repos/${owner}/${name}/git/refs`,{method:"POST",body:JSON.stringify({ref:`refs/heads/${branch}`,sha:ref.object.sha})});
