@@ -45,6 +45,35 @@ export function createMqttPlugin(mqtt:MqttIntegration):JarvisPlugin{
         }
       },
       {
+        name:"tasmota.mqtt.discover",
+        description:"Discover Tasmota devices by subscribing to common tele/stat discovery topics.",
+        capability:"mqtt.subscribe",
+        async execute(){
+          await mqtt.subscribe("tele/+/LWT",0);
+          await mqtt.subscribe("tele/+/STATE",0);
+          await mqtt.subscribe("stat/+/RESULT",0);
+          return {
+            tele:mqtt.topics("tele/"),
+            stat:mqtt.topics("stat/")
+          };
+        }
+      },
+      {
+        name:"tasmota.mqtt.command",
+        description:"Send a Tasmota MQTT command to cmnd/<device>/<command>.",
+        capability:"smart-home.control",
+        async execute(input){
+          const value=z.object({
+            device:z.string().min(1),
+            command:z.string().min(1),
+            payload:z.union([z.string(),z.number(),z.boolean()]).default("")
+          }).parse(input);
+          const topic=`cmnd/${value.device}/${value.command}`;
+          await mqtt.publish(topic,String(value.payload),{qos:0,retain:false});
+          return {ok:true,topic,payload:String(value.payload)};
+        }
+      },
+      {
         name:"mqtt.publish",
         description:"Publish an MQTT message.",
         capability:"mqtt.publish",
