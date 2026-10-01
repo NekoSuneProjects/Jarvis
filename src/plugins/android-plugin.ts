@@ -40,10 +40,32 @@ export const androidPlugin:JarvisPlugin={
   tools:[
     {
       name:"android.devices",
-      description:"List ADB-connected Android devices.",
+      description:"List ADB-connected Android/Android TV devices.",
       capability:"android.read",
       async execute(){
         return parseDevices(await adb(undefined,["devices","-l"]));
+      }
+    },
+    {
+      name:"android.pair",
+      description:"Pair to an Android or Android TV device using wireless ADB pairing.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({host:z.string().min(1),code:z.string().min(1)}).parse(input);
+        const result=await runProcess(config.adbBin,["pair",value.host,value.code],{timeoutMs:30000});
+        if(result.code!==0) throw new Error(result.stderr.trim() || "adb pair failed");
+        return {ok:true,output:result.stdout.trim()};
+      }
+    },
+    {
+      name:"android.connect",
+      description:"Connect to a paired Android or Android TV device over ADB.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({host:z.string().min(1)}).parse(input);
+        const result=await runProcess(config.adbBin,["connect",value.host],{timeoutMs:30000});
+        if(result.code!==0) throw new Error(result.stderr.trim() || "adb connect failed");
+        return {ok:true,output:result.stdout.trim()};
       }
     },
     {
@@ -175,6 +197,21 @@ export const androidPlugin:JarvisPlugin={
           adb(value.serial,["shell","dumpsys","connectivity"])
         ]);
         return {ip,connectivity};
+      }
+    },
+    {
+      name:"android.notification.post",
+      description:"Post a local notification to a connected Android device using cmd notification.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({
+          serial:z.string().optional(),
+          tag:z.string().default("jarvis"),
+          title:z.string().min(1),
+          text:z.string().default("")
+        }).parse(input);
+        await adb(value.serial,["shell","cmd","notification","post","-t",value.title,value.tag,value.text]);
+        return {ok:true,tag:value.tag};
       }
     },
     {
