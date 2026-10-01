@@ -32,6 +32,7 @@ import { createGithubPlugin } from "./plugins/github-plugin.js";
 import { createGooglePlugin } from "./plugins/google-plugin.js";
 import { createHomeAssistantPlugin } from "./plugins/home-assistant-plugin.js";
 import { createMemoryPlugin } from "./plugins/memory-plugin.js";
+import { createMapsPlugin } from "./plugins/maps-plugin.js";
 import { createNotificationsPlugin } from "./plugins/notifications-plugin.js";
 import { createNativeNotificationPlugin } from "./plugins/native-notification-plugin.js";
 import { createMqttPlugin } from "./plugins/mqtt-plugin.js";
@@ -84,6 +85,7 @@ export async function createServer(ai: AiProvider) {
   const githubPlugin = createGithubPlugin();
   const googlePlugin = createGooglePlugin();
   const memoryPlugin = createMemoryPlugin(store);
+  const mapsPlugin = createMapsPlugin(store);
   const mediaServersPlugin = createMediaServersPlugin();
   const lanSmartHomePlugin = createLanSmartHomePlugin();
   const notificationsPlugin = createNotificationsPlugin(store, events);
@@ -108,6 +110,7 @@ export async function createServer(ai: AiProvider) {
     githubPlugin,
     googlePlugin,
     memoryPlugin,
+    mapsPlugin,
     mediaServersPlugin,
     lanSmartHomePlugin,
     monitoringPlugin,
