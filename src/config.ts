@@ -56,6 +56,11 @@ const schema = z.object({
   EDGE_TTS_RATE: z.string().default("+0%"),
   EDGE_TTS_PITCH: z.string().default("+0Hz"),
 
+  CUSTOM_TTS_URL: z.string().default(""),
+  CUSTOM_TTS_API_KEY: z.string().default(""),
+  CUSTOM_TTS_FORMAT: z.string().default("wav"),
+  CUSTOM_TTS_VOICE_MAP_JSON: z.string().default("{}"),
+
   JARVIS_API_TOKEN: z.string().default(""),
   JARVIS_SECRET_KEY: z.string().default(""),
   ADB_BIN: z.string().default("adb"),
@@ -133,6 +138,12 @@ export const config = {
     voice: parsed.data.EDGE_TTS_VOICE,
     rate: parsed.data.EDGE_TTS_RATE,
     pitch: parsed.data.EDGE_TTS_PITCH
+  },
+  customTts:{
+    url:parsed.data.CUSTOM_TTS_URL,
+    apiKey:parsed.data.CUSTOM_TTS_API_KEY,
+    format:parsed.data.CUSTOM_TTS_FORMAT,
+    voiceMapJson:parsed.data.CUSTOM_TTS_VOICE_MAP_JSON
   },
   apiToken: parsed.data.JARVIS_API_TOKEN,
   secretKey: parsed.data.JARVIS_SECRET_KEY,
