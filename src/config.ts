@@ -98,7 +98,7 @@ if (!parsed.success) {
 }
 
 export const config = {
-  host: parsed.data.JARVIS_HOST,
+  host: parsed.data.JARVIS_LOCAL_ONLY.toLowerCase()!=="false" ? "127.0.0.1" : parsed.data.JARVIS_HOST,
   port: parsed.data.JARVIS_PORT,
   assistantName: parsed.data.JARVIS_NAME,
   ai: {
