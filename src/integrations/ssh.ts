@@ -7,6 +7,8 @@ export interface SshHostConfig {
   username:string;
   password?:string;
   privateKeyPath?:string;
+  hostFingerprint?:string;
+  agent?:string;
 }
 
 export class SshIntegration {
@@ -30,7 +32,13 @@ export class SshIntegration {
       port:host.port ?? 22,
       username:host.username,
       ...(host.password?{password:host.password}:{}),
-      ...(host.privateKeyPath?{privateKey:await fs.readFile(host.privateKeyPath)}:{})
+      ...(host.privateKeyPath?{privateKey:await fs.readFile(host.privateKeyPath)}:{}),
+      ...(!host.password && !host.privateKeyPath && (host.agent || process.env.SSH_AUTH_SOCK)
+        ? {agent:host.agent || process.env.SSH_AUTH_SOCK}
+        : {}),
+      ...(host.hostFingerprint
+        ? {hostHash:"sha256" as const,hostVerifier:(key:string)=>key===host.hostFingerprint}
+        : {})
     };
   }
 
@@ -76,6 +84,54 @@ export class SshIntegration {
       client.on("error",(error)=>finish(()=>reject(error)));
       client.connect(config);
     });
+  }
+
+  private async withClient<T>(name:string,run:(client:Client)=>Promise<T>):Promise<T>{
+    const connection=await this.connectionConfig(name);
+    return new Promise<T>((resolve,reject)=>{
+      const client=new Client();
+      client.once("ready",()=>{
+        run(client).then((value)=>{client.end();resolve(value);},(error)=>{client.end();reject(error);});
+      });
+      client.once("error",reject);
+      client.connect(connection);
+    });
+  }
+
+  async sftpList(name:string,remotePath:string){
+    return this.withClient(name,(client)=>new Promise((resolve,reject)=>{
+      client.sftp((error,sftp)=>{
+        if(error) return reject(error);
+        sftp.readdir(remotePath,(err,list)=>{
+          if(err) return reject(err);
+          resolve(list.map((item)=>({
+            name:item.filename,
+            size:item.attrs.size,
+            mode:item.attrs.mode,
+            modifiedAt:item.attrs.mtime ? new Date(item.attrs.mtime*1000).toISOString() : null
+          })));
+        });
+      });
+    }));
+  }
+
+  async upload(name:string,localPath:string,remotePath:string){
+    return this.withClient(name,(client)=>new Promise<{ok:true}>((resolve,reject)=>{
+      client.sftp((error,sftp)=>{
+        if(error) return reject(error);
+        sftp.fastPut(localPath,remotePath,(err)=>err?reject(err):resolve({ok:true}));
+      });
+    }));
+  }
+
+  async download(name:string,remotePath:string,localPath:string){
+    await fs.mkdir((await import("node:path")).dirname(localPath),{recursive:true});
+    return this.withClient(name,(client)=>new Promise<{ok:true}>((resolve,reject)=>{
+      client.sftp((error,sftp)=>{
+        if(error) return reject(error);
+        sftp.fastGet(remotePath,localPath,(err)=>err?reject(err):resolve({ok:true}));
+      });
+    }));
   }
 
   async test(name:string){
