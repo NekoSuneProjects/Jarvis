@@ -60,7 +60,12 @@ export function createDevicesPlugin(devices:DeviceRegistry):JarvisPlugin{
             deviceId:{type:"string"},
             command:{
               type:"string",
-              enum:["system.info","process.list","app.open","url.open"]
+              enum:[
+                "system.info","process.list","app.open","url.open",
+                "screenshot.capture","notification.send","file.read","file.write",
+                "power.lock","power.sleep","power.restart","power.shutdown",
+                "audio.play","audio.volume","tts.speak"
+              ]
             },
             args:{type:"object"}
           },
@@ -70,7 +75,12 @@ export function createDevicesPlugin(devices:DeviceRegistry):JarvisPlugin{
         async execute(input){
           const value=z.object({
             deviceId:z.string().min(1),
-            command:z.enum(["system.info","process.list","app.open","url.open"]),
+            command:z.enum([
+              "system.info","process.list","app.open","url.open",
+              "screenshot.capture","notification.send","file.read","file.write",
+              "power.lock","power.sleep","power.restart","power.shutdown",
+              "audio.play","audio.volume","tts.speak"
+            ]),
             args:z.record(z.unknown()).default({})
           }).parse(input);
           return devices.enqueueCommand(value.deviceId,value.command,value.args);
