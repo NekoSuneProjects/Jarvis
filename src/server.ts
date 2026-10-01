@@ -340,6 +340,26 @@ export async function createServer(ai: AiProvider) {
     return {ok:true};
   });
 
+  app.get<{ Querystring:{ path:string } }>("/api/v1/media/local", async (request,reply) => {
+    try{
+      const file=workspacePath(request.query.path);
+      const bytes=await fs.readFile(file);
+      const lower=file.toLowerCase();
+      const type=lower.endsWith(".mp3")?"audio/mpeg":
+        lower.endsWith(".wav")?"audio/wav":
+        lower.endsWith(".ogg")?"audio/ogg":
+        lower.endsWith(".flac")?"audio/flac":
+        lower.endsWith(".m4a")?"audio/mp4":
+        lower.endsWith(".mp4")?"video/mp4":
+        "application/octet-stream";
+      reply.header("content-type",type);
+      reply.header("cache-control","private, max-age=60");
+      return reply.send(bytes);
+    }catch(error){
+      return reply.code(404).send({error:error instanceof Error?error.message:"Media file not found"});
+    }
+  });
+
   app.get("/api/v1/metrics", async () => ({
     websocketConnections:metrics.websocketConnections,
     tts:{
