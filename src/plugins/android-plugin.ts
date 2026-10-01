@@ -156,6 +156,128 @@ export const androidPlugin:JarvisPlugin={
       }
     },
     {
+      name:"android.battery",
+      description:"Read Android battery/charging state.",
+      capability:"android.read",
+      async execute(input){
+        const value=z.object({serial:z.string().optional()}).parse(input??{});
+        return {raw:await adb(value.serial,["shell","dumpsys","battery"])};
+      }
+    },
+    {
+      name:"android.network",
+      description:"Read Android network interfaces and connectivity state.",
+      capability:"android.read",
+      async execute(input){
+        const value=z.object({serial:z.string().optional()}).parse(input??{});
+        const [ip,connectivity]=await Promise.all([
+          adb(value.serial,["shell","ip","addr"]),
+          adb(value.serial,["shell","dumpsys","connectivity"])
+        ]);
+        return {ip,connectivity};
+      }
+    },
+    {
+      name:"android.notifications",
+      description:"Read Android notification manager state where ADB permissions allow it.",
+      capability:"android.read",
+      async execute(input){
+        const value=z.object({serial:z.string().optional()}).parse(input??{});
+        return {raw:await adb(value.serial,["shell","dumpsys","notification","--noredact"])};
+      }
+    },
+    {
+      name:"android.bluetooth",
+      description:"Read Android Bluetooth manager state.",
+      capability:"android.read",
+      async execute(input){
+        const value=z.object({serial:z.string().optional()}).parse(input??{});
+        return {raw:await adb(value.serial,["shell","dumpsys","bluetooth_manager"])};
+      }
+    },
+    {
+      name:"android.permission.microphone",
+      description:"Grant or revoke RECORD_AUDIO for an installed Android package.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({serial:z.string().optional(),package:z.string().min(1),grant:z.boolean().default(true)}).parse(input);
+        await adb(value.serial,["shell","pm",value.grant?"grant":"revoke",value.package,"android.permission.RECORD_AUDIO"]);
+        return {ok:true};
+      }
+    },
+    {
+      name:"android.permission.notifications",
+      description:"Grant or revoke POST_NOTIFICATIONS for an Android package.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({serial:z.string().optional(),package:z.string().min(1),grant:z.boolean().default(true)}).parse(input);
+        await adb(value.serial,["shell","pm",value.grant?"grant":"revoke",value.package,"android.permission.POST_NOTIFICATIONS"]);
+        return {ok:true};
+      }
+    },
+    {
+      name:"android.media",
+      description:"Send Android media remote key events.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({serial:z.string().optional(),action:z.enum(["play_pause","play","pause","next","previous","stop","volume_up","volume_down"])}).parse(input);
+        const key={play_pause:"KEYCODE_MEDIA_PLAY_PAUSE",play:"KEYCODE_MEDIA_PLAY",pause:"KEYCODE_MEDIA_PAUSE",next:"KEYCODE_MEDIA_NEXT",previous:"KEYCODE_MEDIA_PREVIOUS",stop:"KEYCODE_MEDIA_STOP",volume_up:"KEYCODE_VOLUME_UP",volume_down:"KEYCODE_VOLUME_DOWN"}[value.action];
+        await adb(value.serial,["shell","input","keyevent",key]);
+        return {ok:true,action:value.action};
+      }
+    },
+    {
+      name:"android.alarm.set",
+      description:"Create an Android local alarm using the standard SET_ALARM intent.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({serial:z.string().optional(),hour:z.number().int().min(0).max(23),minute:z.number().int().min(0).max(59),message:z.string().default("Jarvis alarm")}).parse(input);
+        await adb(value.serial,["shell","am","start","-a","android.intent.action.SET_ALARM","--ei","android.intent.extra.alarm.HOUR",String(value.hour),"--ei","android.intent.extra.alarm.MINUTES",String(value.minute),"--es","android.intent.extra.alarm.MESSAGE",value.message]);
+        return {ok:true};
+      }
+    },
+    {
+      name:"android.timer.set",
+      description:"Create an Android local timer using the standard SET_TIMER intent.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({serial:z.string().optional(),seconds:z.number().int().positive(),message:z.string().default("Jarvis timer")}).parse(input);
+        await adb(value.serial,["shell","am","start","-a","android.intent.action.SET_TIMER","--ei","android.intent.extra.alarm.LENGTH",String(value.seconds),"--es","android.intent.extra.alarm.MESSAGE",value.message]);
+        return {ok:true};
+      }
+    },
+    {
+      name:"android.deeplink",
+      description:"Open an Android deep link/URL.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({serial:z.string().optional(),url:z.string().min(1)}).parse(input);
+        await adb(value.serial,["shell","am","start","-a","android.intent.action.VIEW","-d",value.url]);
+        return {ok:true,url:value.url};
+      }
+    },
+    {
+      name:"android.service.start",
+      description:"Start an Android service or foreground service component.",
+      capability:"android.control",
+      async execute(input){
+        const value=z.object({serial:z.string().optional(),component:z.string().min(1),foreground:z.boolean().default(true)}).parse(input);
+        await adb(value.serial,["shell","am",value.foreground?"start-foreground-service":"startservice","-n",value.component]);
+        return {ok:true,foreground:value.foreground};
+      }
+    },
+    {
+      name:"android.presence",
+      description:"Check whether a selected Android device is currently connected through ADB.",
+      capability:"android.read",
+      async execute(input){
+        const value=z.object({serial:z.string().min(1)}).parse(input);
+        const devices=parseDevices(await adb(undefined,["devices","-l"]));
+        const device=devices.find((item)=>item.serial===value.serial);
+        return {present:Boolean(device&&device.state==="device"),device:device??null};
+      }
+    },
+    {
       name:"android.install",
       description:"Install or replace an APK from the Jarvis workspace.",
       capability:"android.control",
