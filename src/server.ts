@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import websocket from "@fastify/websocket";
 import Fastify from "fastify";
+import { z } from "zod";
 import { config } from "./config.js";
 import { BrowserAutomation } from "./browser/automation.js";
 import type { AiProvider, ChatMessage } from "./ai/types.js";
@@ -274,6 +275,77 @@ export async function createServer(ai: AiProvider) {
     });
 
     socket.on("close", unsubscribe);
+  });
+
+  const settingSchema=z.object({
+    assistantName:z.string().min(1).max(100).optional(),
+    aiEndpoint:z.string().url().optional(),
+    aiModel:z.string().min(1).max(200).optional(),
+    ttsProvider:z.enum(["piper","edge"]).optional(),
+    piperVoice:z.enum(["en_GB-jarvis-medium","en_GB-jarvis-high"]).optional(),
+    wakeWordMode:z.enum(["always","push-to-talk","disabled"]).optional(),
+    memoryEnabled:z.boolean().optional()
+  }).strict();
+
+  app.get("/api/v1/settings", async () => ({
+    defaults:{
+      assistantName:config.assistantName,
+      aiEndpoint:config.ai.baseUrl,
+      aiModel:config.ai.model,
+      ttsProvider:"piper",
+      piperVoice:config.piper.voice,
+      wakeWordMode:"always",
+      memoryEnabled:true
+    },
+    settings:store.listSettings()
+  }));
+
+  app.patch<{ Body: unknown }>("/api/v1/settings", async (request, reply) => {
+    const parsed=settingSchema.safeParse(request.body ?? {});
+    if(!parsed.success){
+      return reply.code(400).send({
+        ok:false,
+        error:"Invalid settings",
+        details:parsed.error.flatten().fieldErrors
+      });
+    }
+    const entries=Object.entries(parsed.data).map(([key,value])=>({key,value}));
+    store.importSettings(entries);
+    store.audit("api","settings.update",{keys:entries.map((entry)=>entry.key)});
+    events.publish("settings.updated",{keys:entries.map((entry)=>entry.key)});
+    return {ok:true,settings:store.listSettings()};
+  });
+
+  app.post<{ Body: { settings?: Array<{ key:string; value:unknown }> } }>(
+    "/api/v1/settings/import",
+    async (request, reply) => {
+      const entries=request.body?.settings ?? [];
+      const object=Object.fromEntries(entries.map((entry)=>[entry.key,entry.value]));
+      const parsed=settingSchema.partial().safeParse(object);
+      if(!parsed.success){
+        return reply.code(400).send({
+          ok:false,
+          error:"Invalid settings import",
+          details:parsed.error.flatten().fieldErrors
+        });
+      }
+      const imported=Object.entries(parsed.data).map(([key,value])=>({key,value}));
+      store.importSettings(imported);
+      store.audit("api","settings.import",{keys:imported.map((entry)=>entry.key)});
+      events.publish("settings.updated",{keys:imported.map((entry)=>entry.key)});
+      return {ok:true,settings:store.listSettings()};
+    }
+  );
+
+  app.get("/api/v1/settings/export", async () => ({
+    settings:store.listSettings()
+  }));
+
+  app.delete("/api/v1/settings", async () => {
+    store.resetSettings();
+    store.audit("api","settings.reset",{});
+    events.publish("settings.updated",{reset:true});
+    return {ok:true};
   });
 
   app.get("/api/v1/permissions", async () => ({
