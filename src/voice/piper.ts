@@ -100,9 +100,17 @@ async function downloadFile(url: string, destination: string): Promise<void> {
 
 export class PiperTtsProvider implements TtsProvider {
   readonly id = "piper";
+  private selectedVoice:JarvisVoiceId=config.piper.voice;
+
+  get voiceId():JarvisVoiceId{return this.selectedVoice;}
+
+  setVoice(voice:JarvisVoiceId){
+    this.selectedVoice=voice;
+    return this.selectedVoice;
+  }
 
   private get voice(): VoiceDefinition {
-    return VOICES[config.piper.voice];
+    return VOICES[this.selectedVoice];
   }
 
   private get modelDirectory(): string {
