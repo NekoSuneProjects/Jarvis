@@ -41,6 +41,32 @@ class JarvisClient {
     return _json(response);
   }
 
+  Future<Map<String,dynamic>> settings() async {
+    final response=await http.get(_uri('/api/v1/settings'),headers:_headers);
+    return _json(response);
+  }
+
+  Future<Map<String,dynamic>> updateSettings(Map<String,dynamic> values) async {
+    final response=await http.patch(
+      _uri('/api/v1/settings'),
+      headers:_jsonHeaders,
+      body:jsonEncode(values),
+    );
+    return _json(response);
+  }
+
+  Future<Map<String,dynamic>> piperPreview({String? voice,String? text}) async {
+    final response=await http.post(
+      _uri('/api/v1/voice/piper/preview'),
+      headers:_jsonHeaders,
+      body:jsonEncode({
+        if(voice!=null)'voice':voice,
+        if(text!=null)'text':text,
+      }),
+    );
+    return _json(response);
+  }
+
   Future<List<dynamic>> integrations() async {
     final response = await http.get(_uri('/api/v1/integrations'), headers: _headers);
     return (_json(response)['integrations'] as List<dynamic>? ?? []);
