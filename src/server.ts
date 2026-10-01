@@ -64,6 +64,7 @@ import { JarvisDatabase } from "./storage/database.js";
 import { SecretVault } from "./security/secret-vault.js";
 import { ToolRouter } from "./tools/tool-router.js";
 import { workspacePath } from "./utils/workspace-path.js";
+import { RotatingJsonLog } from "./utils/rotating-log.js";
 import { runProcess } from "./utils/process.js";
 
 export async function createServer(ai: AiProvider) {
@@ -71,8 +72,31 @@ export async function createServer(ai: AiProvider) {
   const tls=tlsEnabled
     ? {cert:await fs.readFile(config.tls.cert),key:await fs.readFile(config.tls.key)}
     : undefined;
-  const app = Fastify({ logger: true, ...(tls?{https:tls}:{}) });
+  const app = Fastify({ logger: {level:config.logging.level}, ...(tls?{https:tls}:{}) });
+  const fileLog=new RotatingJsonLog(config.logging.file,config.logging.maxBytes);
   await app.register(websocket);
+
+  app.addHook("onResponse", async (request, reply) => {
+    fileLog.write({
+      level:"info",
+      type:"http",
+      method:request.method,
+      url:request.url,
+      statusCode:reply.statusCode,
+      requestId:request.id
+    });
+  });
+
+  app.addHook("onError", async (request, _reply, error) => {
+    fileLog.write({
+      level:"error",
+      type:"http-error",
+      method:request.method,
+      url:request.url,
+      requestId:request.id,
+      error:error.message
+    });
+  });
 
   const database = new JarvisDatabase();
   const store = new AssistantStore(database);
@@ -90,7 +114,8 @@ export async function createServer(ai: AiProvider) {
   const metrics={
     websocketConnections:0,
     tts:{count:0,totalMs:0,lastMs:0},
-    ai:{count:0,totalMs:0,lastMs:0}
+    ai:{count:0,totalMs:0,lastMs:0},
+    get integrationReconnect(){return integrations.reconnectMetrics();}
   };
   const startupDiagnostics=[{
     at:new Date().toISOString(),
