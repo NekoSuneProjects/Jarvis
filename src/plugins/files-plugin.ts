@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { watch, type FSWatcher } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import JSZip from "jszip";
@@ -19,6 +20,8 @@ async function walk(dir:string,root:string,query:string,results:Array<{path:stri
     if(entry.isDirectory()) await walk(target,root,query,results,limit,depth+1);
   }
 }
+
+const watchers=new Map<string,{watcher:FSWatcher;events:Array<{at:string;event:string;filename:string|null}>}>();
 
 export const filesPlugin:JarvisPlugin={
   id:"files",
@@ -137,6 +140,48 @@ export const filesPlugin:JarvisPlugin={
         await fs.mkdir(path.dirname(target),{recursive:true});
         await fs.writeFile(target,await zip.generateAsync({type:"nodebuffer"}));
         return {ok:true,path:value.output};
+      }
+    },
+    {
+      name:"files.watch.start",
+      description:"Start watching a workspace file or directory for changes.",
+      capability:"files.read",
+      async execute(input){
+        const value=z.object({id:z.string().min(1),path:z.string().default("."),recursive:z.boolean().default(false)}).parse(input);
+        if(watchers.has(value.id)) throw new Error("Watcher ID already exists");
+        const events:Array<{at:string;event:string;filename:string|null}>=[];
+        const watcher=watch(workspacePath(value.path),{recursive:value.recursive},(event,filename)=>{
+          events.push({at:new Date().toISOString(),event,filename:filename?.toString() ?? null});
+          if(events.length>500) events.splice(0,events.length-500);
+        });
+        watchers.set(value.id,{watcher,events});
+        return {ok:true,id:value.id,path:value.path};
+      }
+    },
+    {
+      name:"files.watch.events",
+      description:"Read queued events from a workspace file watcher.",
+      capability:"files.read",
+      async execute(input){
+        const value=z.object({id:z.string().min(1),clear:z.boolean().default(true)}).parse(input);
+        const current=watchers.get(value.id);
+        if(!current) throw new Error("Watcher not found");
+        const events=[...current.events];
+        if(value.clear) current.events.length=0;
+        return {id:value.id,events};
+      }
+    },
+    {
+      name:"files.watch.stop",
+      description:"Stop a workspace file watcher.",
+      capability:"files.read",
+      async execute(input){
+        const value=z.object({id:z.string().min(1)}).parse(input);
+        const current=watchers.get(value.id);
+        if(!current) return {ok:false};
+        current.watcher.close();
+        watchers.delete(value.id);
+        return {ok:true};
       }
     },
     {
