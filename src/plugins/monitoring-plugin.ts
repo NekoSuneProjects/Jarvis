@@ -128,6 +128,33 @@ export const monitoringPlugin:JarvisPlugin={
       }
     },
     {
+      name:"system.monitor.disk_health",
+      description:"Read physical disk health and SMART-related details when available.",
+      capability:"system.read",
+      async execute(){
+        const disks=await si.diskLayout();
+        return disks.map((disk)=>({
+          device:disk.device,
+          type:disk.type,
+          name:disk.name,
+          vendor:disk.vendor,
+          size:disk.size,
+          interfaceType:disk.interfaceType,
+          smartStatus:disk.smartStatus,
+          temperature:disk.temperature
+        }));
+      }
+    },
+    {
+      name:"system.monitor.services",
+      description:"List operating-system services and their running state.",
+      capability:"system.read",
+      async execute(input){
+        const value=z.object({name:z.string().default("*")}).parse(input ?? {});
+        return si.services(value.name);
+      }
+    },
+    {
       name:"system.monitor.wifi",
       description:"Read Wi-Fi interfaces/connections when supported by the operating system.",
       capability:"system.read",
