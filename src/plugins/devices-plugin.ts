@@ -41,6 +41,10 @@ export function createDevicesPlugin(devices:DeviceRegistry):JarvisPlugin{
             name:z.string().min(1).optional(),
             room:z.string().optional(),
             icon:z.string().optional(),
+            permissionProfile:z.object({
+              allowedCommands:z.array(z.string()).optional(),
+              deniedCommands:z.array(z.string()).optional()
+            }).optional(),
             metadata:z.record(z.unknown()).optional()
           }).parse(input);
           return {ok:devices.updateDevice(value.deviceId,value)};
