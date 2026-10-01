@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 953 / 1215
-- **Remaining:** 262
-- **Progress:** **78.44%**
+- **Completed:** 960 / 1215
+- **Remaining:** 255
+- **Progress:** **79.01%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -1192,16 +1192,16 @@ Implemented in the repository so far:
 - [x] OR conditions
 - [x] NOT conditions
 - [x] Time windows
-- [ ] Device state
-- [ ] Network state
+- [x] Device state
+- [x] Network state
 - [x] Presence
-- [ ] Weather
-- [ ] Calendar
-- [ ] Email
+- [x] Weather
+- [x] Calendar
+- [x] Email
 - [x] Webhooks
 - [x] MQTT
-- [ ] System state
-- [ ] AI condition
+- [x] System state
+- [x] AI condition
 - [x] Cooldown
 - [x] Loop prevention
 
