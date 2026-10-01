@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 823 / 1215
-- **Remaining:** 392
-- **Progress:** **67.74%**
+- **Completed:** 855 / 1215
+- **Remaining:** 360
+- **Progress:** **70.37%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -112,26 +112,26 @@ Implemented in the repository so far:
 - [x] Add API key storage foundation
 - [x] Add encrypted secrets storage
 - [ ] Add connection status UI
-- [ ] Add reconnect support
+- [x] Add reconnect support
 - [ ] Add refresh-token support
 - [x] Add integration health checks
 - [x] Add rate-limit handling foundation
 - [x] Add retry handling
 - [x] Add timeout handling
-- [ ] Add integration logs
+- [x] Add integration logs
 - [x] Add audit logs for sensitive actions
 - [x] Add integration capability discovery
 - [x] Add integration versioning
-- [ ] Add plugin dependency system
+- [x] Add plugin dependency system
 - [ ] Add plugin update system
 - [ ] Add integration test framework
 - [ ] Add mock integration mode for development
 - [ ] Add offline fallback support where possible
 - [x] Add WebSocket event support
 - [x] Add webhook event support
-- [ ] Add scheduled polling support
-- [ ] Add background event queue
-- [ ] Add integration error notifications
+- [x] Add scheduled polling support
+- [x] Add background event queue
+- [x] Add integration error notifications
 
 ---
 
@@ -575,8 +575,8 @@ Implemented in the repository so far:
 - [x] List repositories
 - [x] Search repositories
 - [x] Read repository
-- [ ] Clone repository
-- [ ] Pull repository
+- [x] Clone repository
+- [x] Pull repository
 - [x] Read issues
 - [x] Create issue
 - [x] Update issue
@@ -585,14 +585,14 @@ Implemented in the repository so far:
 - [x] Create pull request
 - [x] Review pull request
 - [x] Read Actions runs
-- [ ] Read build logs
+- [x] Read build logs
 - [x] Re-run workflow
 - [x] Read releases
 - [x] Create release
 - [x] Read branches
 - [x] Create branch
-- [ ] Commit files
-- [ ] Push changes
+- [x] Commit files
+- [x] Push changes
 - [x] Permission confirmations for write actions
 
 ---
@@ -604,7 +604,7 @@ Implemented in the repository so far:
 - [x] Connection test
 - [x] Read entities
 - [x] Read devices
-- [ ] Read areas
+- [x] Read areas
 - [x] Turn entity on/off
 - [x] Set brightness
 - [x] Set colour
@@ -616,9 +616,9 @@ Implemented in the repository so far:
 - [x] Read automation state
 - [x] Trigger service calls
 - [ ] Subscribe to state changes
-- [ ] Presence integration
-- [ ] Alarm panel support
-- [ ] Media player support
+- [x] Presence integration
+- [x] Alarm panel support
+- [x] Media player support
 - [x] Dashboard device grouping
 
 ---
@@ -753,12 +753,12 @@ Implemented in the repository so far:
 
 ## Android TV / Google TV
 
-- [ ] Device discovery
-- [ ] Pairing
+- [x] Device discovery
+- [x] Pairing
 - [x] ADB support
 - [x] Open app
-- [ ] Media controls
-- [ ] Volume
+- [x] Media controls
+- [x] Volume
 - [x] Input navigation
 - [x] Text input
 - [x] Read current app
@@ -965,8 +965,8 @@ Implemented in the repository so far:
 - [x] Stop stack
 - [x] Restart stack
 - [x] Update stack foundation
-- [ ] Confirmation for destructive commands
-- [ ] Remote Docker support
+- [x] Confirmation for destructive commands
+- [x] Remote Docker support
 
 ---
 
@@ -1020,7 +1020,7 @@ Implemented in the repository so far:
 - [x] Windows notifications
 - [x] Linux notifications
 - [x] macOS notifications
-- [ ] Android notifications
+- [x] Android notifications
 - [ ] Future iOS notifications
 - [ ] Email notifications
 - [ ] GitHub notifications
@@ -1031,7 +1031,7 @@ Implemented in the repository so far:
 - [x] Jarvis notification summary foundation
 - [x] Priority filtering
 - [x] Quiet hours
-- [ ] Read aloud option
+- [x] Read aloud option
 
 ---
 
@@ -1092,8 +1092,8 @@ Implemented in the repository so far:
 - [x] Recurring alarms
 - [x] Weekday alarms
 - [x] Named alarms
-- [ ] Custom alarm sounds
-- [ ] TTS alarm
+- [x] Custom alarm sounds
+- [x] TTS alarm
 - [x] Snooze
 - [x] Dismiss
 - [ ] Cross-device sync
@@ -1111,7 +1111,7 @@ Implemented in the repository so far:
 - [x] Remove time
 - [x] Cancel timer
 - [x] Timer notifications
-- [ ] Timer TTS
+- [x] Timer TTS
 - [ ] Cross-device sync
 - [x] Offline operation
 
@@ -1126,7 +1126,7 @@ Implemented in the repository so far:
 - [ ] Presence reminder
 - [ ] Location reminder
 - [ ] Reminder priority
-- [ ] Read reminder aloud
+- [x] Read reminder aloud
 - [x] Snooze
 - [x] Complete
 - [ ] Cross-device sync
@@ -1142,9 +1142,9 @@ Implemented in the repository so far:
 - [x] Tag notes
 - [x] Pin notes
 - [ ] Voice-created notes
-- [ ] Markdown support
+- [x] Markdown support
 - [ ] Sync between devices
-- [ ] Export notes
+- [x] Export notes
 
 ---
 
@@ -1157,8 +1157,8 @@ Implemented in the repository so far:
 - [x] Remove item
 - [x] Check item
 - [x] Clear checked
-- [ ] Read list aloud
-- [ ] Share list
+- [x] Read list aloud
+- [x] Share list
 - [ ] Cross-device sync
 
 ---
@@ -1345,7 +1345,7 @@ Implemented in the repository so far:
 - [x] Move
 - [x] Copy
 - [x] Delete with confirmation
-- [ ] File watcher
+- [x] File watcher
 
 ---
 
