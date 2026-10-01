@@ -333,6 +333,26 @@ export class AssistantStore {
     return this.database.db.prepare("UPDATE routines SET enabled=?,updated_at=? WHERE id=?").run(enabled?1:0,now(),id).changes>0;
   }
 
+  exportRoutines() {
+    return (this.listRoutines() as any[]).map((row)=>({
+      name:row.name,
+      enabled:Boolean(row.enabled),
+      trigger:JSON.parse(row.trigger_json),
+      actions:JSON.parse(row.actions_json),
+      conditions:JSON.parse(row.conditions_json || "[]")
+    }));
+  }
+
+  importRoutines(items:Array<{name:string;enabled?:boolean;trigger:unknown;actions:unknown[];conditions?:unknown[]}>) {
+    const created=[];
+    for(const item of items){
+      const routine=this.createRoutine(item.name,item.trigger,item.actions,item.conditions ?? []) as any;
+      if(item.enabled===false && routine?.id) this.setRoutineEnabled(Number(routine.id),false);
+      created.push(routine);
+    }
+    return created;
+  }
+
   dueTimers() {
     return this.database.db.prepare("SELECT * FROM timers WHERE state='running' AND ends_at<=?").all(now());
   }
