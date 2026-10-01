@@ -371,7 +371,12 @@ export async function createServer(ai: AiProvider) {
     ttsProvider:z.enum(["piper","edge"]).optional(),
     piperVoice:z.enum(["en_GB-jarvis-medium","en_GB-jarvis-high"]).optional(),
     wakeWordMode:z.enum(["always","push-to-talk","disabled"]).optional(),
-    memoryEnabled:z.boolean().optional()
+    memoryEnabled:z.boolean().optional(),
+    localOnly:z.boolean().optional(),
+    homeAssistantUrl:z.string().optional(),
+    homeAssistantToken:z.string().optional(),
+    discordBotToken:z.string().optional(),
+    firstRunComplete:z.boolean().optional()
   }).strict();
 
   app.get("/api/v1/settings", async () => ({
@@ -382,7 +387,12 @@ export async function createServer(ai: AiProvider) {
       ttsProvider:"piper",
       piperVoice:config.piper.voice,
       wakeWordMode:"always",
-      memoryEnabled:true
+      memoryEnabled:true,
+      localOnly:false,
+      homeAssistantUrl:config.homeAssistant.url,
+      homeAssistantToken:"",
+      discordBotToken:"",
+      firstRunComplete:false
     },
     settings:store.listSettings()
   }));
