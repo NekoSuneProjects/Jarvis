@@ -300,13 +300,15 @@ export class AssistantStore {
     return this.database.db.prepare("SELECT * FROM notifications WHERE id=?").get(result.lastInsertRowid);
   }
 
-  listNotifications(limit=100, unreadOnly=false) {
-    if(unreadOnly) return this.database.db.prepare(
-      "SELECT * FROM notifications WHERE is_read=0 ORDER BY created_at DESC LIMIT ?"
-    ).all(limit);
-    return this.database.db.prepare(
-      "SELECT * FROM notifications ORDER BY created_at DESC LIMIT ?"
-    ).all(limit);
+  listNotifications(limit=100, unreadOnly=false, minPriority:"low"|"normal"|"high"|"critical"="low") {
+    const rank={low:0,normal:1,high:2,critical:3}[minPriority];
+    const rows=this.database.db.prepare(
+      `SELECT * FROM notifications
+       WHERE (?=0 OR is_read=0)
+       ORDER BY created_at DESC LIMIT ?`
+    ).all(unreadOnly?1:0,limit) as any[];
+    const priorities:Record<string,number>={low:0,normal:1,high:2,critical:3};
+    return rows.filter((row)=> (priorities[row.priority] ?? 1)>=rank);
   }
 
   markNotificationRead(id:number,read=true) {
