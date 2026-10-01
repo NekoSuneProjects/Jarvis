@@ -112,6 +112,30 @@ export function createMediaServersPlugin():JarvisPlugin{
         async execute(){return jellyfin.sessions();}
       },
       {
+        name:"plex.discover",
+        description:"Discover Plex resources/servers for the configured account token.",
+        capability:"media.read",
+        async execute(){return plex.discoverServers();}
+      },
+      {
+        name:"plex.recent",
+        description:"Read recently added Plex media.",
+        capability:"media.read",
+        async execute(input){const value=z.object({limit:z.number().int().min(1).max(100).default(20)}).parse(input??{});return plex.recentlyAdded(value.limit);}
+      },
+      {
+        name:"plex.continue",
+        description:"Read Plex continue-watching hub.",
+        capability:"media.read",
+        async execute(){return plex.continueWatching();}
+      },
+      {
+        name:"plex.clients",
+        description:"List Plex player clients known to the server.",
+        capability:"media.read",
+        async execute(){return plex.clients();}
+      },
+      {
         name:"plex.search",
         description:"Search Plex media.",
         capability:"media.read",
