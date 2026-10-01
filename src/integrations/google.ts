@@ -94,6 +94,12 @@ export class GoogleIntegration {
     });
   }
 
+  calendarRsvp(calendarId:string,eventId:string,email:string,responseStatus:"accepted"|"declined"|"tentative"|"needsAction"){
+    return this.calendarUpdate(calendarId,eventId,{
+      attendees:[{email,responseStatus}]
+    });
+  }
+
   calendarDelete(calendarId:string,eventId:string){
     return this.request("https://www.googleapis.com",`/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}`,{
       method:"DELETE"
@@ -130,6 +136,35 @@ export class GoogleIntegration {
 
   driveDownload(id:string){
     return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}?alt=media`);
+  }
+
+  driveExport(id:string,mimeType:string){
+    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}/export?mimeType=${encodeURIComponent(mimeType)}`);
+  }
+
+  driveCreateGoogleFile(name:string,mimeType:string,parentId?:string){
+    return this.request("https://www.googleapis.com","/drive/v3/files",{
+      method:"POST",
+      body:JSON.stringify({name,mimeType,...(parentId?{parents:[parentId]}:{})})
+    });
+  }
+
+  driveShare(id:string,email:string,role:"reader"|"commenter"|"writer"="reader"){
+    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}/permissions?sendNotificationEmail=true`,{
+      method:"POST",
+      body:JSON.stringify({type:"user",role,emailAddress:email})
+    });
+  }
+
+  driveComments(id:string){
+    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}/comments?fields=comments(id,content,createdTime,modifiedTime,resolved,author,quotedFileContent,replies)`);
+  }
+
+  driveReplyComment(id:string,commentId:string,content:string){
+    return this.request("https://www.googleapis.com",`/drive/v3/files/${encodeURIComponent(id)}/comments/${encodeURIComponent(commentId)}/replies`,{
+      method:"POST",
+      body:JSON.stringify({content})
+    });
   }
 
   driveCreateFolder(name:string,parentId?:string){
