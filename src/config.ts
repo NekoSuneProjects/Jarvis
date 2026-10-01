@@ -18,6 +18,7 @@ const schema = z.object({
   JARVIS_TLS_CERT: z.string().default(""),
   JARVIS_TLS_KEY: z.string().default(""),
   JARVIS_LOCAL_ONLY: z.string().default("true"),
+  JARVIS_LAN_ONLY: z.string().default("true"),
 
   HOME_ASSISTANT_URL: z.string().default(""),
   HOME_ASSISTANT_TOKEN: z.string().default(""),
@@ -116,6 +117,7 @@ export const config = {
     key:parsed.data.JARVIS_TLS_KEY
   },
   localOnly:parsed.data.JARVIS_LOCAL_ONLY.toLowerCase()!=="false",
+  lanOnly:parsed.data.JARVIS_LAN_ONLY.toLowerCase()!=="false",
   homeAssistant: {
     url: parsed.data.HOME_ASSISTANT_URL,
     token: parsed.data.HOME_ASSISTANT_TOKEN
