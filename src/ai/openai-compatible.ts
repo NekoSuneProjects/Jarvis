@@ -25,15 +25,36 @@ type CompletionResponse = {
 };
 
 export class OpenAiCompatibleProvider implements AiProvider {
-  public readonly id = config.ai.provider;
+  public readonly id:string;
+  private readonly baseUrl:string;
+  private readonly apiKey:string;
+  private readonly model:string;
+  private readonly temperature:number;
+  private readonly timeoutMs:number;
+
+  constructor(options:Partial<{
+    id:string;
+    baseUrl:string;
+    apiKey:string;
+    model:string;
+    temperature:number;
+    timeoutMs:number;
+  }>={}){
+    this.id=options.id ?? config.ai.provider;
+    this.baseUrl=(options.baseUrl ?? this.baseUrl).replace(/\/$/,"");
+    this.apiKey=options.apiKey ?? this.apiKey;
+    this.model=options.model ?? this.model;
+    this.temperature=options.temperature ?? this.temperature;
+    this.timeoutMs=options.timeoutMs ?? this.timeoutMs;
+  }
 
   private headers(): Record<string, string> {
     const headers: Record<string, string> = {
       "content-type": "application/json"
     };
 
-    if (config.ai.apiKey) {
-      headers.authorization = `Bearer ${config.ai.apiKey}`;
+    if (this.apiKey) {
+      headers.authorization = `Bearer ${this.apiKey}`;
     }
 
     return headers;
@@ -71,17 +92,17 @@ export class OpenAiCompatibleProvider implements AiProvider {
 
   async chat(request: ChatRequest): Promise<ChatResponse> {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), config.ai.timeoutMs);
+    const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
 
     try {
-      const response = await fetchWithRetry(`${config.ai.baseUrl}/chat/completions`, {
+      const response = await fetchWithRetry(`${this.baseUrl}/chat/completions`, {
         method: "POST",
         headers: this.headers(),
         signal: controller.signal,
         body: JSON.stringify({
-          model: request.model ?? config.ai.model,
+          model: request.model ?? this.model,
           messages: request.messages.map((message) => this.wireMessage(message)),
-          temperature: request.temperature ?? config.ai.temperature,
+          temperature: request.temperature ?? this.temperature,
           stream: false,
           ...(request.tools?.length
             ? {
@@ -130,7 +151,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
 
       return {
         content,
-        model: data.model ?? request.model ?? config.ai.model,
+        model: data.model ?? request.model ?? this.model,
         provider: this.id,
         toolCalls
       };
@@ -141,7 +162,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
 
 
   async models() {
-    const response = await fetchWithRetry(`${config.ai.baseUrl}/models`, {
+    const response = await fetchWithRetry(`${this.baseUrl}/models`, {
       headers: this.headers(),
       signal: AbortSignal.timeout(10000)
     });
@@ -164,12 +185,12 @@ export class OpenAiCompatibleProvider implements AiProvider {
   }
 
   async embeddings(input: string | string[], model?: string) {
-    const response = await fetchWithRetry(`${config.ai.baseUrl}/embeddings`, {
+    const response = await fetchWithRetry(`${this.baseUrl}/embeddings`, {
       method: "POST",
       headers: this.headers(),
-      signal: AbortSignal.timeout(config.ai.timeoutMs),
+      signal: AbortSignal.timeout(this.timeoutMs),
       body: JSON.stringify({
-        model: model ?? config.ai.model,
+        model: model ?? this.model,
         input
       })
     });
@@ -191,7 +212,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
     );
 
     return {
-      model: data.model ?? model ?? config.ai.model,
+      model: data.model ?? model ?? this.model,
       embeddings: rows.map((row) => row.embedding ?? []),
       provider: this.id
     };
@@ -199,12 +220,12 @@ export class OpenAiCompatibleProvider implements AiProvider {
 
 
   async vision(prompt:string,images:Array<{mimeType:string;base64:string}>,model?:string):Promise<ChatResponse>{
-    const response=await fetchWithRetry(`${config.ai.baseUrl}/chat/completions`,{
+    const response=await fetchWithRetry(`${this.baseUrl}/chat/completions`,{
       method:"POST",
       headers:this.headers(),
-      signal:AbortSignal.timeout(config.ai.timeoutMs),
+      signal:AbortSignal.timeout(this.timeoutMs),
       body:JSON.stringify({
-        model:model ?? config.ai.model,
+        model:model ?? this.model,
         messages:[{
           role:"user",
           content:[
@@ -232,7 +253,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
 
     return {
       content,
-      model:data.model ?? model ?? config.ai.model,
+      model:data.model ?? model ?? this.model,
       provider:this.id,
       toolCalls:[]
     };
@@ -244,7 +265,7 @@ export class OpenAiCompatibleProvider implements AiProvider {
       const timeout = setTimeout(() => controller.abort(), 5000);
 
       try {
-        const response = await fetchWithRetry(`${config.ai.baseUrl}/models`, {
+        const response = await fetchWithRetry(`${this.baseUrl}/models`, {
           headers: this.headers(),
           signal: controller.signal
         });
