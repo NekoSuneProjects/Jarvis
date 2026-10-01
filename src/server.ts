@@ -91,7 +91,7 @@ export async function createServer(ai: AiProvider) {
   const notificationsPlugin = createNotificationsPlugin(store, events);
   const nativeNotificationPlugin = createNativeNotificationPlugin(store, events);
   const searchPlugin = createSearchPlugin();
-  const weatherPlugin = createWeatherPlugin();
+  const weatherPlugin = createWeatherPlugin(store);
   const youtubePlugin = createYoutubePlugin();
   const spotifyPlugin = createSpotifyPlugin();
   const sshPlugin = createSshPlugin();
