@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 372 / 1215
-- **Remaining:** 843
-- **Progress:** **30.62%**
+- **Completed:** 513 / 1215
+- **Remaining:** 702
+- **Progress:** **42.22%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -185,13 +185,13 @@ Implemented in the repository so far:
 
 ## sherpa-onnx
 
-- [ ] Add wake word detection
-- [ ] Add VAD
-- [ ] Add STT
+- [x] Add wake word detection
+- [x] Add VAD
+- [x] Add STT
 - [ ] Add TTS
 - [ ] Add model download manager
 - [ ] Add model selection
-- [ ] Add CPU-only mode
+- [x] Add CPU-only mode
 - [ ] Add ARM64 support
 - [ ] Add Raspberry Pi testing
 - [ ] Add Android support
@@ -201,8 +201,8 @@ Implemented in the repository so far:
 ## Piper
 
 - [x] Add Piper TTS provider
-- [ ] Add local voice model selection
-- [ ] Add UK English voices
+- [x] Add local voice model selection
+- [x] Add UK English voices
 - [x] Add speed control
 - [x] Add pitch control where supported
 - [ ] Add Raspberry Pi support
@@ -247,7 +247,7 @@ Implemented in the repository so far:
 
 ## General Web Search
 
-- [ ] Add pluggable search provider interface
+- [x] Add pluggable search provider interface
 - [x] Add news search
 - [x] Add image search
 - [x] Add video search
@@ -383,7 +383,7 @@ Implemented in the repository so far:
 
 # YouTube
 
-- [ ] Search YouTube
+- [x] Search YouTube
 - [ ] Embedded player
 - [ ] Play video
 - [x] Pause
@@ -682,16 +682,16 @@ Implemented in the repository so far:
 
 - [ ] Bridge discovery
 - [ ] Bridge pairing
-- [ ] List rooms
-- [ ] List lights
-- [ ] Turn lights on/off
+- [x] List rooms
+- [x] List lights
+- [x] Turn lights on/off
 - [x] Brightness
-- [ ] Colour
-- [ ] Colour temperature
+- [x] Colour
+- [x] Colour temperature
 - [ ] Scenes
-- [ ] Groups
+- [x] Groups
 - [ ] Entertainment zones
-- [ ] Local LAN control
+- [x] Local LAN control
 
 ---
 
@@ -711,15 +711,15 @@ Implemented in the repository so far:
 
 # Tasmota
 
-- [ ] HTTP control
+- [x] HTTP control
 - [ ] MQTT control
 - [ ] Device discovery
 - [x] Power control
-- [ ] Sensor values
-- [ ] Energy values
-- [ ] Device information
-- [ ] Rules support
-- [ ] Local-only support
+- [x] Sensor values
+- [x] Energy values
+- [x] Device information
+- [x] Rules support
+- [x] Local-only support
 
 ---
 
@@ -727,13 +727,13 @@ Implemented in the repository so far:
 
 - [x] Shelly foundation discovery
 - [ ] Gen1 support
-- [ ] Gen2+ RPC support
-- [ ] Switch control
-- [ ] Relay control
-- [ ] Sensor reading
-- [ ] Energy monitoring
-- [ ] Device information
-- [ ] Local network control
+- [x] Gen2+ RPC support
+- [x] Switch control
+- [x] Relay control
+- [x] Sensor reading
+- [x] Energy monitoring
+- [x] Device information
+- [x] Local network control
 
 ---
 
@@ -779,31 +779,31 @@ Implemented in the repository so far:
 
 - [x] Application launcher
 - [x] Process manager
-- [ ] Window manager
+- [x] Window manager
 - [x] Mouse control
 - [x] Keyboard control
 - [x] Clipboard
 - [x] Screenshots
 - [ ] Audio volume
 - [ ] Per-app audio control
-- [ ] PowerShell
+- [x] PowerShell
 - [ ] CMD
 - [ ] Services
 - [ ] Task Scheduler
-- [ ] Notifications
-- [ ] Battery
-- [ ] CPU
-- [ ] RAM
-- [ ] GPU
-- [ ] Disk
-- [ ] Network
-- [ ] Wi-Fi
+- [x] Notifications
+- [x] Battery
+- [x] CPU
+- [x] RAM
+- [x] GPU
+- [x] Disk
+- [x] Network
+- [x] Wi-Fi
 - [ ] Bluetooth
-- [ ] Shutdown
-- [ ] Restart
-- [ ] Sleep
-- [ ] Lock
-- [ ] Wake-on-LAN sender
+- [x] Shutdown
+- [x] Restart
+- [x] Sleep
+- [x] Lock
+- [x] Wake-on-LAN sender
 - [ ] Windows startup support
 - [ ] Tray integration
 
@@ -811,30 +811,30 @@ Implemented in the repository so far:
 
 # Linux Integration
 
-- [ ] Application launcher
-- [ ] Process manager
-- [ ] Window manager
-- [ ] X11 input support
+- [x] Application launcher
+- [x] Process manager
+- [x] Window manager
+- [x] X11 input support
 - [ ] Wayland support
-- [ ] Clipboard
-- [ ] Screenshots
+- [x] Clipboard
+- [x] Screenshots
 - [ ] PipeWire audio
 - [ ] PulseAudio fallback
-- [ ] Shell commands
+- [x] Shell commands
 - [ ] systemd services
-- [ ] Notifications
-- [ ] CPU
-- [ ] RAM
-- [ ] GPU
-- [ ] Disk
-- [ ] Network
-- [ ] Wi-Fi
+- [x] Notifications
+- [x] CPU
+- [x] RAM
+- [x] GPU
+- [x] Disk
+- [x] Network
+- [x] Wi-Fi
 - [ ] Bluetooth
-- [ ] Shutdown
-- [ ] Restart
-- [ ] Sleep
-- [ ] Lock
-- [ ] Wake-on-LAN
+- [x] Shutdown
+- [x] Restart
+- [x] Sleep
+- [x] Lock
+- [x] Wake-on-LAN
 - [ ] Autostart support
 - [ ] Tray support
 
@@ -870,20 +870,20 @@ Implemented in the repository so far:
 # macOS
 
 - [x] Flutter macOS project scaffold
-- [ ] Application launcher
+- [x] Application launcher
 - [ ] Accessibility permission guide
-- [ ] Keyboard control
-- [ ] Mouse control
-- [ ] Screenshots
-- [ ] Clipboard
+- [x] Keyboard control
+- [x] Mouse control
+- [x] Screenshots
+- [x] Clipboard
 - [ ] AppleScript support
 - [ ] Shell support
-- [ ] Notifications
+- [x] Notifications
 - [ ] Audio control
-- [ ] CPU / RAM / disk
-- [ ] Battery
-- [ ] Network
-- [ ] Shutdown / restart / sleep
+- [x] CPU / RAM / disk
+- [x] Battery
+- [x] Network
+- [x] Shutdown / restart / sleep
 - [ ] Manual build documentation
 - [ ] Code signing documentation
 - [ ] Notarisation documentation
@@ -1087,11 +1087,11 @@ Implemented in the repository so far:
 
 # Alarms
 
-- [ ] Local alarm database
+- [x] Local alarm database
 - [x] One-time alarms
-- [ ] Recurring alarms
+- [x] Recurring alarms
 - [ ] Weekday alarms
-- [ ] Named alarms
+- [x] Named alarms
 - [ ] Custom alarm sounds
 - [ ] TTS alarm
 - [ ] Snooze
@@ -1107,8 +1107,8 @@ Implemented in the repository so far:
 - [x] Named timers
 - [x] Pause timer
 - [x] Resume timer
-- [ ] Add time
-- [ ] Remove time
+- [x] Add time
+- [x] Remove time
 - [x] Cancel timer
 - [ ] Timer notifications
 - [ ] Timer TTS
@@ -1127,8 +1127,8 @@ Implemented in the repository so far:
 - [ ] Location reminder
 - [ ] Reminder priority
 - [ ] Read reminder aloud
-- [ ] Snooze
-- [ ] Complete
+- [x] Snooze
+- [x] Complete
 - [ ] Cross-device sync
 
 ---
@@ -1257,9 +1257,9 @@ Implemented in the repository so far:
 
 # Device Discovery
 
-- [ ] mDNS
-- [ ] SSDP
-- [ ] UPnP
+- [x] mDNS
+- [x] SSDP
+- [x] UPnP
 - [ ] MQTT discovery
 - [ ] Home Assistant discovery
 - [ ] Jarvis agent discovery
@@ -1281,9 +1281,9 @@ Implemented in the repository so far:
 - [x] Add broadcast address
 - [x] Send magic packet
 - [ ] Android sender
-- [ ] Windows sender
-- [ ] Linux sender
-- [ ] Raspberry Pi sender
+- [x] Windows sender
+- [x] Linux sender
+- [x] Raspberry Pi sender
 - [ ] Device online detection
 - [ ] Optional automatic app launch after wake
 
@@ -1334,16 +1334,16 @@ Implemented in the repository so far:
 ## General Files
 
 - [x] TXT
-- [ ] Markdown
+- [x] Markdown
 - [x] JSON
-- [ ] CSV
-- [ ] HTML
+- [x] CSV
+- [x] HTML
 - [ ] ZIP
 - [x] File search
-- [ ] Folder search
-- [ ] Rename
-- [ ] Move
-- [ ] Copy
+- [x] Folder search
+- [x] Rename
+- [x] Move
+- [x] Copy
 - [ ] Delete with confirmation
 - [ ] File watcher
 
@@ -1362,10 +1362,10 @@ Implemented in the repository so far:
 - [x] Network upload
 - [x] Network download
 - [x] Wi-Fi information
-- [ ] Battery
+- [x] Battery
 - [x] Running processes
 - [ ] Running services
-- [ ] Docker stats
+- [x] Docker stats
 - [x] Uptime
 - [ ] Alerts
 - [ ] History graphs
@@ -1389,20 +1389,20 @@ Implemented in the repository so far:
 # Authentication / Security
 
 - [ ] Local user accounts
-- [ ] Device pairing code
+- [x] Device pairing code
 - [ ] QR pairing
 - [ ] TLS
 - [ ] Secure WebSocket
 - [ ] Refresh tokens
 - [ ] Session expiry
-- [ ] Device revoke
+- [x] Device revoke
 - [ ] Integration revoke
-- [ ] Secret encryption
+- [x] Secret encryption
 - [ ] OS keychain support
 - [ ] Android secure storage
 - [ ] macOS Keychain
 - [ ] Future iOS Keychain
-- [ ] Audit logs
+- [x] Audit logs
 - [ ] Emergency disable
 - [ ] Local-only mode
 - [ ] LAN-only remote control
@@ -1414,59 +1414,59 @@ Implemented in the repository so far:
 
 ## Stage 1
 
-- [ ] Ollama
-- [ ] sherpa-onnx
-- [ ] Piper
-- [ ] Windows
-- [ ] Linux
-- [ ] Local files
-- [ ] System monitoring
-- [ ] Timers
-- [ ] Alarms
-- [ ] Notes
-- [ ] Lists
+- [x] Ollama
+- [x] sherpa-onnx
+- [x] Piper
+- [x] Windows
+- [x] Linux
+- [x] Local files
+- [x] System monitoring
+- [x] Timers
+- [x] Alarms
+- [x] Notes
+- [x] Lists
 
 ## Stage 2
 
-- [ ] Playwright
-- [ ] SearXNG
-- [ ] Spotify
-- [ ] YouTube
-- [ ] Home Assistant
-- [ ] MQTT
-- [ ] Docker
-- [ ] SSH
+- [x] Playwright
+- [x] SearXNG
+- [x] Spotify
+- [x] YouTube
+- [x] Home Assistant
+- [x] MQTT
+- [x] Docker
+- [x] SSH
 
 ## Stage 3
 
-- [ ] Gmail
-- [ ] Google Calendar
-- [ ] Google Drive
-- [ ] GitHub
-- [ ] Discord
-- [ ] Android
+- [x] Gmail
+- [x] Google Calendar
+- [x] Google Drive
+- [x] GitHub
+- [x] Discord
+- [x] Android
 
 ## Stage 4
 
-- [ ] Raspberry Pi satellite
-- [ ] Remote Jarvis agents
+- [x] Raspberry Pi satellite
+- [x] Remote Jarvis agents
 - [ ] Multi-room audio
 - [ ] Intercom
 - [ ] Announcements
-- [ ] Device discovery
+- [x] Device discovery
 
 ## Stage 5
 
 - [ ] Matter
-- [ ] Hue
+- [x] Hue
 - [ ] Tuya
 - [x] Tasmota foundation
-- [ ] Shelly
+- [x] Shelly
 - [ ] Chromecast
 - [ ] DLNA
-- [ ] Jellyfin
-- [ ] Plex
-- [ ] Kodi
+- [x] Jellyfin
+- [x] Plex
+- [x] Kodi
 
 ## Stage 6
 
@@ -1510,8 +1510,8 @@ An integration should not be marked complete until:
 
 This section is a focused queue of 100 concrete implementation tasks for upcoming Jarvis work.
 
-- [ ] 001. Add automatic Piper Jarvis medium voice download
-- [ ] 002. Add automatic Piper Jarvis high voice download
+- [x] 001. Add automatic Piper Jarvis medium voice download
+- [x] 002. Add automatic Piper Jarvis high voice download
 - [ ] 003. Add Piper model download checksum validation
 - [ ] 004. Add interrupted Piper download resume handling
 - [ ] 005. Add Piper model download progress reporting
@@ -1530,15 +1530,15 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [ ] 018. Add Windows Start Menu shortcut for logs
 - [ ] 019. Add Windows Start Menu shortcut for settings
 - [ ] 020. Add Windows uninstall cleanup option for cached models
-- [ ] 021. Add manual GitHub Actions portable ZIP toggle
-- [ ] 022. Add manual GitHub Actions installer EXE toggle
-- [ ] 023. Add manual GitHub Actions release publishing toggle
-- [ ] 024. Add manual GitHub Actions release tag input
+- [x] 021. Add manual GitHub Actions portable ZIP toggle
+- [x] 022. Add manual GitHub Actions installer EXE toggle
+- [x] 023. Add manual GitHub Actions release publishing toggle
+- [x] 024. Add manual GitHub Actions release tag input
 - [ ] 025. Add manual GitHub Actions Jarvis base URL input validation
 - [ ] 026. Add manual GitHub Actions Piper voice preset input
 - [ ] 027. Add GitHub Actions build summary with artifact links
 - [ ] 028. Add GitHub Actions cache for npm dependencies
-- [ ] 029. Add GitHub Actions cache for Flutter pub dependencies
+- [x] 029. Add GitHub Actions cache for Flutter pub dependencies
 - [ ] 030. Add GitHub Actions timeout limits for stuck builds
 - [ ] 031. Add CI job that verifies TypeScript formatting
 - [ ] 032. Add CI job that runs TypeScript tests
@@ -1564,7 +1564,7 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [ ] 052. Add rotating local log files
 - [ ] 053. Add configurable log levels
 - [ ] 054. Add request correlation IDs
-- [ ] 055. Add tool-call audit logging
+- [x] 055. Add tool-call audit logging
 - [ ] 056. Add TTS latency metrics
 - [ ] 057. Add AI response latency metrics
 - [ ] 058. Add WebSocket connection metrics
@@ -1600,8 +1600,8 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [ ] 088. Add per-tool allow/deny rules
 - [ ] 089. Add per-device permission profiles
 - [ ] 090. Add emergency stop button
-- [ ] 091. Add Windows notification support
-- [ ] 092. Add Linux notification support
+- [x] 091. Add Windows notification support
+- [x] 092. Add Linux notification support
 - [ ] 093. Add notification action buttons
 - [ ] 094. Add tray icon for desktop builds
 - [ ] 095. Add tray menu for mute/listening modes
