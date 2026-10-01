@@ -264,6 +264,7 @@ return {
           }else if(block.type==="image"){
             children.push(new Paragraph({
               children:[new ImageRun({
+                type:block.path.toLowerCase().endsWith(".png") ? "png" : "jpg",
                 data:await fs.readFile(workspacePath(block.path)),
                 transformation:{width:block.width,height:block.height}
               })]
