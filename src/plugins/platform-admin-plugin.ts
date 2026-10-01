@@ -78,6 +78,55 @@ export const platformAdminPlugin:JarvisPlugin={
       }
     },
     {
+      name:"windows.audio",
+      description:"Set Windows master output volume using the built-in shell volume keys.",
+      capability:"system.admin",
+      async execute(input){
+        if(process.platform!=="win32") throw new Error("Windows audio control is only available on Windows");
+        const value=z.object({percent:z.number().min(0).max(100)}).parse(input);
+        const p=Math.round(value.percent);
+        const script=`$w=New-Object -ComObject WScript.Shell; 1..50 | % {$w.SendKeys([char]174)}; 1..${Math.round(p/2)} | % {$w.SendKeys([char]175)}`;
+        return run("powershell.exe",["-NoProfile","-Command",script]);
+      }
+    },
+    {
+      name:"linux.wayland",
+      description:"Type text or move/click the pointer on Wayland using wtype/ydotool when available.",
+      capability:"computer.input",
+      async execute(input){
+        if(process.platform!=="linux") throw new Error("Wayland helper is only available on Linux");
+        const value=z.discriminatedUnion("action",[
+          z.object({action:z.literal("type"),text:z.string()}),
+          z.object({action:z.literal("move"),x:z.number().int(),y:z.number().int()}),
+          z.object({action:z.literal("click"),button:z.enum(["left","right","middle"]).default("left")})
+        ]).parse(input);
+        if(value.action==="type") return run("wtype",[value.text]);
+        if(value.action==="move") return run("ydotool",["mousemove","--absolute",String(value.x),String(value.y)]);
+        const button={left:"0xC0",right:"0xC1",middle:"0xC2"}[value.button];
+        return run("ydotool",["click",button]);
+      }
+    },
+    {
+      name:"macos.applescript",
+      description:"Run an AppleScript expression on macOS.",
+      capability:"system.shell",
+      async execute(input){
+        if(process.platform!=="darwin") throw new Error("AppleScript is only available on macOS");
+        const value=z.object({script:z.string().min(1)}).parse(input);
+        return run("osascript",["-e",value.script]);
+      }
+    },
+    {
+      name:"macos.audio",
+      description:"Set macOS master output volume.",
+      capability:"system.admin",
+      async execute(input){
+        if(process.platform!=="darwin") throw new Error("macOS audio control is only available on macOS");
+        const value=z.object({percent:z.number().min(0).max(100)}).parse(input);
+        return run("osascript",["-e",`set volume output volume ${Math.round(value.percent)}`]);
+      }
+    },
+    {
       name:"linux.audio",
       description:"Set Linux default sink volume using PipeWire wpctl with PulseAudio pactl fallback.",
       capability:"system.admin",
