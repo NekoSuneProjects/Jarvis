@@ -13,6 +13,7 @@ export interface JarvisPlugin {
   name: string;
   version: string;
   description?: string;
+  dependencies?: string[];
   tools: JarvisTool[];
 }
 
@@ -24,6 +25,12 @@ export class PluginRegistry {
   register(plugin: JarvisPlugin): void {
     if (this.plugins.has(plugin.id)) {
       throw new Error(`Plugin already registered: ${plugin.id}`);
+    }
+
+    for(const dependency of plugin.dependencies ?? []){
+      if(!this.plugins.has(dependency)){
+        throw new Error(`Plugin ${plugin.id} requires missing dependency: ${dependency}`);
+      }
     }
 
     this.plugins.set(plugin.id, plugin);
@@ -69,7 +76,9 @@ export class PluginRegistry {
   listStatus(){
     return this.list().map((plugin)=>({
       ...plugin,
-      enabled:this.isEnabled(plugin.id)
+      enabled:this.isEnabled(plugin.id),
+      dependencies:plugin.dependencies ?? [],
+      dependenciesSatisfied:(plugin.dependencies ?? []).every((id)=>this.plugins.has(id) && this.isEnabled(id))
     }));
   }
 
