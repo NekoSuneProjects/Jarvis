@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'api/jarvis_client.dart';
-import 'screens/dashboard.dart';
+import 'screens/setup_wizard.dart';
 
 void main() {
   runApp(const JarvisApp());
@@ -40,7 +40,7 @@ class JarvisApp extends StatelessWidget {
           ),
         ),
       ),
-      home: DashboardScreen(
+      home: SetupGate(
         client: JarvisClient(
           baseUrl: baseUrl,
           apiToken: apiToken,
