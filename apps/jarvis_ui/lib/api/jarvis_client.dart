@@ -100,6 +100,38 @@ class JarvisClient {
     return (_json(response)['devices'] as List<dynamic>? ?? []);
   }
 
+  Future<List<dynamic>> memories() async {
+    final response=await http.get(_uri('/api/v1/memories'),headers:_headers);
+    return (_json(response)['memories'] as List<dynamic>? ?? []);
+  }
+
+  Future<void> forgetMemory(int id) async {
+    final response=await http.delete(_uri('/api/v1/memories/$id'),headers:_headers);
+    _json(response);
+  }
+
+  Future<List<dynamic>> permissions() async {
+    final response=await http.get(_uri('/api/v1/permissions'),headers:_headers);
+    return (_json(response)['permissions'] as List<dynamic>? ?? []);
+  }
+
+  Future<void> setPermission(String capability,String decision) async {
+    final response=await http.patch(
+      _uri('/api/v1/permissions/${Uri.encodeComponent(capability)}'),
+      headers:_jsonHeaders,
+      body:jsonEncode({'decision':decision}),
+    );
+    _json(response);
+  }
+
+  Future<void> reconnectIntegration(String id) async {
+    final response=await http.post(
+      _uri('/api/v1/integrations/${Uri.encodeComponent(id)}/reconnect'),
+      headers:_jsonHeaders,
+    );
+    _json(response);
+  }
+
   Future<JarvisReply> chat(String message) async {
     final response = await http.post(
       _uri('/api/v1/chat'),
