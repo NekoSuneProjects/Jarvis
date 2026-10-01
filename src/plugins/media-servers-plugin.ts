@@ -22,6 +22,7 @@ export function createMediaServersPlugin():JarvisPlugin{
   let localShuffle=false;
   let localRepeat:"off"|"one"|"all"="off";
   const radioFavorites=new Map<string,unknown>();
+  let radioCurrent:{url:string;name?:string;metadata?:unknown}|null=null;
 
   return {
     id:"media-servers",
@@ -262,6 +263,50 @@ export function createMediaServersPlugin():JarvisPlugin{
           const value=z.object({volume:z.number().min(0).max(100)}).parse(input);
           return kodi.volume(value.volume);
         }
+      },
+      {
+        name:"radio.country",
+        description:"Browse internet radio stations by country.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({country:z.string().min(1),limit:z.number().int().min(1).max(100).default(20)}).parse(input);
+          return radio.byCountry(value.country,value.limit);
+        }
+      },
+      {
+        name:"radio.genre",
+        description:"Browse internet radio stations by genre/tag.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({genre:z.string().min(1),limit:z.number().int().min(1).max(100).default(20)}).parse(input);
+          return radio.byTag(value.genre,value.limit);
+        }
+      },
+      {
+        name:"radio.play",
+        description:"Select an internet radio stream URL for playback by a client/device.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({url:z.string().url(),name:z.string().optional(),metadata:z.unknown().optional()}).parse(input);
+          radioCurrent={url:value.url,name:value.name,metadata:value.metadata};
+          return {ok:true,current:radioCurrent};
+        }
+      },
+      {
+        name:"radio.custom",
+        description:"Set a custom internet radio stream URL.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({url:z.string().url(),name:z.string().default("Custom Radio")}).parse(input);
+          radioCurrent={url:value.url,name:value.name};
+          return {ok:true,current:radioCurrent};
+        }
+      },
+      {
+        name:"radio.current",
+        description:"Read selected radio stream and metadata.",
+        capability:"media.read",
+        async execute(){return {current:radioCurrent};}
       },
       {
         name:"radio.search",
