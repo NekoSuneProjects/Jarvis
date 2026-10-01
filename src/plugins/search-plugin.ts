@@ -4,6 +4,7 @@ import { SearxngIntegration } from "../integrations/searxng.js";
 import type { JarvisPlugin } from "./plugin-registry.js";
 import type { AiProvider } from "../ai/types.js";
 import type { AssistantStore } from "../assistant/store.js";
+import type { EventBus } from "../events/event-bus.js";
 
 const common=z.object({
   query:z.string().min(1),
@@ -13,7 +14,7 @@ const common=z.object({
   timeRange:z.enum(["day","month","year"]).optional()
 });
 
-export function createSearchPlugin(ai:AiProvider,store:AssistantStore):JarvisPlugin{
+export function createSearchPlugin(ai:AiProvider,store:AssistantStore,events?:EventBus):JarvisPlugin{
   const search=new SearxngIntegration(config.searxngUrl);
 
   const run=(category?:string)=>(input:unknown)=>{
@@ -118,6 +119,25 @@ export function createSearchPlugin(ai:AiProvider,store:AssistantStore):JarvisPlu
           const results=filterNews(gathered);
           const response=await ai.chat({messages:[{role:"user",content:`Create a concise daily news briefing from these results. Keep source URLs with each item.\n\n${results.map((item,i)=>`[${i+1}] ${item.title}\n${item.url}\n${item.content??""}`).join("\n\n")}`}]});
           return {briefing:response.content,results};
+        }
+      },
+      {
+        name:"news.read_aloud",
+        description:"Create a concise news briefing and send it to the Jarvis TTS pipeline.",
+        capability:"web.search",
+        async execute(input){
+          const value=z.object({
+            topics:z.array(z.string()).default(["technology","gaming","world"]),
+            perTopic:z.number().int().min(1).max(20).default(5)
+          }).parse(input??{});
+          const gathered:any[]=[];
+          for(const topic of value.topics){
+            gathered.push(...await search.search(topic,{categories:"news",limit:value.perTopic,timeRange:"day"}));
+          }
+          const results=filterNews(gathered);
+          const response=await ai.chat({messages:[{role:"user",content:`Create a short spoken news briefing.\n\n${results.map((item,i)=>`[${i+1}] ${item.title}\n${item.url}\n${item.content??""}`).join("\n\n")}`}]});
+          events?.publish("voice.tts.requested",{text:response.content,source:"news"});
+          return {ok:true,briefing:response.content,results};
         }
       },
       {
