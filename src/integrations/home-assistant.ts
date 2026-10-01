@@ -57,6 +57,48 @@ export class HomeAssistantIntegration implements JarvisIntegration {
     return this.request("/api/states");
   }
 
+  async config(){return this.request("/api/config");}
+  async services(){return this.request("/api/services");}
+
+  async devices(){
+    const states=await this.states() as Array<any>;
+    const grouped=new Map<string,{device:string;entities:any[]}>();
+    for(const state of states){
+      const device=state.attributes?.device_class ?? state.entity_id?.split(".")[0] ?? "unknown";
+      const item=grouped.get(device) ?? {device,entities:[]};
+      item.entities.push(state);
+      grouped.set(device,item);
+    }
+    return [...grouped.values()];
+  }
+
+  async areas(){
+    const states=await this.states() as Array<any>;
+    const grouped=new Map<string,any[]>();
+    for(const state of states){
+      const area=state.attributes?.area_id ?? state.attributes?.room ?? state.attributes?.friendly_name?.split(" ")[0] ?? "unassigned";
+      const items=grouped.get(area) ?? [];
+      items.push(state);
+      grouped.set(area,items);
+    }
+    return [...grouped.entries()].map(([area,entities])=>({area,entities}));
+  }
+
+  async presence(){
+    const states=await this.states() as Array<any>;
+    return states.filter((state)=>state.entity_id?.startsWith("person.") || state.entity_id?.startsWith("device_tracker."));
+  }
+
+  async alarms(){
+    const states=await this.states() as Array<any>;
+    return states.filter((state)=>state.entity_id?.startsWith("alarm_control_panel."));
+  }
+
+  async mediaPlayers(){
+    const states=await this.states() as Array<any>;
+    return states.filter((state)=>state.entity_id?.startsWith("media_player."));
+  }
+
   async entityState(entityId:string) {
     return this.request(`/api/states/${encodeURIComponent(entityId)}`);
   }
