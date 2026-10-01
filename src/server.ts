@@ -906,6 +906,13 @@ export async function createServer(ai: AiProvider) {
   );
 
   app.get("/api/v1/routines", async () => ({ routines: store.listRoutines() }));
+  app.get("/api/v1/routines/export", async () => ({ routines: store.exportRoutines() }));
+  app.post<{ Body: { routines: Array<{ name:string; enabled?:boolean; trigger:unknown; actions:unknown[]; conditions?:unknown[] }> } }>(
+    "/api/v1/routines/import",
+    async (request) => ({
+      routines: store.importRoutines(request.body.routines ?? [])
+    })
+  );
   app.post<{ Body: { name: string; trigger?: unknown; actions: unknown[]; conditions?: unknown[] } }>(
     "/api/v1/routines",
     async (request) => ({
