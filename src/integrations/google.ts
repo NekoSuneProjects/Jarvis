@@ -167,6 +167,27 @@ export class GoogleIntegration {
     });
   }
 
+  docsBatchUpdate(documentId:string,requests:unknown[]){
+    return this.request("https://docs.googleapis.com",`/v1/documents/${encodeURIComponent(documentId)}:batchUpdate`,{
+      method:"POST",
+      body:JSON.stringify({requests})
+    });
+  }
+
+  sheetsBatchUpdate(spreadsheetId:string,requests:unknown[]){
+    return this.request("https://sheets.googleapis.com",`/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}:batchUpdate`,{
+      method:"POST",
+      body:JSON.stringify({requests})
+    });
+  }
+
+  slidesBatchUpdate(presentationId:string,requests:unknown[]){
+    return this.request("https://slides.googleapis.com",`/v1/presentations/${encodeURIComponent(presentationId)}:batchUpdate`,{
+      method:"POST",
+      body:JSON.stringify({requests})
+    });
+  }
+
   driveCreateFolder(name:string,parentId?:string){
     return this.request("https://www.googleapis.com","/drive/v3/files",{
       method:"POST",
