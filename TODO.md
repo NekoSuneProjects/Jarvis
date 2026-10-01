@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 960 / 1215
-- **Remaining:** 255
-- **Progress:** **79.01%**
+- **Completed:** 980 / 1215
+- **Remaining:** 235
+- **Progress:** **80.66%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -665,14 +665,14 @@ Implemented in the repository so far:
 
 # Zigbee
 
-- [ ] Integrate through Home Assistant first
-- [ ] Zigbee2MQTT support
-- [ ] Device discovery via MQTT
-- [ ] Read device state
-- [ ] Control devices
-- [ ] Sensor readings
-- [ ] Light control
-- [ ] Button events
+- [x] Integrate through Home Assistant first
+- [x] Zigbee2MQTT support
+- [x] Device discovery via MQTT
+- [x] Read device state
+- [x] Control devices
+- [x] Sensor readings
+- [x] Light control
+- [x] Button events
 - [x] Battery information
 - [ ] Direct coordinator support as future option
 
@@ -680,7 +680,7 @@ Implemented in the repository so far:
 
 # Philips Hue
 
-- [ ] Bridge discovery
+- [x] Bridge discovery
 - [x] Bridge pairing
 - [x] List rooms
 - [x] List lights
@@ -697,23 +697,23 @@ Implemented in the repository so far:
 
 # Tuya
 
-- [ ] Home Assistant-based support first
+- [x] Home Assistant-based support first
 - [ ] Local Tuya support where possible
 - [ ] Cloud Tuya optional
-- [ ] Device discovery
-- [ ] Smart plug control
-- [ ] Light control
-- [ ] Sensor reading
-- [ ] Device state
-- [ ] Energy monitoring where supported
+- [x] Device discovery
+- [x] Smart plug control
+- [x] Light control
+- [x] Sensor reading
+- [x] Device state
+- [x] Energy monitoring where supported
 
 ---
 
 # Tasmota
 
 - [x] HTTP control
-- [ ] MQTT control
-- [ ] Device discovery
+- [x] MQTT control
+- [x] Device discovery
 - [x] Power control
 - [x] Sensor values
 - [x] Energy values
@@ -1064,7 +1064,7 @@ Implemented in the repository so far:
 - [x] Daily briefing
 - [x] Source citations
 - [x] Avoid duplicate stories
-- [ ] Read-aloud mode
+- [x] Read-aloud mode
 - [x] User-defined blocked sources
 - [x] User-defined favourite sources
 
@@ -1081,7 +1081,7 @@ Implemented in the repository so far:
 - [x] Home
 - [x] Work / college custom location
 - [x] Open route externally
-- [ ] Future Android navigation integration
+- [x] Future Android navigation integration
 
 ---
 
