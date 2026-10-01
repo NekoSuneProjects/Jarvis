@@ -43,6 +43,7 @@ import { createLanSmartHomePlugin } from "./plugins/lan-smart-home-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { powerPlugin } from "./plugins/power-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
+import { createStreamingMediaPlugin } from "./plugins/streaming-media-plugin.js";
 import { shellPlugin } from "./plugins/shell-plugin.js";
 import { createSshPlugin } from "./plugins/ssh-plugin.js";
 import { createWeatherPlugin } from "./plugins/weather-plugin.js";
@@ -112,6 +113,7 @@ export async function createServer(ai: AiProvider) {
   const weatherPlugin = createWeatherPlugin(store);
   const youtubePlugin = createYoutubePlugin();
   const spotifyPlugin = createSpotifyPlugin();
+  const streamingMediaPlugin = createStreamingMediaPlugin(browser);
   const sshPlugin = createSshPlugin();
   const builtInPlugins = [
     systemPlugin,
@@ -144,6 +146,7 @@ export async function createServer(ai: AiProvider) {
     youtubePlugin,
     utilitiesPlugin,
     spotifyPlugin,
+    streamingMediaPlugin,
     sshPlugin
   ];
 
