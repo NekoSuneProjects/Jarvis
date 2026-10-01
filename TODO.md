@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 926 / 1215
-- **Remaining:** 289
-- **Progress:** **76.21%**
+- **Completed:** 942 / 1215
+- **Remaining:** 273
+- **Progress:** **77.53%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -111,7 +111,7 @@ Implemented in the repository so far:
 - [x] Add OAuth token storage foundation
 - [x] Add API key storage foundation
 - [x] Add encrypted secrets storage
-- [ ] Add connection status UI
+- [x] Add connection status UI
 - [x] Add reconnect support
 - [ ] Add refresh-token support
 - [x] Add integration health checks
@@ -525,9 +525,9 @@ Implemented in the repository so far:
 - [x] Save favourites
 - [x] Play stream URL
 - [x] Station metadata
-- [ ] Current track metadata
-- [ ] Country filtering
-- [ ] Genre filtering
+- [x] Current track metadata
+- [x] Country filtering
+- [x] Genre filtering
 - [x] Custom stream URL support
 
 ---
@@ -784,7 +784,7 @@ Implemented in the repository so far:
 - [x] Keyboard control
 - [x] Clipboard
 - [x] Screenshots
-- [ ] Audio volume
+- [x] Audio volume
 - [ ] Per-app audio control
 - [x] PowerShell
 - [x] CMD
@@ -815,7 +815,7 @@ Implemented in the repository so far:
 - [x] Process manager
 - [x] Window manager
 - [x] X11 input support
-- [ ] Wayland support
+- [x] Wayland support
 - [x] Clipboard
 - [x] Screenshots
 - [x] PipeWire audio
@@ -876,10 +876,10 @@ Implemented in the repository so far:
 - [x] Mouse control
 - [x] Screenshots
 - [x] Clipboard
-- [ ] AppleScript support
+- [x] AppleScript support
 - [x] Shell support
 - [x] Notifications
-- [ ] Audio control
+- [x] Audio control
 - [x] CPU / RAM / disk
 - [x] Battery
 - [x] Network
@@ -1561,14 +1561,14 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [x] 049. Add /health degraded-state reporting
 - [x] 050. Add /health startup diagnostics history
 - [x] 051. Add structured JSON logging
-- [ ] 052. Add rotating local log files
-- [ ] 053. Add configurable log levels
+- [x] 052. Add rotating local log files
+- [x] 053. Add configurable log levels
 - [x] 054. Add request correlation IDs
 - [x] 055. Add tool-call audit logging
 - [x] 056. Add TTS latency metrics
 - [x] 057. Add AI response latency metrics
 - [x] 058. Add WebSocket connection metrics
-- [ ] 059. Add integration reconnect metrics
+- [x] 059. Add integration reconnect metrics
 - [x] 060. Add optional diagnostics export ZIP
 - [x] 061. Add settings API for assistant name
 - [x] 062. Add settings API for AI endpoint
@@ -1577,7 +1577,7 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [x] 065. Add settings API for Piper voice
 - [x] 066. Add settings API for wake-word mode
 - [x] 067. Add settings persistence in SQLite
-- [ ] 068. Add settings validation errors to UI
+- [x] 068. Add settings validation errors to UI
 - [x] 069. Add settings import/export
 - [x] 070. Add settings reset-to-defaults
 - [x] 071. Add first-run setup wizard
@@ -1594,19 +1594,19 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [x] 082. Add conversation delete controls
 - [x] 083. Add per-conversation export
 - [x] 084. Add memory enable/disable control
-- [ ] 085. Add memory review screen
-- [ ] 086. Add tool permission confirmation UI
+- [x] 085. Add memory review screen
+- [x] 086. Add tool permission confirmation UI
 - [x] 087. Add dangerous action confirmation flow
 - [x] 088. Add per-tool allow/deny rules
 - [x] 089. Add per-device permission profiles
 - [x] 090. Add emergency stop button
 - [x] 091. Add Windows notification support
 - [x] 092. Add Linux notification support
-- [ ] 093. Add notification action buttons
+- [x] 093. Add notification action buttons
 - [ ] 094. Add tray icon for desktop builds
 - [ ] 095. Add tray menu for mute/listening modes
 - [ ] 096. Add tray menu for restarting core
 - [ ] 097. Add tray menu for opening logs
-- [ ] 098. Add auto-start-on-login option
+- [x] 098. Add auto-start-on-login option
 - [ ] 099. Add update-available notification
 - [ ] 100. Add self-update preparation for signed releases
