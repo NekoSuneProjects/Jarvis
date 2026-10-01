@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 946 / 1215
-- **Remaining:** 269
-- **Progress:** **77.86%**
+- **Completed:** 953 / 1215
+- **Remaining:** 262
+- **Progress:** **78.44%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -215,11 +215,11 @@ Implemented in the repository so far:
 - [x] Add Edge TTS provider
 - [x] Add voice list
 - [x] Add locale selection foundation
-- [ ] Add voice preview
+- [x] Add voice preview
 - [x] Add speed control
 - [x] Add pitch control
 - [x] Add online/offline detection
-- [ ] Add fallback voice if service fails
+- [x] Add fallback voice if service fails
 
 ## Custom TTS API
 
@@ -1096,7 +1096,7 @@ Implemented in the repository so far:
 - [x] TTS alarm
 - [x] Snooze
 - [x] Dismiss
-- [ ] Cross-device sync
+- [x] Cross-device sync
 - [x] Offline operation
 
 ---
@@ -1112,7 +1112,7 @@ Implemented in the repository so far:
 - [x] Cancel timer
 - [x] Timer notifications
 - [x] Timer TTS
-- [ ] Cross-device sync
+- [x] Cross-device sync
 - [x] Offline operation
 
 ---
@@ -1129,7 +1129,7 @@ Implemented in the repository so far:
 - [x] Read reminder aloud
 - [x] Snooze
 - [x] Complete
-- [ ] Cross-device sync
+- [x] Cross-device sync
 
 ---
 
@@ -1141,7 +1141,7 @@ Implemented in the repository so far:
 - [x] Search notes
 - [x] Tag notes
 - [x] Pin notes
-- [ ] Voice-created notes
+- [x] Voice-created notes
 - [x] Markdown support
 - [ ] Sync between devices
 - [x] Export notes
@@ -1159,7 +1159,7 @@ Implemented in the repository so far:
 - [x] Clear checked
 - [x] Read list aloud
 - [x] Share list
-- [ ] Cross-device sync
+- [x] Cross-device sync
 
 ---
 
