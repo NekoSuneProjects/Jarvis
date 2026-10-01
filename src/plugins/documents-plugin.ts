@@ -18,12 +18,14 @@ import ExcelJS from "exceljs";
 import { z } from "zod";
 import { workspacePath } from "../utils/workspace-path.js";
 import type { JarvisPlugin } from "./plugin-registry.js";
+import type { AiProvider } from "../ai/types.js";
 
 async function ensureParent(file:string){
   await fs.mkdir(path.dirname(file),{recursive:true});
 }
 
-export const documentsPlugin:JarvisPlugin={
+export function createDocumentsPlugin(ai:AiProvider):JarvisPlugin{
+return {
   id:"documents",
   name:"Documents",
   version:"0.1.0",
@@ -82,6 +84,98 @@ export const documentsPlugin:JarvisPlugin={
 
         await fs.writeFile(file,await pdf.save());
         return {ok:true,path:file};
+      }
+    },
+    {
+      name:"documents.pdf.summarize",
+      description:"Extract text from a PDF and summarise it with the configured AI provider.",
+      capability:"files.read",
+      async execute(input){
+        const value=z.object({
+          path:z.string().min(1),
+          prompt:z.string().default("Summarise this PDF clearly and concisely.")
+        }).parse(input);
+        const parser=new PDFParse({data:await fs.readFile(workspacePath(value.path))});
+        try{
+          const result=await parser.getText();
+          const text=(result as any).text ?? String(result);
+          const response=await ai.chat({
+            messages:[{
+              role:"user",
+              content:`${value.prompt}\n\nPDF text:\n${text.slice(0,120000)}`
+            }]
+          });
+          return {summary:response.content,provider:response.provider,model:response.model};
+        }finally{
+          await parser.destroy().catch(()=>{});
+        }
+      }
+    },
+    {
+      name:"documents.pdf.append",
+      description:"Append a page to an existing PDF with text, an optional image and a simple table.",
+      capability:"files.write",
+      async execute(input){
+        const value=z.object({
+          path:z.string().min(1),
+          title:z.string().optional(),
+          paragraphs:z.array(z.string()).default([]),
+          imagePath:z.string().optional(),
+          table:z.array(z.array(z.string())).optional()
+        }).parse(input);
+        const file=workspacePath(value.path);
+        const pdf=await PDFDocument.load(await fs.readFile(file));
+        const font=await pdf.embedFont(StandardFonts.Helvetica);
+        const bold=await pdf.embedFont(StandardFonts.HelveticaBold);
+        const page=pdf.addPage([595.28,841.89]);
+        let y=790;
+        if(value.title){
+          page.drawText(value.title,{x:50,y,size:18,font:bold});
+          y-=34;
+        }
+        for(const paragraph of value.paragraphs){
+          for(const line of paragraph.match(/.{1,80}(?:\s+|$)/g) ?? [paragraph]){
+            page.drawText(line.trim(),{x:50,y,size:10,font});
+            y-=16;
+          }
+          y-=6;
+        }
+        if(value.table?.length){
+          const colCount=Math.max(...value.table.map((row)=>row.length));
+          const colWidth=480/Math.max(1,colCount);
+          for(const row of value.table){
+            let x=50;
+            for(let i=0;i<colCount;i++){
+              const text=String(row[i] ?? "").slice(0,40);
+              page.drawRectangle({x,y:y-16,width:colWidth,height:20,borderWidth:0.5});
+              page.drawText(text,{x:x+3,y:y-10,size:8,font});
+              x+=colWidth;
+            }
+            y-=20;
+          }
+          y-=12;
+        }
+        if(value.imagePath){
+          const imageBytes=await fs.readFile(workspacePath(value.imagePath));
+          const lower=value.imagePath.toLowerCase();
+          const image=lower.endsWith(".png")?await pdf.embedPng(imageBytes):await pdf.embedJpg(imageBytes);
+          const scale=Math.min(480/image.width,Math.max(1,Math.min(300,y-60))/image.height,1);
+          page.drawImage(image,{x:50,y:Math.max(40,y-image.height*scale),width:image.width*scale,height:image.height*scale});
+        }
+        await fs.writeFile(file,await pdf.save());
+        return {ok:true,path:value.path};
+      }
+    },
+    {
+      name:"documents.pdf.export",
+      description:"Copy/export a PDF to another workspace path.",
+      capability:"files.write",
+      async execute(input){
+        const value=z.object({from:z.string().min(1),to:z.string().min(1)}).parse(input);
+        const target=workspacePath(value.to);
+        await ensureParent(target);
+        await fs.copyFile(workspacePath(value.from),target);
+        return {ok:true,path:value.to};
       }
     },
     {
@@ -358,3 +452,4 @@ export const documentsPlugin:JarvisPlugin={
     }
   ]
 };
+}
