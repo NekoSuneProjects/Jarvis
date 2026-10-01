@@ -337,6 +337,13 @@ export async function createServer(ai: AiProvider) {
     });
   });
 
+  app.get<{ Querystring:{limit?:string;type?:string} }>("/api/v1/events/recent", async (request) => ({
+    events:events.recent(
+      Math.max(1,Math.min(2000,Number(request.query.limit ?? 100))),
+      request.query.type
+    )
+  }));
+
   app.post("/api/v1/system/shutdown", async () => {
     store.audit("api","system.graceful_shutdown",{});
     setImmediate(()=>void app.close());
