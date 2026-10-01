@@ -90,6 +90,26 @@ export class AssistantStore {
     return this.database.db.prepare("SELECT * FROM notes ORDER BY pinned DESC, updated_at DESC").all();
   }
 
+  updateNote(id:number, fields:{title?:string;body?:string;tags?:string[];pinned?:boolean}) {
+    const current=this.getNote(id) as {title:string;body:string;tags:string;pinned:number}|undefined;
+    if(!current) return null;
+    const title=fields.title ?? current.title;
+    const body=fields.body ?? current.body;
+    const tags=fields.tags ? JSON.stringify(fields.tags) : current.tags;
+    const pinned=fields.pinned===undefined ? current.pinned : (fields.pinned?1:0);
+    this.database.db.prepare(
+      "UPDATE notes SET title=?,body=?,tags=?,pinned=?,updated_at=? WHERE id=?"
+    ).run(title,body,tags,pinned,now(),id);
+    return this.getNote(id);
+  }
+
+  searchNotes(query:string,limit=100) {
+    const like=`%${query}%`;
+    return this.database.db.prepare(
+      "SELECT * FROM notes WHERE title LIKE ? OR body LIKE ? OR tags LIKE ? ORDER BY pinned DESC,updated_at DESC LIMIT ?"
+    ).all(like,like,like,limit);
+  }
+
   deleteNote(id: number) {
     return this.database.db.prepare("DELETE FROM notes WHERE id=?").run(id).changes > 0;
   }
@@ -120,6 +140,10 @@ export class AssistantStore {
 
   checkListItem(id: number, checked: boolean) {
     return this.database.db.prepare("UPDATE list_items SET checked=? WHERE id=?").run(checked ? 1 : 0, id).changes > 0;
+  }
+
+  removeListItem(id:number) {
+    return this.database.db.prepare("DELETE FROM list_items WHERE id=?").run(id).changes>0;
   }
 
   clearChecked(listName: string) {
