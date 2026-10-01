@@ -146,7 +146,7 @@ export async function createServer(ai: AiProvider) {
   const lanSmartHomePlugin = createLanSmartHomePlugin(discovery);
   const notificationsPlugin = createNotificationsPlugin(store, events);
   const nativeNotificationPlugin = createNativeNotificationPlugin(store, events);
-  const searchPlugin = createSearchPlugin(ai,store);
+  const searchPlugin = createSearchPlugin(ai,store,events);
   const weatherPlugin = createWeatherPlugin(store);
   const youtubePlugin = createYoutubePlugin();
   const spotifyPlugin = createSpotifyPlugin();
