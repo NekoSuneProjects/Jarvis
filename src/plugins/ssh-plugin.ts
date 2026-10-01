@@ -43,6 +43,53 @@ export function createSshPlugin():JarvisPlugin{
         }
       },
       {
+        name:"ssh.sftp.list",
+        description:"Browse a remote folder over SFTP.",
+        capability:"development.read",
+        async execute(input){
+          const value=z.object({host:z.string().min(1),path:z.string().default(".")}).parse(input);
+          return ssh.sftpList(value.host,value.path);
+        }
+      },
+      {
+        name:"ssh.upload",
+        description:"Upload a workspace file to a configured SSH host over SFTP.",
+        capability:"development.write",
+        async execute(input){
+          const value=z.object({host:z.string().min(1),localPath:z.string().min(1),remotePath:z.string().min(1)}).parse(input);
+          const {workspacePath}=await import("../utils/workspace-path.js");
+          return ssh.upload(value.host,workspacePath(value.localPath),value.remotePath);
+        }
+      },
+      {
+        name:"ssh.download",
+        description:"Download a file from a configured SSH host into the Jarvis workspace.",
+        capability:"development.write",
+        async execute(input){
+          const value=z.object({host:z.string().min(1),remotePath:z.string().min(1),localPath:z.string().min(1)}).parse(input);
+          const {workspacePath}=await import("../utils/workspace-path.js");
+          return ssh.download(value.host,value.remotePath,workspacePath(value.localPath));
+        }
+      },
+      {
+        name:"ssh.service",
+        description:"Control or inspect a remote systemd service.",
+        capability:"system.shell",
+        async execute(input){
+          const value=z.object({host:z.string().min(1),service:z.string().min(1),action:z.enum(["status","start","stop","restart"])}).parse(input);
+          return ssh.exec(value.host,`systemctl ${value.action} -- ${JSON.stringify(value.service)}`);
+        }
+      },
+      {
+        name:"ssh.logs",
+        description:"Read recent journal logs from a remote systemd service.",
+        capability:"development.read",
+        async execute(input){
+          const value=z.object({host:z.string().min(1),service:z.string().min(1),lines:z.number().int().min(1).max(5000).default(200)}).parse(input);
+          return ssh.exec(value.host,`journalctl -u ${JSON.stringify(value.service)} -n ${value.lines} --no-pager`);
+        }
+      },
+      {
         name:"ssh.exec",
         description:"Execute a shell command on a configured SSH host. Requires approval.",
         capability:"system.shell",
