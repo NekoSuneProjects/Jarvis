@@ -17,6 +17,7 @@ jobs:
   typecheck:
     name: TypeScript build
     runs-on: [self-hosted, Linux, docker, buildx]
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -26,12 +27,16 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "22"
+          cache: npm
 
       - name: Install dependencies
         run: npm install
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Test
+        run: npm test
 
       - name: Build
         run: npm run build
