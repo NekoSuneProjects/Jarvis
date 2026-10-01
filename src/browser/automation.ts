@@ -1,34 +1,51 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { chromium, type Browser, type BrowserContext, type Page } from "playwright-core";
+import { chromium, firefox, type Browser, type BrowserContext, type Page } from "playwright-core";
 import { config } from "../config.js";
 
 export class BrowserAutomation {
   private browser?:Browser;
   private context?:BrowserContext;
   private page?:Page;
+  private readonly actionTimes:number[]=[];
+
+  private guardAction(){
+    const cutoff=Date.now()-60000;
+    while(this.actionTimes.length && this.actionTimes[0]<cutoff) this.actionTimes.shift();
+    if(this.actionTimes.length>=config.browser.maxActionsPerMinute){
+      throw new Error("Browser anti-loop protection triggered: too many actions in one minute");
+    }
+    this.actionTimes.push(Date.now());
+  }
 
   private async ensurePage():Promise<Page>{
     if(this.page && !this.page.isClosed()) return this.page;
 
-    this.browser=await chromium.launch({
+    const engine=config.browser.engine==="firefox"?firefox:chromium;
+    await fs.mkdir(path.resolve(config.browser.profileDir),{recursive:true});
+    this.context=await engine.launchPersistentContext(path.resolve(config.browser.profileDir),{
       headless:config.browser.headless,
+      acceptDownloads:true,
       ...(config.browser.executablePath
         ? {executablePath:config.browser.executablePath}
-        : {channel:config.browser.channel as "chrome"})
+        : config.browser.engine==="chromium"
+          ? {channel:config.browser.channel as "chrome"}
+          : {})
     });
-    this.context=await this.browser.newContext({acceptDownloads:true});
-    this.page=await this.context.newPage();
+    this.page=this.context.pages()[0] ?? await this.context.newPage();
     return this.page;
   }
 
   async available(){
     try{
-      const browser=await chromium.launch({
+      const engine=config.browser.engine==="firefox"?firefox:chromium;
+      const browser=await engine.launch({
         headless:true,
         ...(config.browser.executablePath
           ? {executablePath:config.browser.executablePath}
-          : {channel:config.browser.channel as "chrome"})
+          : config.browser.engine==="chromium"
+            ? {channel:config.browser.channel as "chrome"}
+            : {})
       });
       await browser.close();
       return {ok:true};
@@ -38,6 +55,7 @@ export class BrowserAutomation {
   }
 
   async open(url:string,newTab=false){
+    this.guardAction();
     const current=await this.ensurePage();
     const page=newTab ? await this.context!.newPage() : current;
     this.page=page;
@@ -85,12 +103,14 @@ export class BrowserAutomation {
   }
 
   async click(selector:string){
+    this.guardAction();
     const page=await this.ensurePage();
     await page.locator(selector).first().click({timeout:15000});
     return {ok:true,url:page.url()};
   }
 
   async type(selector:string,text:string,clear=true){
+    this.guardAction();
     const page=await this.ensurePage();
     const locator=page.locator(selector).first();
     if(clear) await locator.fill(text,{timeout:15000});
@@ -99,12 +119,14 @@ export class BrowserAutomation {
   }
 
   async select(selector:string,value:string){
+    this.guardAction();
     const page=await this.ensurePage();
     const selected=await page.locator(selector).first().selectOption(value);
     return {ok:true,selected};
   }
 
   async check(selector:string,checked=true){
+    this.guardAction();
     const page=await this.ensurePage();
     const locator=page.locator(selector).first();
     if(checked) await locator.check({timeout:15000});
@@ -113,12 +135,14 @@ export class BrowserAutomation {
   }
 
   async upload(selector:string,files:string[]){
+    this.guardAction();
     const page=await this.ensurePage();
     await page.locator(selector).first().setInputFiles(files);
     return {ok:true,files};
   }
 
   async downloadClick(selector:string,downloadDir:string){
+    this.guardAction();
     const page=await this.ensurePage();
     await fs.mkdir(downloadDir,{recursive:true});
     const [download]=await Promise.all([
@@ -138,6 +162,7 @@ export class BrowserAutomation {
   }
 
   async close(){
+    await this.context?.close();
     await this.browser?.close();
     this.browser=undefined;
     this.context=undefined;
