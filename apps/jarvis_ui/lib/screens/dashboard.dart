@@ -26,6 +26,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<dynamic> reminders = [];
   List<dynamic> notifications = [];
   List<dynamic> devices = [];
+  List<dynamic> memories = [];
+  List<dynamic> permissions = [];
 
   JarvisState state = JarvisState.idle;
   StreamSubscription<dynamic>? eventSubscription;
@@ -48,6 +50,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         widget.client.reminders(),
         widget.client.notifications(),
         widget.client.devices(),
+        widget.client.memories(),
+        widget.client.permissions(),
       ]);
       if (!mounted) return;
       setState(() {
@@ -58,6 +62,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         reminders = results[4] as List<dynamic>;
         notifications = results[5] as List<dynamic>;
         devices = results[6] as List<dynamic>;
+        memories = results[7] as List<dynamic>;
+        permissions = results[8] as List<dynamic>;
         error = null;
       });
     } catch (e) {
