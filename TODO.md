@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 659 / 1215
-- **Remaining:** 556
-- **Progress:** **54.24%**
+- **Completed:** 718 / 1215
+- **Remaining:** 497
+- **Progress:** **59.09%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -439,19 +439,19 @@ Implemented in the repository so far:
 - [x] Add Jellyfin server URL
 - [x] Add API token
 - [ ] Add username/password pairing
-- [ ] Browse media
+- [x] Browse media
 - [x] Search movies
 - [x] Search shows
 - [x] Search music
-- [ ] Play media
-- [ ] Pause
-- [ ] Resume
+- [x] Play media
+- [x] Pause
+- [x] Resume
 - [x] Stop playback
-- [ ] Select playback device
-- [ ] Continue watching
-- [ ] Recently added
-- [ ] User profiles
-- [ ] Library status
+- [x] Select playback device
+- [x] Continue watching
+- [x] Recently added
+- [x] User profiles
+- [x] Library status
 - [x] Server health check foundation
 
 ---
@@ -459,7 +459,7 @@ Implemented in the repository so far:
 # Plex
 
 - [x] Plex authentication
-- [ ] Discover Plex servers
+- [x] Discover Plex servers
 - [x] Browse libraries
 - [x] Search media
 - [ ] Play media
@@ -467,9 +467,9 @@ Implemented in the repository so far:
 - [ ] Resume
 - [ ] Stop
 - [ ] Choose player
-- [ ] Continue watching
-- [ ] Recently added
-- [ ] Plex account support
+- [x] Continue watching
+- [x] Recently added
+- [x] Plex account support
 
 ---
 
@@ -522,7 +522,7 @@ Implemented in the repository so far:
 # Internet Radio
 
 - [x] Search stations
-- [ ] Save favourites
+- [x] Save favourites
 - [ ] Play stream URL
 - [x] Station metadata
 - [ ] Current track metadata
@@ -536,14 +536,14 @@ Implemented in the repository so far:
 
 - [x] Scan local music folders
 - [x] Read metadata
-- [ ] Album art
-- [ ] Search artists
-- [ ] Search albums
+- [x] Album art
+- [x] Search artists
+- [x] Search albums
 - [x] Search tracks
-- [ ] Create local playlists
-- [ ] Shuffle
-- [ ] Repeat
-- [ ] Queue
+- [x] Create local playlists
+- [x] Shuffle
+- [x] Repeat
+- [x] Queue
 - [ ] Multi-room playback
 
 ---
@@ -1047,10 +1047,10 @@ Implemented in the repository so far:
 - [x] Wind
 - [x] Sunrise
 - [x] Sunset
-- [ ] Weather alerts
-- [ ] Multiple saved locations
-- [ ] Home location setting
-- [ ] Unit preference
+- [x] Weather alerts
+- [x] Multiple saved locations
+- [x] Home location setting
+- [x] Unit preference
 
 ---
 
@@ -1072,15 +1072,15 @@ Implemented in the repository so far:
 
 # Maps / Directions
 
-- [ ] Location provider interface
+- [x] Location provider interface
 - [x] Search places
-- [ ] Get directions
-- [ ] Travel time
-- [ ] Distance
-- [ ] Saved locations
-- [ ] Home
-- [ ] Work / college custom location
-- [ ] Open route externally
+- [x] Get directions
+- [x] Travel time
+- [x] Distance
+- [x] Saved locations
+- [x] Home
+- [x] Work / college custom location
+- [x] Open route externally
 - [ ] Future Android navigation integration
 
 ---
@@ -1296,20 +1296,20 @@ Implemented in the repository so far:
 - [x] Create PDF
 - [x] Read PDF
 - [x] Search PDF
-- [ ] Summarise PDF
-- [ ] Add images
-- [ ] Add tables
-- [ ] Export PDF
+- [x] Summarise PDF
+- [x] Add images
+- [x] Add tables
+- [x] Export PDF
 
 ## DOCX
 
 - [x] Create DOCX
 - [x] Read DOCX
-- [ ] Edit DOCX
+- [x] Edit DOCX
 - [x] Search DOCX
-- [ ] Add headings
-- [ ] Add tables
-- [ ] Add images
+- [x] Add headings
+- [x] Add tables
+- [x] Add images
 
 ## XLSX
 
@@ -1317,7 +1317,7 @@ Implemented in the repository so far:
 - [x] Read XLSX
 - [x] Edit cells
 - [x] Formulas
-- [ ] Tables
+- [x] Tables
 - [ ] Charts
 - [x] Multiple sheets foundation
 
@@ -1326,10 +1326,10 @@ Implemented in the repository so far:
 - [x] Create PPTX
 - [x] Read PPTX
 - [ ] Edit PPTX
-- [ ] Add slides
-- [ ] Add images
-- [ ] Add charts
-- [ ] Apply themes
+- [x] Add slides
+- [x] Add images
+- [x] Add charts
+- [x] Apply themes
 
 ## General Files
 
@@ -1555,21 +1555,21 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [x] 043. Add /health details for AI provider reachability
 - [x] 044. Add /health details for database state
 - [x] 045. Add /health details for writable data directory
-- [ ] 046. Add /health details for browser automation availability
-- [ ] 047. Add /health details for ADB availability
+- [x] 046. Add /health details for browser automation availability
+- [x] 047. Add /health details for ADB availability
 - [x] 048. Add /health details for smart-home integrations
 - [x] 049. Add /health degraded-state reporting
-- [ ] 050. Add /health startup diagnostics history
-- [ ] 051. Add structured JSON logging
+- [x] 050. Add /health startup diagnostics history
+- [x] 051. Add structured JSON logging
 - [ ] 052. Add rotating local log files
 - [ ] 053. Add configurable log levels
-- [ ] 054. Add request correlation IDs
+- [x] 054. Add request correlation IDs
 - [x] 055. Add tool-call audit logging
-- [ ] 056. Add TTS latency metrics
-- [ ] 057. Add AI response latency metrics
-- [ ] 058. Add WebSocket connection metrics
+- [x] 056. Add TTS latency metrics
+- [x] 057. Add AI response latency metrics
+- [x] 058. Add WebSocket connection metrics
 - [ ] 059. Add integration reconnect metrics
-- [ ] 060. Add optional diagnostics export ZIP
+- [x] 060. Add optional diagnostics export ZIP
 - [x] 061. Add settings API for assistant name
 - [x] 062. Add settings API for AI endpoint
 - [x] 063. Add settings API for AI model
@@ -1596,10 +1596,10 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [x] 084. Add memory enable/disable control
 - [ ] 085. Add memory review screen
 - [ ] 086. Add tool permission confirmation UI
-- [ ] 087. Add dangerous action confirmation flow
-- [ ] 088. Add per-tool allow/deny rules
-- [ ] 089. Add per-device permission profiles
-- [ ] 090. Add emergency stop button
+- [x] 087. Add dangerous action confirmation flow
+- [x] 088. Add per-tool allow/deny rules
+- [x] 089. Add per-device permission profiles
+- [x] 090. Add emergency stop button
 - [x] 091. Add Windows notification support
 - [x] 092. Add Linux notification support
 - [ ] 093. Add notification action buttons
