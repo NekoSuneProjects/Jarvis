@@ -41,11 +41,11 @@ export class OpenAiCompatibleProvider implements AiProvider {
     timeoutMs:number;
   }>={}){
     this.id=options.id ?? config.ai.provider;
-    this.baseUrl=(options.baseUrl ?? this.baseUrl).replace(/\/$/,"");
-    this.apiKey=options.apiKey ?? this.apiKey;
-    this.model=options.model ?? this.model;
-    this.temperature=options.temperature ?? this.temperature;
-    this.timeoutMs=options.timeoutMs ?? this.timeoutMs;
+    this.baseUrl=(options.baseUrl ?? config.ai.baseUrl).replace(/\/$/,"");
+    this.apiKey=options.apiKey ?? config.ai.apiKey;
+    this.model=options.model ?? config.ai.model;
+    this.temperature=options.temperature ?? config.ai.temperature;
+    this.timeoutMs=options.timeoutMs ?? config.ai.timeoutMs;
   }
 
   private headers(): Record<string, string> {
