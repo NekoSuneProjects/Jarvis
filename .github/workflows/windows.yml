@@ -36,6 +36,14 @@ on:
         required: false
         default: ""
         type: string
+      piper_voice:
+        description: Piper Jarvis voice preset
+        required: true
+        default: en_GB-jarvis-medium
+        type: choice
+        options:
+          - en_GB-jarvis-medium
+          - en_GB-jarvis-high
 permissions:
   contents: write
 
@@ -52,9 +60,12 @@ jobs:
       run:
         shell: pwsh
 
+    timeout-minutes: 45
+
     env:
       JARVIS_BASE_URL: ${{ github.event.inputs.jarvis_base_url || 'http://127.0.0.1:3000' }}
       BUILD_TYPE: ${{ github.event.inputs.build_type || 'release' }}
+      PIPER_VOICE: ${{ github.event.inputs.piper_voice || 'en_GB-jarvis-medium' }}
 
     steps:
       - name: Checkout
@@ -64,6 +75,20 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: "22"
+
+      - name: Validate manual build inputs
+        run: |
+          try {
+            $uri = [System.Uri]$env:JARVIS_BASE_URL
+          } catch {
+            throw "jarvis_base_url must be a valid absolute URL."
+          }
+          if (-not $uri.IsAbsoluteUri) {
+            throw "jarvis_base_url must be an absolute URL."
+          }
+          if ($env:PIPER_VOICE -notin @("en_GB-jarvis-medium","en_GB-jarvis-high")) {
+            throw "Unsupported Piper voice preset."
+          }
 
       - name: Install core dependencies
         run: npm install
