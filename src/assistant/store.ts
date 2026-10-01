@@ -1,9 +1,17 @@
 import type { JarvisDatabase } from "../storage/database.js";
+import type { EventBus } from "../events/event-bus.js";
 
 const now = () => new Date().toISOString();
 
 export class AssistantStore {
-  constructor(private readonly database: JarvisDatabase) {}
+  constructor(
+    private readonly database: JarvisDatabase,
+    private readonly events?:EventBus
+  ) {}
+
+  private changed(type:string,payload:unknown){
+    this.events?.publish(`sync.${type}`,payload);
+  }
 
   ensureConversation(id:string, title?:string) {
     const existing=this.database.db.prepare("SELECT * FROM conversations WHERE id=?").get(id);
@@ -108,7 +116,9 @@ export class AssistantStore {
     const result = this.database.db
       .prepare("INSERT INTO notes (title,body,tags,created_at,updated_at) VALUES (?,?,?,?,?)")
       .run(title, body, JSON.stringify(tags), at, at);
-    return this.getNote(Number(result.lastInsertRowid));
+    const note=this.getNote(Number(result.lastInsertRowid));
+    this.changed("notes",{action:"create",note});
+    return note;
   }
 
   getNote(id: number) {
@@ -129,7 +139,9 @@ export class AssistantStore {
     this.database.db.prepare(
       "UPDATE notes SET title=?,body=?,tags=?,pinned=?,updated_at=? WHERE id=?"
     ).run(title,body,tags,pinned,now(),id);
-    return this.getNote(id);
+    const note=this.getNote(id);
+    this.changed("notes",{action:"update",note});
+    return note;
   }
 
   searchNotes(query:string,limit=100) {
@@ -140,7 +152,9 @@ export class AssistantStore {
   }
 
   deleteNote(id: number) {
-    return this.database.db.prepare("DELETE FROM notes WHERE id=?").run(id).changes > 0;
+    const ok=this.database.db.prepare("DELETE FROM notes WHERE id=?").run(id).changes > 0;
+    if(ok) this.changed("notes",{action:"delete",id});
+    return ok;
   }
 
   ensureList(name: string) {
@@ -157,7 +171,9 @@ export class AssistantStore {
     const result = this.database.db
       .prepare("INSERT INTO list_items (list_id,text,created_at) VALUES (?,?,?)")
       .run(list.id, text, now());
-    return this.database.db.prepare("SELECT * FROM list_items WHERE id=?").get(result.lastInsertRowid);
+    const item=this.database.db.prepare("SELECT * FROM list_items WHERE id=?").get(result.lastInsertRowid);
+    this.changed("lists",{action:"add",list:listName,item});
+    return item;
   }
 
   getList(listName: string) {
@@ -168,11 +184,15 @@ export class AssistantStore {
   }
 
   checkListItem(id: number, checked: boolean) {
-    return this.database.db.prepare("UPDATE list_items SET checked=? WHERE id=?").run(checked ? 1 : 0, id).changes > 0;
+    const ok=this.database.db.prepare("UPDATE list_items SET checked=? WHERE id=?").run(checked ? 1 : 0, id).changes > 0;
+    if(ok) this.changed("lists",{action:"check",id,checked});
+    return ok;
   }
 
   removeListItem(id:number) {
-    return this.database.db.prepare("DELETE FROM list_items WHERE id=?").run(id).changes>0;
+    const ok=this.database.db.prepare("DELETE FROM list_items WHERE id=?").run(id).changes>0;
+    if(ok) this.changed("lists",{action:"remove",id});
+    return ok;
   }
 
   clearChecked(listName: string) {
@@ -187,7 +207,9 @@ export class AssistantStore {
     const result = this.database.db
       .prepare("INSERT INTO timers (name,duration_ms,ends_at,created_at) VALUES (?,?,?,?)")
       .run(name, durationMs, endsAt, createdAt);
-    return this.database.db.prepare("SELECT * FROM timers WHERE id=?").get(result.lastInsertRowid);
+    const timer=this.database.db.prepare("SELECT * FROM timers WHERE id=?").get(result.lastInsertRowid);
+    this.changed("timers",{action:"create",timer});
+    return timer;
   }
 
   listTimers() {
@@ -236,16 +258,20 @@ export class AssistantStore {
   }
 
   cancelTimer(id:number) {
-    return this.database.db.prepare(
+    const ok=this.database.db.prepare(
       "UPDATE timers SET state='cancelled' WHERE id=? AND state IN ('running','paused')"
     ).run(id).changes>0;
+    if(ok) this.changed("timers",{action:"cancel",id});
+    return ok;
   }
 
   createAlarm(name: string, fireAt: string, repeatRule?: string) {
     const result = this.database.db
       .prepare("INSERT INTO alarms (name,fire_at,repeat_rule,created_at) VALUES (?,?,?,?)")
       .run(name, fireAt, repeatRule ?? null, now());
-    return this.database.db.prepare("SELECT * FROM alarms WHERE id=?").get(result.lastInsertRowid);
+    const alarm=this.database.db.prepare("SELECT * FROM alarms WHERE id=?").get(result.lastInsertRowid);
+    this.changed("alarms",{action:"create",alarm});
+    return alarm;
   }
 
   listAlarms() {
@@ -261,14 +287,18 @@ export class AssistantStore {
   }
 
   deleteAlarm(id:number) {
-    return this.database.db.prepare("DELETE FROM alarms WHERE id=?").run(id).changes>0;
+    const ok=this.database.db.prepare("DELETE FROM alarms WHERE id=?").run(id).changes>0;
+    if(ok) this.changed("alarms",{action:"delete",id});
+    return ok;
   }
 
   createReminder(text: string, fireAt: string, repeatRule?: string) {
     const result = this.database.db
       .prepare("INSERT INTO reminders (text,fire_at,repeat_rule,created_at) VALUES (?,?,?,?)")
       .run(text, fireAt, repeatRule ?? null, now());
-    return this.database.db.prepare("SELECT * FROM reminders WHERE id=?").get(result.lastInsertRowid);
+    const reminder=this.database.db.prepare("SELECT * FROM reminders WHERE id=?").get(result.lastInsertRowid);
+    this.changed("reminders",{action:"create",reminder});
+    return reminder;
   }
 
   listReminders() {
@@ -276,7 +306,9 @@ export class AssistantStore {
   }
 
   completeReminder(id:number) {
-    return this.database.db.prepare("UPDATE reminders SET completed=1 WHERE id=?").run(id).changes > 0;
+    const ok=this.database.db.prepare("UPDATE reminders SET completed=1 WHERE id=?").run(id).changes > 0;
+    if(ok) this.changed("reminders",{action:"complete",id});
+    return ok;
   }
 
   updateReminderFireAt(id:number,fireAt:string) {
@@ -290,7 +322,9 @@ export class AssistantStore {
   }
 
   deleteReminder(id:number) {
-    return this.database.db.prepare("DELETE FROM reminders WHERE id=?").run(id).changes>0;
+    const ok=this.database.db.prepare("DELETE FROM reminders WHERE id=?").run(id).changes>0;
+    if(ok) this.changed("reminders",{action:"delete",id});
+    return ok;
   }
 
   createNotification(title:string,body:string,priority="normal",source="jarvis") {
