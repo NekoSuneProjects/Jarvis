@@ -23,7 +23,7 @@ import { androidPlugin } from "./plugins/android-plugin.js";
 import { createBrowserPlugin } from "./plugins/browser-plugin.js";
 import { createDiscordPlugin } from "./plugins/discord-plugin.js";
 import { createDiscoveryPlugin } from "./plugins/discovery-plugin.js";
-import { documentsPlugin } from "./plugins/documents-plugin.js";
+import { createDocumentsPlugin } from "./plugins/documents-plugin.js";
 import { createDevicesPlugin } from "./plugins/devices-plugin.js";
 import { computerPlugin } from "./plugins/computer-plugin.js";
 import { desktopInputPlugin } from "./plugins/desktop-input-plugin.js";
@@ -96,6 +96,7 @@ export async function createServer(ai: AiProvider) {
   const browserPlugin = createBrowserPlugin(browser);
   const devicesPlugin = createDevicesPlugin(devices);
   const discoveryPlugin = createDiscoveryPlugin(discovery);
+  const documentsPlugin = createDocumentsPlugin(ai);
   const discordPlugin = createDiscordPlugin();
   const githubPlugin = createGithubPlugin();
   const googlePlugin = createGooglePlugin();
