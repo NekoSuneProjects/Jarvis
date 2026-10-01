@@ -52,6 +52,7 @@ import { wolPlugin } from "./plugins/wol-plugin.js";
 import { windowPlugin } from "./plugins/window-plugin.js";
 import { PiperTtsProvider } from "./voice/piper.js";
 import { EdgeTtsProvider } from "./voice/edge-tts.js";
+import { CustomTtsProvider } from "./voice/custom-tts.js";
 import { PluginRegistry } from "./plugins/plugin-registry.js";
 import { systemPlugin } from "./plugins/system-plugin.js";
 import { JarvisDatabase } from "./storage/database.js";
@@ -155,6 +156,7 @@ export async function createServer(ai: AiProvider) {
   const savedPiperVoice=store.getSetting<"en_GB-jarvis-medium"|"en_GB-jarvis-high">("piperVoice");
   if(savedPiperVoice) piper.setVoice(savedPiperVoice);
   const edgeTts = new EdgeTtsProvider();
+  const customTts = new CustomTtsProvider();
 
   app.addHook("onSend", async (request,reply,payload)=>{
     reply.header("x-request-id",request.id);
@@ -666,6 +668,11 @@ export async function createServer(ai: AiProvider) {
         id: edgeTts.id,
         available: await edgeTts.available(),
         offline: false
+      },
+      {
+        id: customTts.id,
+        available: await customTts.available(),
+        offline: false
       }
     ]
   }));
@@ -712,7 +719,7 @@ export async function createServer(ai: AiProvider) {
   app.post<{
     Body: {
       text: string;
-      provider?: "piper" | "edge";
+      provider?: "piper" | "edge" | "custom";
       outputPath?: string;
       voice?: string;
       rate?: string;
@@ -730,7 +737,7 @@ export async function createServer(ai: AiProvider) {
           ? `${config.dataDir}/tts/output.mp3`
           : `${config.dataDir}/tts/output.wav`
       );
-      const selected = provider === "edge" ? edgeTts : piper;
+      const selected = provider === "edge" ? edgeTts : provider === "custom" ? customTts : piper;
       const result = await selected.synthesize({
         text: request.body.text,
         outputPath,
