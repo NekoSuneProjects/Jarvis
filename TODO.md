@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 799 / 1215
-- **Remaining:** 416
-- **Progress:** **65.76%**
+- **Completed:** 823 / 1215
+- **Remaining:** 392
+- **Progress:** **67.74%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -339,8 +339,8 @@ Implemented in the repository so far:
 - [x] Create Sheets
 - [x] Create Slides
 - [ ] Edit Docs
-- [ ] Edit Sheets
-- [ ] Edit Slides
+- [x] Edit Sheets
+- [x] Edit Slides
 - [x] Read comments
 - [x] Reply to comments
 - [ ] Multiple Drive account support
@@ -462,11 +462,11 @@ Implemented in the repository so far:
 - [x] Discover Plex servers
 - [x] Browse libraries
 - [x] Search media
-- [ ] Play media
-- [ ] Pause
-- [ ] Resume
-- [ ] Stop
-- [ ] Choose player
+- [x] Play media
+- [x] Pause
+- [x] Resume
+- [x] Stop
+- [x] Choose player
 - [x] Continue watching
 - [x] Recently added
 - [x] Plex account support
@@ -603,7 +603,7 @@ Implemented in the repository so far:
 - [x] Add long-lived access token
 - [x] Connection test
 - [x] Read entities
-- [ ] Read devices
+- [x] Read devices
 - [ ] Read areas
 - [x] Turn entity on/off
 - [x] Set brightness
@@ -619,7 +619,7 @@ Implemented in the repository so far:
 - [ ] Presence integration
 - [ ] Alarm panel support
 - [ ] Media player support
-- [ ] Dashboard device grouping
+- [x] Dashboard device grouping
 
 ---
 
@@ -688,9 +688,9 @@ Implemented in the repository so far:
 - [x] Brightness
 - [x] Colour
 - [x] Colour temperature
-- [ ] Scenes
+- [x] Scenes
 - [x] Groups
-- [ ] Entertainment zones
+- [x] Entertainment zones
 - [x] Local LAN control
 
 ---
@@ -1374,15 +1374,15 @@ Implemented in the repository so far:
 
 # Home Presence
 
-- [ ] Phone Wi-Fi presence
+- [x] Phone Wi-Fi presence
 - [ ] Bluetooth presence
-- [ ] Home Assistant presence
-- [ ] Device ping
+- [x] Home Assistant presence
+- [x] Device ping
 - [ ] Router integration option
-- [ ] Home / Away state
-- [ ] Per-user presence
-- [ ] Presence-triggered routines
-- [ ] Privacy controls
+- [x] Home / Away state
+- [x] Per-user presence
+- [x] Presence-triggered routines
+- [x] Privacy controls
 
 ---
 
@@ -1540,16 +1540,16 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [ ] 028. Add GitHub Actions cache for npm dependencies
 - [x] 029. Add GitHub Actions cache for Flutter pub dependencies
 - [x] 030. Add GitHub Actions timeout limits for stuck builds
-- [ ] 031. Add CI job that verifies TypeScript formatting
+- [x] 031. Add CI job that verifies TypeScript formatting
 - [x] 032. Add CI job that runs TypeScript tests
-- [ ] 033. Add CI job that validates environment schema defaults
-- [ ] 034. Add CI job that validates Flutter formatting
-- [ ] 035. Add CI job that runs Flutter tests
+- [x] 033. Add CI job that validates environment schema defaults
+- [x] 034. Add CI job that validates Flutter formatting
+- [x] 035. Add CI job that runs Flutter tests
 - [ ] 036. Add CI job that smoke-tests Windows executable startup
 - [ ] 037. Add CI job that validates installer creation
 - [ ] 038. Add CI job that verifies release assets exist
-- [ ] 039. Add CI failure log artifact upload
-- [ ] 040. Add CI dependency vulnerability audit
+- [x] 039. Add CI failure log artifact upload
+- [x] 040. Add CI dependency vulnerability audit
 - [x] 041. Add /health details for Piper availability
 - [x] 042. Add /health details for selected voice
 - [x] 043. Add /health details for AI provider reachability
