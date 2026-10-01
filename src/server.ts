@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import websocket from "@fastify/websocket";
 import Fastify from "fastify";
 import { z } from "zod";
+import JSZip from "jszip";
 import { config } from "./config.js";
 import { BrowserAutomation } from "./browser/automation.js";
 import type { AiProvider, ChatMessage } from "./ai/types.js";
@@ -57,6 +58,7 @@ import { JarvisDatabase } from "./storage/database.js";
 import { SecretVault } from "./security/secret-vault.js";
 import { ToolRouter } from "./tools/tool-router.js";
 import { workspacePath } from "./utils/workspace-path.js";
+import { runProcess } from "./utils/process.js";
 
 export async function createServer(ai: AiProvider) {
   const app = Fastify({ logger: true });
@@ -75,6 +77,19 @@ export async function createServer(ai: AiProvider) {
   const integrations = new IntegrationManager();
   const routines = new RoutineEngine(store, tools, events);
   const agent = new JarvisAgent(ai, tools, events, store);
+  const metrics={
+    websocketConnections:0,
+    tts:{count:0,totalMs:0,lastMs:0},
+    ai:{count:0,totalMs:0,lastMs:0}
+  };
+  const startupDiagnostics=[{
+    at:new Date().toISOString(),
+    node:process.version,
+    platform:process.platform,
+    arch:process.arch,
+    dataDir:config.dataDir,
+    aiProvider:ai.id
+  }];
 
   const browser = new BrowserAutomation();
   const assistantPlugin = createAssistantPlugin(store);
@@ -136,6 +151,11 @@ export async function createServer(ai: AiProvider) {
 
   const piper = new PiperTtsProvider();
   const edgeTts = new EdgeTtsProvider();
+
+  app.addHook("onSend", async (request,reply,payload)=>{
+    reply.header("x-request-id",request.id);
+    return payload;
+  });
 
   app.addHook("onRequest", async (request, reply) => {
     if (!config.apiToken) return;
@@ -202,6 +222,14 @@ export async function createServer(ai: AiProvider) {
   app.get("/health", async () => {
     const aiHealth = await ai.health();
     const piperAvailable = await piper.available();
+    const browserHealth = await browser.available();
+    let adbHealth:{ok:boolean;detail?:string}={ok:false};
+    try{
+      const adb=await runProcess(config.adbBin,["version"],{timeoutMs:5000});
+      adbHealth={ok:adb.code===0,detail:(adb.stdout||adb.stderr).trim().slice(0,500)};
+    }catch(error){
+      adbHealth={ok:false,detail:error instanceof Error?error.message:String(error)};
+    }
 
     let databaseOk=true;
     let databaseDetail="ok";
@@ -265,19 +293,58 @@ export async function createServer(ai: AiProvider) {
         writable: dataDirectoryWritable,
         detail: dataDirectoryDetail
       },
+      browserAutomation:browserHealth,
+      adb:adbHealth,
+      startupDiagnostics,
+      metrics,
       smartHome,
       integrations: integrationHealth
     };
   });
 
   app.get("/api/v1/events", { websocket: true }, (socket) => {
+    metrics.websocketConnections++;
     const unsubscribe = events.subscribe((event) => {
       if (socket.readyState === socket.OPEN) {
         socket.send(JSON.stringify(event));
       }
     });
 
-    socket.on("close", unsubscribe);
+    socket.on("close", ()=>{
+      metrics.websocketConnections=Math.max(0,metrics.websocketConnections-1);
+      unsubscribe();
+    });
+  });
+
+  app.get("/api/v1/metrics", async () => ({
+    websocketConnections:metrics.websocketConnections,
+    tts:{
+      ...metrics.tts,
+      averageMs:metrics.tts.count?metrics.tts.totalMs/metrics.tts.count:0
+    },
+    ai:{
+      ...metrics.ai,
+      averageMs:metrics.ai.count?metrics.ai.totalMs/metrics.ai.count:0
+    }
+  }));
+
+  app.get("/api/v1/diagnostics/export", async (_request,reply) => {
+    const zip=new JSZip();
+    zip.file("health.json",JSON.stringify({
+      startupDiagnostics,
+      metrics,
+      settings:store.listSettings(),
+      integrations:await Promise.all(integrations.list().map(async(item)=>({
+        id:item.id,
+        state:item.state,
+        health:await item.health()
+      })))
+    },null,2));
+    zip.file("audit.json",JSON.stringify(store.listAudit(1000),null,2));
+    const buffer=await zip.generateAsync({type:"nodebuffer"});
+    reply.header("content-type","application/zip");
+    reply.header("content-disposition",'attachment; filename="jarvis-diagnostics.zip"');
+    return reply.send(buffer);
   });
 
   const settingSchema=z.object({
@@ -580,6 +647,7 @@ export async function createServer(ai: AiProvider) {
       volume?: string;
     };
   }>("/api/v1/voice/tts", async (request, reply) => {
+    const started=Date.now();
     try {
       const provider = request.body.provider ?? (
         await piper.available() ? "piper" : "edge"
@@ -598,11 +666,16 @@ export async function createServer(ai: AiProvider) {
         pitch: request.body.pitch,
         volume: request.body.volume
       });
+      const elapsed=Date.now()-started;
+      metrics.tts.count++;
+      metrics.tts.totalMs+=elapsed;
+      metrics.tts.lastMs=elapsed;
       events.publish("voice.tts.completed", {
         provider,
+        latencyMs:elapsed,
         ...result
       });
-      return { ok: true, provider, ...result };
+      return { ok: true, provider, latencyMs:elapsed, ...result };
     } catch (error) {
       return reply.code(503).send({
         ok: false,
@@ -1073,14 +1146,20 @@ export async function createServer(ai: AiProvider) {
   app.post<{ Body: { message?: string; messages?: ChatMessage[]; conversationId?: string } }>(
     "/api/v1/chat",
     async (request, reply) => {
+      const started=Date.now();
       permissions.assertAllowed("assistant.chat");
 
       const supplied = request.body?.messages;
 
       if (supplied && supplied.length > 0) {
         const response = await agent.chat(supplied);
+        const elapsed=Date.now()-started;
+        metrics.ai.count++;
+        metrics.ai.totalMs+=elapsed;
+        metrics.ai.lastMs=elapsed;
         return {
           ...response,
+          latencyMs:elapsed,
           conversationId: request.body.conversationId ?? null
         };
       }
@@ -1109,8 +1188,13 @@ export async function createServer(ai: AiProvider) {
 
       store.appendConversationMessage(conversationId, "assistant", response.content);
 
+      const elapsed=Date.now()-started;
+      metrics.ai.count++;
+      metrics.ai.totalMs+=elapsed;
+      metrics.ai.lastMs=elapsed;
       return {
         ...response,
+        latencyMs:elapsed,
         conversationId
       };
     }
