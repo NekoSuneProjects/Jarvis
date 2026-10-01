@@ -185,9 +185,10 @@ export class PiperTtsProvider implements TtsProvider {
     const { modelPath } = await this.ensureVoiceDownloaded();
     await fs.mkdir(path.dirname(path.resolve(request.outputPath)), { recursive: true });
 
+    const binary=await this.resolveBinary();
     await new Promise<void>((resolve, reject) => {
       const child = spawn(
-        await this.resolveBinary(),
+        binary,
         ["--model", modelPath, "--output_file", request.outputPath],
         {
           shell: false,
