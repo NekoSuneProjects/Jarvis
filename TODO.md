@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 872 / 1215
-- **Remaining:** 343
-- **Progress:** **71.77%**
+- **Completed:** 884 / 1215
+- **Remaining:** 331
+- **Progress:** **72.76%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -1522,21 +1522,21 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [x] 010. Add Piper fallback error message when binary is missing
 - [ ] 011. Bundle Piper runtime for Windows builds
 - [x] 012. Detect bundled Piper binary before PATH lookup
-- [ ] 013. Add Windows installer option for Piper voice model preload
-- [ ] 014. Add Windows installer option to skip model preload
-- [ ] 015. Add Windows portable launcher health check
-- [ ] 016. Add Windows launcher log file
-- [ ] 017. Add Windows launcher graceful core shutdown
-- [ ] 018. Add Windows Start Menu shortcut for logs
-- [ ] 019. Add Windows Start Menu shortcut for settings
-- [ ] 020. Add Windows uninstall cleanup option for cached models
+- [x] 013. Add Windows installer option for Piper voice model preload
+- [x] 014. Add Windows installer option to skip model preload
+- [x] 015. Add Windows portable launcher health check
+- [x] 016. Add Windows launcher log file
+- [x] 017. Add Windows launcher graceful core shutdown
+- [x] 018. Add Windows Start Menu shortcut for logs
+- [x] 019. Add Windows Start Menu shortcut for settings
+- [x] 020. Add Windows uninstall cleanup option for cached models
 - [x] 021. Add manual GitHub Actions portable ZIP toggle
 - [x] 022. Add manual GitHub Actions installer EXE toggle
 - [x] 023. Add manual GitHub Actions release publishing toggle
 - [x] 024. Add manual GitHub Actions release tag input
 - [x] 025. Add manual GitHub Actions Jarvis base URL input validation
 - [x] 026. Add manual GitHub Actions Piper voice preset input
-- [ ] 027. Add GitHub Actions build summary with artifact links
+- [x] 027. Add GitHub Actions build summary with artifact links
 - [ ] 028. Add GitHub Actions cache for npm dependencies
 - [x] 029. Add GitHub Actions cache for Flutter pub dependencies
 - [x] 030. Add GitHub Actions timeout limits for stuck builds
@@ -1545,9 +1545,9 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [x] 033. Add CI job that validates environment schema defaults
 - [x] 034. Add CI job that validates Flutter formatting
 - [x] 035. Add CI job that runs Flutter tests
-- [ ] 036. Add CI job that smoke-tests Windows executable startup
-- [ ] 037. Add CI job that validates installer creation
-- [ ] 038. Add CI job that verifies release assets exist
+- [x] 036. Add CI job that smoke-tests Windows executable startup
+- [x] 037. Add CI job that validates installer creation
+- [x] 038. Add CI job that verifies release assets exist
 - [x] 039. Add CI failure log artifact upload
 - [x] 040. Add CI dependency vulnerability audit
 - [x] 041. Add /health details for Piper availability
