@@ -175,9 +175,17 @@ class JarvisClient {
 
   Map<String, dynamic> _json(http.Response response) {
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(
-        'Jarvis HTTP ${response.statusCode}: ${response.body}',
-      );
+      try {
+        final decoded=jsonDecode(response.body);
+        if(decoded is Map<String,dynamic>){
+          final error=decoded['error']?.toString() ?? 'Request failed';
+          final details=decoded['details'];
+          throw Exception(details==null ? error : '$error: $details');
+        }
+      } catch (e) {
+        if(e is Exception) rethrow;
+      }
+      throw Exception('Jarvis HTTP ${response.statusCode}: ${response.body}');
     }
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
