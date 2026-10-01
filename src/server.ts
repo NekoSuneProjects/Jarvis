@@ -319,6 +319,12 @@ export async function createServer(ai: AiProvider) {
     });
   });
 
+  app.post("/api/v1/system/shutdown", async () => {
+    store.audit("api","system.graceful_shutdown",{});
+    setImmediate(()=>void app.close());
+    return {ok:true};
+  });
+
   app.get("/api/v1/metrics", async () => ({
     websocketConnections:metrics.websocketConnections,
     tts:{
