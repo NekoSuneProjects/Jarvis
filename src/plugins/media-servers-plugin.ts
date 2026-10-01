@@ -141,6 +141,32 @@ export function createMediaServersPlugin():JarvisPlugin{
         async execute(){return plex.clients();}
       },
       {
+        name:"plex.play",
+        description:"Start a Plex library item on a selected Plex Companion player.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({
+            playerUrl:z.string().url(),
+            key:z.string().min(1),
+            machineIdentifier:z.string().min(1),
+            serverAddress:z.string().min(1),
+            serverPort:z.number().int().min(1).max(65535).default(32400),
+            serverProtocol:z.enum(["http","https"]).default("http"),
+            clientIdentifier:z.string().optional()
+          }).parse(input);
+          return plex.playMedia(value.playerUrl,value);
+        }
+      },
+      ...(["play","pause","stop"] as const).map((action)=>({
+        name:`plex.${action}`,
+        description:`${action} a selected Plex Companion player.`,
+        capability:"media.control",
+        async execute(input:unknown){
+          const value=z.object({playerUrl:z.string().url(),clientIdentifier:z.string().optional()}).parse(input);
+          return plex.playerCommand(value.playerUrl,action,value.clientIdentifier);
+        }
+      })),
+      {
         name:"plex.search",
         description:"Search Plex media.",
         capability:"media.read",
