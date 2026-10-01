@@ -22,4 +22,20 @@ export class PlexIntegration {
   libraries(){return this.request("/library/sections");}
   search(query:string){return this.request(`/hubs/search?query=${encodeURIComponent(query)}&limit=20`);}
   sessions(){return this.request("/status/sessions");}
+  recentlyAdded(limit=20){return this.request(`/library/recentlyAdded?X-Plex-Container-Size=${limit}`);}
+  continueWatching(){return this.request("/hubs/home/continueWatching");}
+  clients(){return this.request("/clients");}
+  async discoverServers(){
+    if(!this.token) throw new Error("Plex token is not configured");
+    const response=await fetch("https://plex.tv/api/v2/resources?includeHttps=1&includeRelay=1",{
+      headers:{
+        "X-Plex-Token":this.token,
+        accept:"application/json"
+      },
+      signal:AbortSignal.timeout(15000)
+    });
+    if(!response.ok) throw new Error(`Plex resources HTTP ${response.status}`);
+    const text=await response.text();
+    try{return JSON.parse(text);}catch{return {raw:text};}
+  }
 }
