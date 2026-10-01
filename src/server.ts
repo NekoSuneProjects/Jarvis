@@ -42,6 +42,7 @@ import { createMediaServersPlugin } from "./plugins/media-servers-plugin.js";
 import { createLanSmartHomePlugin } from "./plugins/lan-smart-home-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { powerPlugin } from "./plugins/power-plugin.js";
+import { platformAdminPlugin } from "./plugins/platform-admin-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
 import { createStreamingMediaPlugin } from "./plugins/streaming-media-plugin.js";
 import { shellPlugin } from "./plugins/shell-plugin.js";
@@ -137,6 +138,7 @@ export async function createServer(ai: AiProvider) {
     nativeNotificationPlugin,
     notificationsPlugin,
     powerPlugin,
+    platformAdminPlugin,
     dockerPlugin,
     wolPlugin,
     searchPlugin,
