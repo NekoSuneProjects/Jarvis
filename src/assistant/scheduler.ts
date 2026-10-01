@@ -39,6 +39,9 @@ export class Scheduler {
     for (const timer of this.store.dueTimers() as Array<{id:number;name:string}>) {
       if (this.store.setTimerState(timer.id, "finished", 0)) {
         this.events.publish("timer.finished", timer);
+        if(this.store.getSetting<boolean>("timers.tts",false)){
+          this.events.publish("voice.tts.requested",{text:`${timer.name || "Timer"} finished`,source:"timer"});
+        }
         const notification=this.store.createNotification(
           "Timer finished",
           timer.name || "Timer",
@@ -56,6 +59,13 @@ export class Scheduler {
       repeat_rule:string|null;
     }>) {
       this.events.publish("alarm.fired", alarm);
+      const alarmSound=this.store.getSetting<string>("alarms.sound","");
+      if(alarmSound){
+        this.events.publish("alarm.sound.requested",{alarmId:alarm.id,sound:alarmSound});
+      }
+      if(this.store.getSetting<boolean>("alarms.tts",false)){
+        this.events.publish("voice.tts.requested",{text:alarm.name || "Alarm",source:"alarm"});
+      }
       const alarmNotification=this.store.createNotification(
         "Alarm",
         alarm.name || "Alarm",
@@ -80,6 +90,9 @@ export class Scheduler {
       repeat_rule:string|null;
     }>) {
       this.events.publish("reminder.fired", reminder);
+      if(this.store.getSetting<boolean>("reminders.readAloud",false)){
+        this.events.publish("voice.tts.requested",{text:reminder.text,source:"reminder"});
+      }
       const reminderNotification=this.store.createNotification(
         "Reminder",
         reminder.text,
