@@ -37,7 +37,7 @@ export class LocalMusicIntegration {
     const tracks:LocalTrack[]=[];
     for(const filename of paths){
       try{
-        const meta=await parseFile(filename,{duration:true,skipCovers:false});
+        const meta=await parseFile(filename);
         const picture=meta.common.picture?.[0];
         tracks.push({
           path:filename,
