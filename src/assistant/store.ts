@@ -37,6 +37,35 @@ export class AssistantStore {
     ).all(limit);
   }
 
+  searchConversations(query:string,limit=50) {
+    const like=`%${query}%`;
+    return this.database.db.prepare(
+      `SELECT DISTINCT c.*
+       FROM conversations c
+       LEFT JOIN conversation_messages m ON m.conversation_id=c.id
+       WHERE c.id LIKE ? OR COALESCE(c.title,'') LIKE ? OR COALESCE(m.content,'') LIKE ?
+       ORDER BY c.updated_at DESC
+       LIMIT ?`
+    ).all(like,like,like,limit);
+  }
+
+  exportConversation(id:string) {
+    const conversation=this.database.db.prepare("SELECT * FROM conversations WHERE id=?").get(id);
+    if(!conversation) return null;
+    return {
+      conversation,
+      messages:this.conversationMessages(id,100000)
+    };
+  }
+
+  deleteConversation(id:string) {
+    const tx=this.database.db.transaction((conversationId:string)=>{
+      this.database.db.prepare("DELETE FROM conversation_messages WHERE conversation_id=?").run(conversationId);
+      return this.database.db.prepare("DELETE FROM conversations WHERE id=?").run(conversationId).changes>0;
+    });
+    return tx(id);
+  }
+
   remember(category:string,key:string,value:string) {
     const at=now();
     this.database.db.prepare(
