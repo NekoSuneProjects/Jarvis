@@ -78,6 +78,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         (raw) {
           final event = jsonDecode(raw.toString()) as Map<String, dynamic>;
           final type = event['type']?.toString() ?? '';
+          if (type == 'tool.failed') {
+            final payload = event['payload'];
+            if (payload is Map<String, dynamic>) {
+              final message = payload['error']?.toString() ?? '';
+              const prefix = 'Permission requires approval: ';
+              if (message.startsWith(prefix)) {
+                final capability = message.substring(prefix.length).trim();
+                if (capability.isNotEmpty) {
+                  Future.microtask(() => _confirmPermission(capability));
+                }
+              }
+            }
+          }
           if (type.startsWith('timer.') ||
               type.startsWith('alarm.') ||
               type.startsWith('reminder.') ||
@@ -296,6 +309,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
       await _refresh();
     } catch (e) {
       if (mounted) setState(() => error = 'Forget memory failed: $e');
+    }
+  }
+
+  Future<void> _confirmPermission(String capability) async {
+    if (!mounted) return;
+    final decision = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Jarvis permission request'),
+        content: Text('Allow capability "$capability" for future tool calls?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'deny'),
+            child: const Text('Deny'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'ask'),
+            child: const Text('Keep asking'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, 'allow'),
+            child: const Text('Allow'),
+          ),
+        ],
+      ),
+    );
+    if (decision != null) {
+      await _setPermission(capability, decision);
     }
   }
 
