@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 718 / 1215
-- **Remaining:** 497
-- **Progress:** **59.09%**
+- **Completed:** 799 / 1215
+- **Remaining:** 416
+- **Progress:** **65.76%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -223,12 +223,12 @@ Implemented in the repository so far:
 
 ## Custom TTS API
 
-- [ ] Add custom TTS endpoint
-- [ ] Add authentication support
-- [ ] Add voice parameter mapping
-- [ ] Add audio format setting
-- [ ] Add streamed audio response
-- [ ] Add connection test
+- [x] Add custom TTS endpoint
+- [x] Add authentication support
+- [x] Add voice parameter mapping
+- [x] Add audio format setting
+- [x] Add streamed audio response
+- [x] Add connection test
 
 ---
 
@@ -254,14 +254,14 @@ Implemented in the repository so far:
 - [x] Add site-specific search
 - [x] Add date-filtered search
 - [x] Add source citations
-- [ ] Add search result summarisation
+- [x] Add search result summarisation
 
 ## Playwright
 
 - [x] Add browser launch
 - [x] Add Chromium support
-- [ ] Add Firefox support
-- [ ] Add persistent profiles
+- [x] Add Firefox support
+- [x] Add persistent profiles
 - [x] Add open URL
 - [x] Add webpage reading
 - [x] Add click
@@ -271,11 +271,11 @@ Implemented in the repository so far:
 - [x] Add downloads
 - [x] Add uploads
 - [x] Add page screenshots
-- [ ] Add cookie storage
-- [ ] Add login session support
-- [ ] Add safe autofill permissions
-- [ ] Add anti-loop protection
-- [ ] Add browser action confirmation for sensitive actions
+- [x] Add cookie storage
+- [x] Add login session support
+- [x] Add safe autofill permissions
+- [x] Add anti-loop protection
+- [x] Add browser action confirmation for sensitive actions
 
 ---
 
@@ -391,11 +391,11 @@ Implemented in the repository so far:
 - [ ] Seek
 - [x] Volume
 - [ ] Fullscreen
-- [ ] Queue videos
-- [ ] Read video metadata
-- [ ] Read channel metadata
-- [ ] Read playlists
-- [ ] Open videos externally
+- [x] Queue videos
+- [x] Read video metadata
+- [x] Read channel metadata
+- [x] Read playlists
+- [x] Open videos externally
 - [ ] Cast to supported device
 - [ ] YouTube account OAuth
 - [ ] Watch history support
@@ -405,32 +405,32 @@ Implemented in the repository so far:
 
 # YouTube Music
 
-- [ ] Search songs
+- [x] Search songs
 - [x] Search artists
 - [x] Search albums
-- [ ] Search playlists
-- [ ] Start playback
-- [ ] Queue songs
-- [ ] Read current track
+- [x] Search playlists
+- [x] Start playback
+- [x] Queue songs
+- [x] Read current track
 - [ ] Read library
 - [ ] Read liked songs
-- [ ] Playlist support
+- [x] Playlist support
 - [ ] Account authentication
 
 ---
 
 # SoundCloud
 
-- [ ] Search SoundCloud
-- [ ] Play tracks
+- [x] Search SoundCloud
+- [x] Play tracks
 - [ ] Pause
 - [ ] Resume
-- [ ] Queue
-- [ ] Search artists
-- [ ] Search playlists
+- [x] Queue
+- [x] Search artists
+- [x] Search playlists
 - [ ] Read likes
 - [ ] Account authentication where available
-- [ ] Open track externally
+- [x] Open track externally
 
 ---
 
@@ -787,9 +787,9 @@ Implemented in the repository so far:
 - [ ] Audio volume
 - [ ] Per-app audio control
 - [x] PowerShell
-- [ ] CMD
-- [ ] Services
-- [ ] Task Scheduler
+- [x] CMD
+- [x] Services
+- [x] Task Scheduler
 - [x] Notifications
 - [x] Battery
 - [x] CPU
@@ -798,13 +798,13 @@ Implemented in the repository so far:
 - [x] Disk
 - [x] Network
 - [x] Wi-Fi
-- [ ] Bluetooth
+- [x] Bluetooth
 - [x] Shutdown
 - [x] Restart
 - [x] Sleep
 - [x] Lock
 - [x] Wake-on-LAN sender
-- [ ] Windows startup support
+- [x] Windows startup support
 - [ ] Tray integration
 
 ---
@@ -818,10 +818,10 @@ Implemented in the repository so far:
 - [ ] Wayland support
 - [x] Clipboard
 - [x] Screenshots
-- [ ] PipeWire audio
-- [ ] PulseAudio fallback
+- [x] PipeWire audio
+- [x] PulseAudio fallback
 - [x] Shell commands
-- [ ] systemd services
+- [x] systemd services
 - [x] Notifications
 - [x] CPU
 - [x] RAM
@@ -829,13 +829,13 @@ Implemented in the repository so far:
 - [x] Disk
 - [x] Network
 - [x] Wi-Fi
-- [ ] Bluetooth
+- [x] Bluetooth
 - [x] Shutdown
 - [x] Restart
 - [x] Sleep
 - [x] Lock
 - [x] Wake-on-LAN
-- [ ] Autostart support
+- [x] Autostart support
 - [ ] Tray support
 
 ---
@@ -895,28 +895,28 @@ Implemented in the repository so far:
 # Android
 
 - [x] Flutter Android app scaffold
-- [ ] Microphone permission
-- [ ] Notifications permission
-- [ ] Wake-word foreground service
+- [x] Microphone permission
+- [x] Notifications permission
+- [x] Wake-word foreground service
 - [ ] STT
 - [ ] TTS
 - [ ] Push-to-talk
 - [x] Assistant chat
 - [ ] Smart-home control
 - [x] Device status foundation
-- [ ] Battery status
-- [ ] Network status
-- [ ] Notification reading
+- [x] Battery status
+- [x] Network status
+- [x] Notification reading
 - [ ] Notification actions where allowed
 - [ ] Wake-on-LAN
 - [ ] Remote PC control
-- [ ] Media remote
-- [ ] Presence detection
-- [ ] Background service
-- [ ] Bluetooth device support
-- [ ] Local alarms
-- [ ] Local timers
-- [ ] Deep links
+- [x] Media remote
+- [x] Presence detection
+- [x] Background service
+- [x] Bluetooth device support
+- [x] Local alarms
+- [x] Local timers
+- [x] Deep links
 - [ ] Share-to-Jarvis action
 - [ ] Android Auto research
 
@@ -1026,11 +1026,11 @@ Implemented in the repository so far:
 - [ ] GitHub notifications
 - [ ] Discord notifications
 - [x] Smart-home notifications foundation
-- [ ] System alerts
-- [ ] Server alerts
+- [x] System alerts
+- [x] Server alerts
 - [x] Jarvis notification summary foundation
-- [ ] Priority filtering
-- [ ] Quiet hours
+- [x] Priority filtering
+- [x] Quiet hours
 - [ ] Read aloud option
 
 ---
@@ -1061,12 +1061,12 @@ Implemented in the repository so far:
 - [x] Gaming news
 - [x] Local news
 - [x] Custom topics
-- [ ] Daily briefing
+- [x] Daily briefing
 - [x] Source citations
-- [ ] Avoid duplicate stories
+- [x] Avoid duplicate stories
 - [ ] Read-aloud mode
-- [ ] User-defined blocked sources
-- [ ] User-defined favourite sources
+- [x] User-defined blocked sources
+- [x] User-defined favourite sources
 
 ---
 
@@ -1367,8 +1367,8 @@ Implemented in the repository so far:
 - [x] Running services
 - [x] Docker stats
 - [x] Uptime
-- [ ] Alerts
-- [ ] History graphs
+- [x] Alerts
+- [x] History graphs
 
 ---
 
@@ -1512,16 +1512,16 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 
 - [x] 001. Add automatic Piper Jarvis medium voice download
 - [x] 002. Add automatic Piper Jarvis high voice download
-- [ ] 003. Add Piper model download checksum validation
-- [ ] 004. Add interrupted Piper download resume handling
-- [ ] 005. Add Piper model download progress reporting
-- [ ] 006. Add Piper model cache cleanup command
-- [ ] 007. Add Piper voice selection API endpoint
-- [ ] 008. Add Piper voice selection in Flutter settings
-- [ ] 009. Add Piper voice preview button
-- [ ] 010. Add Piper fallback error message when binary is missing
+- [x] 003. Add Piper model download checksum validation
+- [x] 004. Add interrupted Piper download resume handling
+- [x] 005. Add Piper model download progress reporting
+- [x] 006. Add Piper model cache cleanup command
+- [x] 007. Add Piper voice selection API endpoint
+- [x] 008. Add Piper voice selection in Flutter settings
+- [x] 009. Add Piper voice preview button
+- [x] 010. Add Piper fallback error message when binary is missing
 - [ ] 011. Bundle Piper runtime for Windows builds
-- [ ] 012. Detect bundled Piper binary before PATH lookup
+- [x] 012. Detect bundled Piper binary before PATH lookup
 - [ ] 013. Add Windows installer option for Piper voice model preload
 - [ ] 014. Add Windows installer option to skip model preload
 - [ ] 015. Add Windows portable launcher health check
@@ -1580,16 +1580,16 @@ This section is a focused queue of 100 concrete implementation tasks for upcomin
 - [ ] 068. Add settings validation errors to UI
 - [x] 069. Add settings import/export
 - [x] 070. Add settings reset-to-defaults
-- [ ] 071. Add first-run setup wizard
-- [ ] 072. Add first-run AI provider test
+- [x] 071. Add first-run setup wizard
+- [x] 072. Add first-run AI provider test
 - [ ] 073. Add first-run microphone test
 - [ ] 074. Add first-run speaker test
-- [ ] 075. Add first-run Piper voice download screen
-- [ ] 076. Add first-run permissions explanation
-- [ ] 077. Add first-run local-only mode option
-- [ ] 078. Add first-run Home Assistant optional setup
-- [ ] 079. Add first-run Discord optional setup
-- [ ] 080. Add first-run completion health check
+- [x] 075. Add first-run Piper voice download screen
+- [x] 076. Add first-run permissions explanation
+- [x] 077. Add first-run local-only mode option
+- [x] 078. Add first-run Home Assistant optional setup
+- [x] 079. Add first-run Discord optional setup
+- [x] 080. Add first-run completion health check
 - [x] 081. Add conversation history search
 - [x] 082. Add conversation delete controls
 - [x] 083. Add per-conversation export
