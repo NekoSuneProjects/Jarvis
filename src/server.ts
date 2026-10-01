@@ -179,7 +179,21 @@ export async function createServer(ai: AiProvider) {
     return payload;
   });
 
+  const isPrivateAddress=(address:string)=>{
+    const value=address.replace(/^::ffff:/,"");
+    return value==="127.0.0.1" || value==="::1" ||
+      /^10\./.test(value) ||
+      /^192\.168\./.test(value) ||
+      /^172\.(1[6-9]|2\d|3[01])\./.test(value) ||
+      /^169\.254\./.test(value) ||
+      /^fe80:/i.test(value) ||
+      /^fc|^fd/i.test(value);
+  };
+
   app.addHook("onRequest", async (request, reply) => {
+    if(config.lanOnly && !isPrivateAddress(request.ip)){
+      return reply.code(403).send({ok:false,error:"Jarvis LAN-only mode rejected a non-private client"});
+    }
     if (!config.apiToken) return;
     if (request.url === "/health") return;
 
