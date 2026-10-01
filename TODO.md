@@ -8,9 +8,9 @@ Use this file alongside `README.md` to implement integrations in manageable stag
 
 # Overall TODO Progress
 
-- **Completed:** 890 / 1215
-- **Remaining:** 325
-- **Progress:** **73.25%**
+- **Completed:** 926 / 1215
+- **Remaining:** 289
+- **Progress:** **76.21%**
 - This percentage is calculated from all Markdown checklist items in this file.
 
 ---
@@ -507,15 +507,15 @@ Implemented in the repository so far:
 
 # DLNA / UPnP
 
-- [ ] Discover DLNA devices
-- [ ] Discover media renderers
-- [ ] Discover media servers
-- [ ] Browse media
-- [ ] Play media
-- [ ] Pause
-- [ ] Stop
-- [ ] Volume
-- [ ] Read playback state
+- [x] Discover DLNA devices
+- [x] Discover media renderers
+- [x] Discover media servers
+- [x] Browse media
+- [x] Play media
+- [x] Pause
+- [x] Stop
+- [x] Volume
+- [x] Read playback state
 
 ---
 
@@ -523,12 +523,12 @@ Implemented in the repository so far:
 
 - [x] Search stations
 - [x] Save favourites
-- [ ] Play stream URL
+- [x] Play stream URL
 - [x] Station metadata
 - [ ] Current track metadata
 - [ ] Country filtering
 - [ ] Genre filtering
-- [ ] Custom stream URL support
+- [x] Custom stream URL support
 
 ---
 
@@ -1209,19 +1209,19 @@ Implemented in the repository so far:
 
 # Multi-Room Audio
 
-- [ ] Discover Jarvis speakers
-- [ ] Speaker groups
-- [ ] Room names
-- [ ] Play to one room
-- [ ] Play to multiple rooms
-- [ ] Whole-home playback
-- [ ] Volume per room
-- [ ] Group volume
+- [x] Discover Jarvis speakers
+- [x] Speaker groups
+- [x] Room names
+- [x] Play to one room
+- [x] Play to multiple rooms
+- [x] Whole-home playback
+- [x] Volume per room
+- [x] Group volume
 - [ ] Playback sync research
 - [ ] Local audio streaming
-- [ ] Internet radio
-- [ ] Spotify handoff
-- [ ] Announcement ducking
+- [x] Internet radio
+- [x] Spotify handoff
+- [x] Announcement ducking
 
 ---
 
@@ -1243,15 +1243,15 @@ Implemented in the repository so far:
 
 # Announcements
 
-- [ ] Announce to one room
-- [ ] Announce to multiple rooms
-- [ ] Announce everywhere
-- [ ] TTS announcements
-- [ ] Chime sound
-- [ ] Volume ducking
-- [ ] Scheduled announcement
-- [ ] Routine announcement
-- [ ] Emergency announcement mode
+- [x] Announce to one room
+- [x] Announce to multiple rooms
+- [x] Announce everywhere
+- [x] TTS announcements
+- [x] Chime sound
+- [x] Volume ducking
+- [x] Scheduled announcement
+- [x] Routine announcement
+- [x] Emergency announcement mode
 
 ---
 
@@ -1262,9 +1262,9 @@ Implemented in the repository so far:
 - [x] UPnP
 - [ ] MQTT discovery
 - [ ] Home Assistant discovery
-- [ ] Jarvis agent discovery
+- [x] Jarvis agent discovery
 - [ ] Chromecast discovery
-- [ ] DLNA discovery
+- [x] DLNA discovery
 - [x] Hue foundation bridge discovery
 - [x] Shelly foundation discovery
 - [x] Manual device add
@@ -1450,9 +1450,9 @@ Implemented in the repository so far:
 
 - [x] Raspberry Pi satellite
 - [x] Remote Jarvis agents
-- [ ] Multi-room audio
+- [x] Multi-room audio
 - [ ] Intercom
-- [ ] Announcements
+- [x] Announcements
 - [x] Device discovery
 
 ## Stage 5
@@ -1463,7 +1463,7 @@ Implemented in the repository so far:
 - [x] Tasmota foundation
 - [x] Shelly
 - [ ] Chromecast
-- [ ] DLNA
+- [x] DLNA
 - [x] Jellyfin
 - [x] Plex
 - [x] Kodi
