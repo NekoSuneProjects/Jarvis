@@ -191,6 +191,10 @@ export async function createServer(ai: AiProvider) {
   };
 
   app.addHook("onRequest", async (request, reply) => {
+    const emergencyDisabled=store.getSetting<boolean>("system.emergencyDisabled",false)===true;
+    if(emergencyDisabled && request.url!=="/health" && !request.url.startsWith("/api/v1/system/emergency-stop")){
+      return reply.code(503).send({ok:false,error:"Jarvis emergency disable is active"});
+    }
     if(config.lanOnly && !isPrivateAddress(request.ip)){
       return reply.code(403).send({ok:false,error:"Jarvis LAN-only mode rejected a non-private client"});
     }
@@ -361,6 +365,13 @@ export async function createServer(ai: AiProvider) {
       request.query.type
     )
   }));
+
+  app.post<{Body:{enabled:boolean}}>("/api/v1/system/emergency-stop", async (request) => {
+    store.setSetting("system.emergencyDisabled",request.body.enabled);
+    store.audit("api","system.emergency_stop",{enabled:request.body.enabled});
+    events.publish("system.emergency_stop",{enabled:request.body.enabled});
+    return {ok:true,enabled:request.body.enabled};
+  });
 
   app.post("/api/v1/system/shutdown", async () => {
     store.audit("api","system.graceful_shutdown",{});
