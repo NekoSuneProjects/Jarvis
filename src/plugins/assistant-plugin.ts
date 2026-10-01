@@ -82,6 +82,24 @@ export function createAssistantPlugin(store:AssistantStore):JarvisPlugin {
         async execute(){return store.listAlarms();}
       },
       {
+        name:"assistant.alarm.snooze",
+        description:"Snooze an alarm by a duration in milliseconds.",
+        capability:"assistant.local",
+        async execute(input){
+          const value=z.object({id:z.number().int().positive(),durationMs:z.number().int().positive()}).parse(input);
+          return {ok:store.updateAlarmFireAt(value.id,new Date(Date.now()+value.durationMs).toISOString())};
+        }
+      },
+      {
+        name:"assistant.alarm.dismiss",
+        description:"Dismiss/delete an alarm by ID.",
+        capability:"assistant.local",
+        async execute(input){
+          const value=z.object({id:z.number().int().positive()}).parse(input);
+          return {ok:store.deleteAlarm(value.id)};
+        }
+      },
+      {
         name:"assistant.alarm.cancel",
         description:"Delete an alarm by ID.",
         capability:"assistant.local",
