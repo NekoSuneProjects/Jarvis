@@ -29,6 +29,27 @@ export function createLanSmartHomePlugin():JarvisPlugin{
     description:"Direct local Hue, Shelly and Tasmota control without a cloud dependency.",
     tools:[
       {
+        name:"hue.pair",
+        description:"Pair with a Philips Hue bridge after the bridge link button is pressed.",
+        capability:"smart-home.control",
+        async execute(input){
+          const value=z.object({baseUrl:z.string().url(),deviceType:z.string().default("nekosune_jarvis#assistant")}).parse(input);
+          return HueIntegration.pair(value.baseUrl,value.deviceType);
+        }
+      },
+      {
+        name:"hue.scenes",
+        description:"List Philips Hue scenes.",
+        capability:"smart-home.read",
+        async execute(){return hue.scenes();}
+      },
+      {
+        name:"hue.entertainment",
+        description:"List Philips Hue entertainment zones.",
+        capability:"smart-home.read",
+        async execute(){return hue.entertainmentZones();}
+      },
+      {
         name:"hue.lights",
         description:"List Philips Hue lights from the configured local bridge.",
         capability:"smart-home.read",
@@ -69,6 +90,24 @@ export function createLanSmartHomePlugin():JarvisPlugin{
         description:"List configured Shelly devices.",
         capability:"smart-home.read",
         async execute(){return shelly.list();}
+      },
+      {
+        name:"shelly.gen1.status",
+        description:"Read status from a Shelly Gen1 device.",
+        capability:"smart-home.read",
+        async execute(input){
+          const value=z.object({device:z.string().min(1)}).parse(input);
+          return shelly.gen1Status(value.device);
+        }
+      },
+      {
+        name:"shelly.gen1.relay",
+        description:"Control a Shelly Gen1 relay channel.",
+        capability:"smart-home.control",
+        async execute(input){
+          const value=z.object({device:z.string().min(1),id:z.number().int().min(0).default(0),on:z.boolean()}).parse(input);
+          return shelly.gen1Relay(value.device,value.id,value.on);
+        }
       },
       {
         name:"shelly.status",
