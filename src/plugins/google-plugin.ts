@@ -255,6 +255,33 @@ export function createGooglePlugin():JarvisPlugin{
         }
       },
       {
+        name:"google.docs.batch_update",
+        description:"Edit a Google Doc with Google Docs batchUpdate requests.",
+        capability:"drive.write",
+        async execute(input){
+          const value=z.object({documentId:z.string().min(1),requests:z.array(z.unknown()).min(1)}).parse(input);
+          return google.docsBatchUpdate(value.documentId,value.requests);
+        }
+      },
+      {
+        name:"google.sheets.batch_update",
+        description:"Edit a Google Sheet with Sheets batchUpdate requests.",
+        capability:"drive.write",
+        async execute(input){
+          const value=z.object({spreadsheetId:z.string().min(1),requests:z.array(z.unknown()).min(1)}).parse(input);
+          return google.sheetsBatchUpdate(value.spreadsheetId,value.requests);
+        }
+      },
+      {
+        name:"google.slides.batch_update",
+        description:"Edit a Google Slides presentation with Slides batchUpdate requests.",
+        capability:"drive.write",
+        async execute(input){
+          const value=z.object({presentationId:z.string().min(1),requests:z.array(z.unknown()).min(1)}).parse(input);
+          return google.slidesBatchUpdate(value.presentationId,value.requests);
+        }
+      },
+      {
         name:"drive.download",
         description:"Download a binary Drive file into the Jarvis workspace.",
         capability:"drive.read",
