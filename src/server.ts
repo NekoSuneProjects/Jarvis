@@ -43,6 +43,7 @@ import { createLanSmartHomePlugin } from "./plugins/lan-smart-home-plugin.js";
 import { createSearchPlugin } from "./plugins/search-plugin.js";
 import { powerPlugin } from "./plugins/power-plugin.js";
 import { platformAdminPlugin } from "./plugins/platform-admin-plugin.js";
+import { createPresencePlugin } from "./plugins/presence-plugin.js";
 import { createSpotifyPlugin } from "./plugins/spotify-plugin.js";
 import { createStreamingMediaPlugin } from "./plugins/streaming-media-plugin.js";
 import { shellPlugin } from "./plugins/shell-plugin.js";
@@ -210,10 +211,13 @@ export async function createServer(ai: AiProvider) {
   integrations.register(mqtt);
 
   const homeAssistantPlugin = createHomeAssistantPlugin(homeAssistant);
+  const presencePlugin = createPresencePlugin(store,events,homeAssistant);
   const mqttPlugin = createMqttPlugin(mqtt);
   plugins.register(homeAssistantPlugin);
+  plugins.register(presencePlugin);
   plugins.register(mqttPlugin);
   tools.registerMany(homeAssistantPlugin.tools, homeAssistantPlugin.id);
+  tools.registerMany(presencePlugin.tools, presencePlugin.id);
   tools.registerMany(mqttPlugin.tools, mqttPlugin.id);
 
   discovery.advertise(config.port);
