@@ -73,6 +73,38 @@ export function createMediaServersPlugin():JarvisPlugin{
         async execute(){return plex.sessions();}
       },
       {
+        name:"kodi.navigate",
+        description:"Send a Kodi navigation action.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({action:z.enum(["up","down","left","right","select","back","home","info","contextmenu"])}).parse(input);
+          return kodi.input(value.action);
+        }
+      },
+      {
+        name:"kodi.search",
+        description:"Search Kodi movie, episode and music libraries.",
+        capability:"media.read",
+        async execute(input){
+          const value=z.object({query:z.string().min(1),limit:z.number().int().min(1).max(200).default(50)}).parse(input);
+          return kodi.search(value.query,value.limit);
+        }
+      },
+      {
+        name:"kodi.open",
+        description:"Open/play a Kodi file or library item.",
+        capability:"media.control",
+        async execute(input){
+          const value=z.object({
+            file:z.string().optional(),
+            movieid:z.number().int().optional(),
+            episodeid:z.number().int().optional(),
+            songid:z.number().int().optional()
+          }).refine((v)=>Boolean(v.file||v.movieid!==undefined||v.episodeid!==undefined||v.songid!==undefined),"Provide a Kodi item").parse(input);
+          return kodi.open(value);
+        }
+      },
+      {
         name:"kodi.status",
         description:"Read Kodi application and active player status.",
         capability:"media.read",
