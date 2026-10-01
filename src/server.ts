@@ -703,12 +703,29 @@ export async function createServer(ai: AiProvider) {
     }
   );
 
-  app.get("/api/v1/conversations", async () => ({
-    conversations: store.listConversations()
+  app.get<{ Querystring: { q?: string; limit?: string } }>("/api/v1/conversations", async (request) => ({
+    conversations: request.query.q
+      ? store.searchConversations(
+          request.query.q,
+          Math.max(1,Math.min(500,Number(request.query.limit ?? 50)))
+        )
+      : store.listConversations(
+          Math.max(1,Math.min(500,Number(request.query.limit ?? 50)))
+        )
   }));
 
   app.get<{ Params: { id: string } }>("/api/v1/conversations/:id/messages", async (request) => ({
     messages: store.conversationMessages(request.params.id, 100)
+  }));
+
+  app.get<{ Params: { id: string } }>("/api/v1/conversations/:id/export", async (request, reply) => {
+    const exported=store.exportConversation(request.params.id);
+    if(!exported) return reply.code(404).send({error:"Conversation not found"});
+    return exported;
+  });
+
+  app.delete<{ Params: { id: string } }>("/api/v1/conversations/:id", async (request) => ({
+    ok: store.deleteConversation(request.params.id)
   }));
 
   app.get<{ Querystring: { category?: string } }>("/api/v1/memories", async (request) => {
