@@ -419,8 +419,40 @@ export async function createServer(ai: AiProvider) {
   });
 
   app.get("/api/v1/permissions", async () => ({
-    permissions: permissions.list()
+    permissions: permissions.list(),
+    toolRules: permissions.listToolRules(),
+    emergencyStop: permissions.emergencyStop
   }));
+
+  app.patch<{ Params:{ tool:string }; Body:{ decision:"allow"|"ask"|"deny" } }>(
+    "/api/v1/permissions/tools/:tool",
+    async (request)=>{
+      permissions.setTool(request.params.tool,request.body.decision);
+      store.audit("api","permission.tool.update",{tool:request.params.tool,decision:request.body.decision});
+      events.publish("permission.tool.updated",{tool:request.params.tool,decision:request.body.decision});
+      return {ok:true};
+    }
+  );
+
+  app.post<{ Params:{ tool:string } }>(
+    "/api/v1/permissions/tools/:tool/approve-once",
+    async (request)=>{
+      permissions.approveOnce(request.params.tool);
+      store.audit("api","permission.tool.approve_once",{tool:request.params.tool});
+      return {ok:true};
+    }
+  );
+
+  app.post<{ Body:{ enabled:boolean } }>(
+    "/api/v1/emergency-stop",
+    async (request)=>{
+      permissions.setEmergencyStop(request.body.enabled);
+      store.setSetting("emergencyStop",request.body.enabled);
+      store.audit("api","emergency-stop",{enabled:request.body.enabled});
+      events.publish("emergency-stop",{enabled:request.body.enabled});
+      return {ok:true,enabled:request.body.enabled};
+    }
+  );
 
   app.get("/api/v1/secrets", async () => {
     permissions.assertAllowed("secrets.manage");
