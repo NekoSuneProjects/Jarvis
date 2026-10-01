@@ -22,6 +22,7 @@ import { createAssistantPlugin } from "./plugins/assistant-plugin.js";
 import { androidPlugin } from "./plugins/android-plugin.js";
 import { createBrowserPlugin } from "./plugins/browser-plugin.js";
 import { createDiscordPlugin } from "./plugins/discord-plugin.js";
+import { createDlnaPlugin } from "./plugins/dlna-plugin.js";
 import { createDiscoveryPlugin } from "./plugins/discovery-plugin.js";
 import { createDocumentsPlugin } from "./plugins/documents-plugin.js";
 import { createDevicesPlugin } from "./plugins/devices-plugin.js";
@@ -103,6 +104,7 @@ export async function createServer(ai: AiProvider) {
   const discoveryPlugin = createDiscoveryPlugin(discovery);
   const documentsPlugin = createDocumentsPlugin(ai);
   const discordPlugin = createDiscordPlugin();
+  const dlnaPlugin = createDlnaPlugin(discovery);
   const githubPlugin = createGithubPlugin();
   const googlePlugin = createGooglePlugin();
   const memoryPlugin = createMemoryPlugin(store);
@@ -129,6 +131,7 @@ export async function createServer(ai: AiProvider) {
     devicesPlugin,
     discoveryPlugin,
     discordPlugin,
+    dlnaPlugin,
     documentsPlugin,
     filesPlugin,
     githubPlugin,
