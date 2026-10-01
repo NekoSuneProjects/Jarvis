@@ -151,6 +151,8 @@ export async function createServer(ai: AiProvider) {
   }
 
   const piper = new PiperTtsProvider();
+  const savedPiperVoice=store.getSetting<"en_GB-jarvis-medium"|"en_GB-jarvis-high">("piperVoice");
+  if(savedPiperVoice) piper.setVoice(savedPiperVoice);
   const edgeTts = new EdgeTtsProvider();
 
   app.addHook("onSend", async (request,reply,payload)=>{
@@ -382,6 +384,7 @@ export async function createServer(ai: AiProvider) {
     }
     const entries=Object.entries(parsed.data).map(([key,value])=>({key,value}));
     store.importSettings(entries);
+    if(parsed.data.piperVoice) piper.setVoice(parsed.data.piperVoice);
     store.audit("api","settings.update",{keys:entries.map((entry)=>entry.key)});
     events.publish("settings.updated",{keys:entries.map((entry)=>entry.key)});
     return {ok:true,settings:store.listSettings()};
@@ -644,6 +647,8 @@ export async function createServer(ai: AiProvider) {
   });
 
   app.get("/api/v1/voice", async () => ({
+    selectedPiperVoice:piper.voiceId,
+    piperVoices:PiperTtsProvider.voices,
     providers: [
       {
         id: piper.id,
@@ -657,6 +662,34 @@ export async function createServer(ai: AiProvider) {
       }
     ]
   }));
+
+  app.put<{ Body:{ voice:"en_GB-jarvis-medium"|"en_GB-jarvis-high" } }>(
+    "/api/v1/voice/piper/voice",
+    async (request)=>{
+      piper.setVoice(request.body.voice);
+      store.setSetting("piperVoice",request.body.voice);
+      events.publish("voice.piper.changed",{voice:request.body.voice});
+      return {ok:true,voice:piper.voiceId};
+    }
+  );
+
+  app.post<{ Body:{ text?:string; voice?:"en_GB-jarvis-medium"|"en_GB-jarvis-high" } }>(
+    "/api/v1/voice/piper/preview",
+    async (request)=>{
+      if(request.body.voice) piper.setVoice(request.body.voice);
+      const outputPath=`${config.dataDir}/tts/piper-preview-${Date.now()}.wav`;
+      const result=await piper.synthesize({
+        text:request.body.text ?? "Jarvis voice preview.",
+        outputPath
+      });
+      return {ok:true,voice:piper.voiceId,...result};
+    }
+  );
+
+  app.delete<{ Querystring:{ voice?:"en_GB-jarvis-medium"|"en_GB-jarvis-high" } }>(
+    "/api/v1/voice/piper/cache",
+    async (request)=>piper.cleanupCache(request.query.voice)
+  );
 
   app.get("/api/v1/voice/edge/voices", async (_request, reply) => {
     try {
