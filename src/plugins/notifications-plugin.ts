@@ -44,7 +44,16 @@ export function createNotificationsPlugin(store:AssistantStore,events:EventBus):
             value.title,value.body,value.priority,value.source
           );
           const suppressed=inQuietHours() && !["high","critical"].includes(value.priority);
-          if(!suppressed) events.publish("notification.created",notification);
+          if(!suppressed){
+            events.publish("notification.created",notification);
+            if(store.getSetting<boolean>("notifications.readAloud",false)){
+              events.publish("voice.tts.requested",{
+                text:[value.title,value.body].filter(Boolean).join(". "),
+                source:"notification",
+                notificationId:(notification as any).id
+              });
+            }
+          }
           return {...(notification as any),suppressed};
         }
       },
@@ -59,6 +68,16 @@ export function createNotificationsPlugin(store:AssistantStore,events:EventBus):
             minPriority:z.enum(["low","normal","high","critical"]).default("low")
           }).parse(input ?? {});
           return store.listNotifications(value.limit,value.unreadOnly,value.minPriority);
+        }
+      },
+      {
+        name:"notifications.read_aloud",
+        description:"Enable or disable reading Jarvis notifications aloud through the voice pipeline.",
+        capability:"assistant.local",
+        async execute(input){
+          const value=z.object({enabled:z.boolean()}).parse(input);
+          store.setSetting("notifications.readAloud",value.enabled);
+          return {ok:true,enabled:value.enabled};
         }
       },
       {
