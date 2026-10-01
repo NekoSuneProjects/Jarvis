@@ -10,6 +10,41 @@ export function createMqttPlugin(mqtt:MqttIntegration):JarvisPlugin{
     description:"Publish and subscribe through the configured MQTT broker.",
     tools:[
       {
+        name:"mqtt.topics",
+        description:"Browse recently seen MQTT topics and payloads.",
+        capability:"mqtt.subscribe",
+        async execute(input){
+          const value=z.object({prefix:z.string().default("")}).parse(input ?? {});
+          return mqtt.topics(value.prefix);
+        }
+      },
+      {
+        name:"mqtt.discovery.home_assistant",
+        description:"Subscribe to Home Assistant MQTT discovery topics.",
+        capability:"mqtt.subscribe",
+        async execute(){return mqtt.discoverHomeAssistant();}
+      },
+      {
+        name:"mqtt.jarvis.state",
+        description:"Publish retained Jarvis state to MQTT.",
+        capability:"mqtt.publish",
+        async execute(input){
+          const value=z.object({state:z.record(z.unknown())}).parse(input);
+          await mqtt.publishJarvisState(value.state);
+          return {ok:true};
+        }
+      },
+      {
+        name:"mqtt.jarvis.voice_event",
+        description:"Publish a Jarvis voice-assistant event to MQTT.",
+        capability:"mqtt.publish",
+        async execute(input){
+          const value=z.object({event:z.string().min(1),payload:z.unknown().optional()}).parse(input);
+          await mqtt.publishVoiceEvent(value.event,value.payload ?? {});
+          return {ok:true};
+        }
+      },
+      {
         name:"mqtt.publish",
         description:"Publish an MQTT message.",
         capability:"mqtt.publish",
