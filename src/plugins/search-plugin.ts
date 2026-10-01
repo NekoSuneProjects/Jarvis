@@ -35,25 +35,25 @@ export function createSearchPlugin():JarvisPlugin{
         name:"web.search",
         description:"Search the general web through the configured SearXNG instance.",
         capability:"web.search",
-        async execute:run()
+        execute:run()
       },
       {
         name:"web.search.news",
         description:"Search recent news sources through SearXNG.",
         capability:"web.search",
-        async execute:run("news")
+        execute:run("news")
       },
       {
         name:"web.search.images",
         description:"Search images through SearXNG and return image/thumbnail metadata when available.",
         capability:"web.search",
-        async execute:run("images")
+        execute:run("images")
       },
       {
         name:"web.search.videos",
         description:"Search video sources through SearXNG.",
         capability:"web.search",
-        async execute:run("videos")
+        execute:run("videos")
       },
       {
         name:"web.search.site",
