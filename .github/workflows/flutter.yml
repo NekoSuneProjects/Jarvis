@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   analyze:
-    runs-on: [self-hosted, Linux, docker, buildx]
+    runs-on: [self-hosted, neko-build]
     defaults:
       run:
         working-directory: apps/jarvis_ui
