@@ -16,7 +16,7 @@ concurrency:
 jobs:
   typecheck:
     name: TypeScript build
-    runs-on: [self-hosted, Linux, docker, buildx]
+    runs-on: [self-hosted, neko-build]
 
     steps:
       - name: Checkout
